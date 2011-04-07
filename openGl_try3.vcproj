@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="glew32.lib freeglut.lib glu32.lib libpardiso411-WIN-X86.lib"
+				AdditionalDependencies="glew32.lib freeglut.lib libpardiso411-WIN-X86.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;C:\Users\bertholet\Dropbox\Visual Studio 2008\Projects\Project1\openGl_try3\libs\pardiso411win32&quot;"
 				GenerateDebugInformation="true"
@@ -136,8 +136,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="glew32.lib freeglut.lib glu32.lib opengl32.lib"
+				AdditionalDependencies="glew32.lib freeglut.lib libpardiso411-WIN-X86.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;C:\Users\bertholet\Dropbox\Visual Studio 2008\Projects\Project1\openGl_try3\libs\pardiso411win32&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
