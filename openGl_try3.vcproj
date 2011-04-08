@@ -233,6 +233,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SmoothingImplicitEuler.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -320,6 +324,10 @@
 			</File>
 			<File
 				RelativePath=".\Smoothing.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SmoothingImplicitEuler.h"
 				>
 			</File>
 			<File

@@ -13,5 +13,4 @@ public:
 	void initNeighbors(mesh& m);
 	int contains(vector<int> , int face);
 	void smootheMesh_explicitEuler(mesh& m);
-	void smootheMesh_implicitEuler(mesh& m);
 };
