@@ -37,11 +37,9 @@ vector<tuple3f> faces;
 mesh bunny;
 curvColormap * cMap;
 Smoothing s;
-//curvColormap * cMap;
 
-int _tmain(int argc, _TCHAR* argv[])
+void smoothingDemo( int argc, _TCHAR* * argv ) 
 {
-
 	//bunny= mesh("C:/Users/Petje/workspace/RA/objfiles/venusm.obj", tuple3f(1.f,0.f,0.f), 1.f/1000);
 	//bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 3);
 	//bunny = ball(2, 20);
@@ -65,17 +63,19 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	glutMainLoop();
 
-/*	tuple3f t1(0,3,0);
-	tuple3f t2(4,3,0);
-	tuple3f t3 = matrixFactory::rotateZ(0.5)*t1 + t2;
-	tuple3f t4 = t2;
-	tuple3f t5 = t2 + matrixFactory::rotateZ(0.5)*t2;
-	cout << "cot: " << tuple3f::cot(t1,t2) << "\n";
-	cout << "cot: " << tuple3f::cotPoints(t3,t4, t5)<< "\n";*/
 	int a ;
 	cout << " rhablabla";
 	cin >> a;
 	delete cMap;
+}
+
+//curvColormap * cMap;
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+
+	//smoothingDemo(argc, argv);
+
 	return 0;
 }
 
