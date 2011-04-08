@@ -139,9 +139,8 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 		if (error == -12 )
 			printf("Wrong username or hostname \n");
 
-		int a;
-		cin >> a;
-		return 1; 
+		int ah;
+		cin >> ah;
 	}
 	else
 		printf("[PARDISO]: License check was successful ... \n");

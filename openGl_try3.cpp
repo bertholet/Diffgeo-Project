@@ -18,6 +18,7 @@
 #include "ball.h"
 #include "torus.h"
 #include "Smoothing.h"
+#include "SmoothingImplicitEuler.h"
 
 #define HEIGHT 1000
 #define WIDTH 1000
@@ -36,6 +37,7 @@ vector<tuple3f> vertices;
 vector<tuple3f> faces;
 mesh bunny;
 curvColormap * cMap;
+//curvColormap * cMap;
 Smoothing s;
 
 void smoothingDemo( int argc, _TCHAR* * argv ) 
@@ -63,18 +65,25 @@ void smoothingDemo( int argc, _TCHAR* * argv )
 
 	glutMainLoop();
 
-	int a ;
-	cout << " rhablabla";
-	cin >> a;
 	delete cMap;
 }
 
-//curvColormap * cMap;
+
+void implicitEulerTests(void){
+	bunny = torus(2.f,1.f, 20, 50);
+	ImplicitEulerSmoothing smoother(bunny,0.1f, 0.1f);
+}
+
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 
 	//smoothingDemo(argc, argv);
+	implicitEulerTests();
+
+	int a ;
+	cout << " rhablabla";
+	cin >> a;
 
 	return 0;
 }
