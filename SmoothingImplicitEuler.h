@@ -2,12 +2,16 @@
 #include "mesh.h"
 #include <vector>
 
+#define NRHS 3
+
 class ImplicitEulerSmoothing
 {
 	//size of matrix
 	int n;
-	double (*b)[1];
-	double (*x)[1];
+	//double (*b)[NRHS];
+	//double (*x)[NRHS];
+	double *b;
+	double *x;
 	//indices of the values in the sparse matrix
 	vector<int> ia, ja;
 	//values of the elements of the sparse matrix
@@ -20,4 +24,5 @@ public:
 	ImplicitEulerSmoothing(mesh &m, float lambda, float dt);
 	~ImplicitEulerSmoothing(void);
 	void smootheMesh(mesh &m);
+	void updateVerticesAndB( mesh & m );
 };

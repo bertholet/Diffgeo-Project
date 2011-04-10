@@ -31,19 +31,36 @@ void idle(void);
 int glutAWindow(void);
 void displayScene( int argc, _TCHAR* * argv );
 void smoothingDemo( int argc, _TCHAR* * argv );
+void implicitSmoothingDemo( int argc, _TCHAR* * argv );
 
 Vertex * points;
 Vertex actualPoint;
 mesh bunny;
 curvColormap * cMap;
+ImplicitEulerSmoothing * smoother;
 
 //curvColormap * cMap;
 Smoothing s;
 
 void implicitEulerTests(void){
-	bunny = torus(2.f,1.f, 20, 50);
-	ImplicitEulerSmoothing smoother(bunny,0.1f, 0.1f);
-	smoother.smootheMesh(bunny);
+	//bunny = torus(2.f,1.f, 20, 50);
+	//smoother(bunny,0.1f, 0.1f);
+	smoother->smootheMesh(bunny);
+
+}
+
+void implicitSmoothing(void){
+	smoother->smootheMesh(bunny);
+
+	Operator::calcAllCurvNormals(bunny,cMap->curvNormals);
+
+	glEnable(GL_DEPTH_TEST);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	bunny.glDisplay((colorMap&) *cMap);
+	glFlush();
+
+	//glEnable(GL_DEPTH_TEST);
+	glutPostRedisplay();
 }
 
 
@@ -53,16 +70,21 @@ int _tmain(int argc, _TCHAR* argv[])
 	//bunny= mesh("C:/Users/Petje/workspace/RA/objfiles/venusm.obj", tuple3f(1.f,0.f,0.f), 1.f/1000);
 	//bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 3);
 	//bunny = ball(2, 20);
-	//bunny = torus(2.f,1.f, 20, 50);
-	bunny = simplestCube();
-	//bunny.addNormalNoise(0.1f);
+	bunny = torus(2.f,1.f, 100, 200);
+	//bunny = simplestCube();
+	bunny.addNormalNoise(0.5f);
 
 	cMap = new curvColormap(bunny);
 	//cMap = new gaussColormap(bunny);
 
+	smoother = new ImplicitEulerSmoothing(bunny,1, 1);
+	implicitSmoothingDemo(argc,argv);
+	//implicitEulerTests();
+	delete smoother;
 	//smoothingDemo(argc, argv);
-	//displayScene(argc, argv);
-	implicitEulerTests();
+//	displayScene(argc, argv);
+	
+	//implicitEulerTests();
 
 	int a ;
 	cout << " rhablabla";
@@ -172,6 +194,24 @@ void smoothingDemo( int argc, _TCHAR* * argv )
 
 	glutInit(&argc, (char **) argv);
 	glutAWindow(smoothing);
+	glewInit();
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(100.0,GLdouble(WIDTH)/HEIGHT, 2.0, 10000.0);
+	//glOrtho(0,WIDTH ,0, HEIGHT,-1,1);
+	glMatrixMode(GL_MODELVIEW);
+
+	glutMainLoop();
+}
+
+void implicitSmoothingDemo( int argc, _TCHAR* * argv ) 
+{
+	cout << cMap->additionalInfo() << "\n";
+	cout << "volume is : " << Operator::volume(bunny) << " \n";
+
+	glutInit(&argc, (char **) argv);
+	glutAWindow(implicitSmoothing);
 	glewInit();
 
 	glMatrixMode(GL_PROJECTION);

@@ -182,5 +182,6 @@ float Operator::volume( mesh &m )
 		volume += ((m.vertices[m.faces[i].a] + m.vertices[m.faces[i].b] + m.vertices[m.faces[i].c]) * (1.f/3)).dot(
 			tuple3f::cross((m.vertices[m.faces[i].b] - m.vertices[m.faces[i].a]),m.vertices[m.faces[i].c] - m.vertices[m.faces[i].a]));
 	}
+	volume = (volume < 0? -volume:volume);
 	return volume / 6;
 }

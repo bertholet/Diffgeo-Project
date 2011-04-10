@@ -184,8 +184,8 @@ void mesh::glDisplay( void )
 	tuple3f normal;
 	tuple3f c;
 
-	position = /*rot2*/rot*position;
-	l.direction = rot.transpose()/*rot2.transpose()*/*l.direction;
+	position = rot2*rot*position;
+	l.direction = rot.transpose()*rot2.transpose()*l.direction;
 
 	glLoadMatrixf((GLfloat *) &position); 
 	glBegin(GL_TRIANGLES);
@@ -230,7 +230,7 @@ void mesh::glDisplay( colorMap & cMap )
 	tuple3f normal;
 	tuple3f c;
 
-	position = /*rot2*/rot*position;
+	//position = /*rot2*rot*/position;
 	l.direction = rot.transpose()/*rot2.transpose()*/*l.direction;
 
 	tuple3f color;
@@ -289,6 +289,13 @@ void mesh::addNormalNoise( float max )
 	static float const alpha = 0.25;
 	for(unsigned int i = 0; i < vertices.size(); i++){
 		vertices[i] += normals[i] *( ((float)rand())/RAND_MAX * max );
+	}
+}
+
+void mesh::scaleVertices( float scale )
+{
+	for(unsigned int i = 0; i < vertices.size(); i++){
+		vertices[i] *= scale;
 	}
 }
 

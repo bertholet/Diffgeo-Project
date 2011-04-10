@@ -36,6 +36,7 @@ public:
 	void initFaceNormals();
 
 	void addNormalNoise( float max );
+	void scaleVertices(float scale);
 
 	vector<tuple3f>& getVertices(void){return vertices;}
 	vector<tuple3i>& getFaces(){return faces;}

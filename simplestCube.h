@@ -10,6 +10,7 @@ public:
 		vertices.push_back(tuple3f(-0.5f,-0.5f,0.5f));
 		vertices.push_back(tuple3f(-0.5f,0.5f,0.5f));
 		vertices.push_back(tuple3f(-0.5f,0.5f,-0.5f));
+
 		vertices.push_back(tuple3f(0.5f,-0.5f,-0.5f));
 		vertices.push_back(tuple3f(0.5f,-0.5f,0.5f));
 		vertices.push_back(tuple3f(0.5f,0.5f,0.5f));

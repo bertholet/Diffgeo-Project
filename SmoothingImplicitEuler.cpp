@@ -2,6 +2,8 @@
 #include "SmoothingImplicitEuler.h"
 #include <algorithm>
 #include <Windows.h>
+#include "Operator.h"
+#include <math.h>
 
 /* PARDISO prototype. */
 extern "C" __declspec(dllimport) void pardisoinit (void   *, int    *,   int *, int *, double *, int *);
@@ -20,17 +22,20 @@ ImplicitEulerSmoothing::ImplicitEulerSmoothing( mesh &m, float lambda, float dt)
 	vector<tuple3f> & vertices = m.vertices;
 	vector<int>  * neighbors = new vector<int>[vertices.size()];
 	vector<int>::iterator low;
+
+	//debug values..
+
 	//vector<int> & neighbors[] = *neighborsptr;
 
 
-	n = 10;
+	/*n = 10;
 	for(int i =0; i < 10; i++){
 		ia.push_back(2*i+1);
 		ja.push_back(i+1);
-		a.push_back( i+5);
+		a.push_back(i+5);
 		if(i<9){
 			ja.push_back(i+2);
-			a.push_back( 2);
+			a.push_back(i*0.1 + 2);
 		}
 		
 	}
@@ -40,22 +45,39 @@ ImplicitEulerSmoothing::ImplicitEulerSmoothing( mesh &m, float lambda, float dt)
 
 	for(int i = 0; i < 10; i++){
 		b[i][0] = i;
-	}
+	}*/
 
-/*	//size of the matrix 
+	/*n = 10;
+	for(int i =0; i < 10; i++){
+		ia.push_back(i+1);
+		ja.push_back(i+1);
+		a.push_back( 5);
+	}
+	ia.push_back(11);
+	b= new double[n][1];
+	x= new double[n][1];
+
+	for(int i = 0; i < 10; i++){
+		b[i][0] = i;
+	}*/
+
+	//size of the matrix 
 	n = m.vertices.size();
 	//memory for the solution in the solving step => to be generalized to 3
-	b = new double[vertices.size()][1];
+	b = new double[vertices.size()*NRHS];//][NRHS];
 	for(int i = 0; i < vertices.size(); i++){
-		b[i][0] = vertices[i].x;
-//		b[i][1] = vertices[i].y;
-//		b[i][2] = vertices[i].z;
+		b[i] = vertices[i].x; //b[i][0]
+		b[vertices.size()+i] = vertices[i].y;
+		b[2*vertices.size()+i] = vertices[i].z;
+		//b[i][1] = vertices[i].y;
+		//b[i][2] = vertices[i].z;
 	}
-	x= new double[vertices.size()][1];
+	x= new double[vertices.size()*NRHS];
 
 	//find neighbors and sotre them in neighbors
 	findNeighbors(m.faces, neighbors);
-	setUpSparseMatrix(vertices, neighbors, lambda, dt);*/
+	setUpSparseMatrix(vertices, neighbors, lambda, dt);
+	//correct up to here! ia, ja, a.
 
 	delete[] neighbors;
 }
@@ -69,13 +91,14 @@ ImplicitEulerSmoothing::~ImplicitEulerSmoothing(void)
 
 void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 {
+	float oldVolume = Operator::volume(m);
 	//refactor this stuff asap
 	//put killing this annoying library in the destructor. init stuff in the constructor.
 	//(muhahaha destoy it, destroy it...)
 
-	int      mtype = 11;        /* Real STRUCTURALLY symmetric matrix : 1*/
+	int      mtype = 1;        /* Real STRUCTURALLY symmetric matrix : 1*/
 
-    int      nrhs = 1;          /* Number of right hand sides. */
+    int      nrhs = NRHS;          /* Number of right hand sides. */
 
 	/* Internal solver memory pointer pt,                  */
 	/* 32-bit: int pt[64]; 64-bit: long int pt[64]         */
@@ -97,7 +120,7 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 	error = 0;
 
 //set parameter here...
-	solver = 0; /* 0: direct solving, 1 iteratvie solving*/
+	solver = 1; /* 0: direct solving, 1 iteratvie solving*/
 	maxfct = 1;		/* Maximum number of numerical factorizations.  */
 	mnum   = 1;         /* Which factorization to use. */
 
@@ -105,11 +128,17 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 
 	SYSTEM_INFO sysinfo; 	GetSystemInfo( &sysinfo );  	
 	num_procs = sysinfo.dwNumberOfProcessors;    
+	int_params[0] = 0; //use default params..
 	int_params[2]  = num_procs;
-	int_params[7] = 1;       /* Max numbers of iterative refinement steps. */
+
+
+	
+
+	//all parameters have to be set after init!. (but for param 2 = num_procs)
+	//int_params[3] = 91;	//hmhmhm
+	int_params[7] = 1;//1       /* Max numbers of iterative refinement steps. */
 	int_params[6] = 0;
 	//int_params[6] = 1; then the result is placed in b.
-
 
 	pardisoinit (pt,  &mtype, &solver, int_params, double_params, &error); 
 
@@ -140,11 +169,11 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 	else
 		printf("Matrice is well formed...\n");
 
-	pardiso_printstats (&mtype, &n, &a[0], &ia[0], &ja[0], &nrhs, &b[0][0], &error);
+	/*pardiso_printstats (&mtype, &n, &a[0], &ia[0], &ja[0], &nrhs, &b[0][0], &error);
 	if (error != 0) {
 		printf("\nERROR right hand side: %d", error);
 		exit(1);
-	}
+	}*/
 
 
 	/* -------------------------------------------------------------------- */
@@ -191,7 +220,7 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 
 	pardiso (pt, &maxfct, &mnum, &mtype, &phase,
 		&n, &a[0], &ia[0], &ja[0], NULL, &nrhs,
-		int_params, &msglvl, &b[0][0], &x[0][0], &error,  double_params);
+		int_params, &msglvl, b, x, &error,  double_params);
 
 	if (error != 0) {
 		printf("\nERROR during solution: %d", error);
@@ -221,16 +250,49 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 	//testing...
 
 	int i = 0;
-	double res = 0;
-	for(int j = ia[i]-1 ; j < ia[i+1]-1; j++){
-		res += a[ia[i] + ja[j] -2]*x[ja[j]-1][0];
+	/*double res = 0;
+	for(int j = 0 ; j < ia[i+1]-ia[i]; j++){
+		cout <<"* " << a[ia[i] + ja[j] -2] << ",";
+		res += a[ia[i] + j -1]*x[ja[ia[i]+ j -1]-1][0];
 	}
 	cout << "diff; expected 0 ...." <<res -b[i][0]<<"\n";
-
-	cout <<"x\n";
-	for(i = 0; i < 10; i++){
-		cout<<x[i][0] <<"\n";
+*/
+	double res;
+	double err_=0;
+	for(int k = 0; k < nrhs; k++){
+		for(i = 0; i < n; i++){
+			res = 0;
+			for(int j = 0 ; j < ia[i+1]-ia[i]; j++){
+				res += a[ia[i] + j -1]*x[ja[ia[i]+ j -1]-1 + k*n];
+			}
+			res = res -b[i + k* n];
+			res = (res >0 ?  res: -res);
+			err_ = (res > err_? res: err_);
+		}
 	}
+	cout << "MAXIMUM ERROR: " << err_ << "\n";
+	//print first values of x;
+	cout <<"x(1:8,:)\n";
+	for(i = 0; i < 8; i++){
+		for (int j = 0; j < nrhs; j++){
+			cout<<x[i + j * n] <<",";
+		}
+		cout << "\n";
+	}
+
+	//print first values of b;
+	cout <<"b(1:8,:)\n";
+	for(i = 0; i < 8; i++){
+		for (int j = 0; j < nrhs; j++){
+			cout<<b[i + j *n] <<",";
+		}
+		cout << "\n";
+	}//*/
+
+	updateVerticesAndB(m);
+
+	float factor = pow(oldVolume / Operator::volume(m), 0.33333333f);
+	m.scaleVertices(factor);
 }
 
 
@@ -344,5 +406,19 @@ void ImplicitEulerSmoothing::setUpSparseMatrix( vector<tuple3f> &vertices, vecto
 	}
 	for (unsigned int i = 0; i < ja.size(); i++) {
 		ja[i] += 1;
+	}
+}
+
+
+void ImplicitEulerSmoothing::updateVerticesAndB( mesh & m )
+{
+	int sz = m.vertices.size();
+	for(int i = 0; i < m.vertices.size(); i++){
+		m.vertices[i].x = (float)x[i + 0 * sz];
+		m.vertices[i].y = (float)x[i + 1 * sz];
+		m.vertices[i].z = (float) x[i + 2* sz];
+	}
+	for(int i = 0; i < NRHS*sz; i++){
+		b[i] = x[i];
 	}
 }
