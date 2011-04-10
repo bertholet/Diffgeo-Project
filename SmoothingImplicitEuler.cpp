@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "SmoothingImplicitEuler.h"
 #include <algorithm>
+#include <Windows.h>
 
 /* PARDISO prototype. */
 extern "C" __declspec(dllimport) void pardisoinit (void   *, int    *,   int *, int *, double *, int *);
@@ -17,89 +18,52 @@ using namespace std;
 ImplicitEulerSmoothing::ImplicitEulerSmoothing( mesh &m, float lambda, float dt)
 {
 	vector<tuple3f> & vertices = m.vertices;
-	vector<tuple3i> & faces = m.faces;
 	vector<int>  * neighbors = new vector<int>[vertices.size()];
 	vector<int>::iterator low;
-	float minus_lambdaDt_div_m;
 	//vector<int> & neighbors[] = *neighborsptr;
 
-	//find neighbors
-	for(unsigned int i = 0; i < faces.size(); i++){
 
-		//adds the integers such that the vector stays ordered.
-		ifNotContainedAdd(neighbors[faces[i].a], faces[i].b);
-		ifNotContainedAdd(neighbors[faces[i].b], faces[i].a);
-
-		ifNotContainedAdd(neighbors[faces[i].a], faces[i].c);
-		ifNotContainedAdd(neighbors[faces[i].c], faces[i].a);
-
-		ifNotContainedAdd(neighbors[faces[i].b], faces[i].c);
-		ifNotContainedAdd(neighbors[faces[i].c], faces[i].b);
-	}
-
-
-	//set up ia
-	ia.reserve(vertices.size()+1);
-	ia.push_back(0);
-	int j = 0;
-	int nb;
-	for(unsigned int i = 0; i < vertices.size(); i++){
-		nb = neighbors[i].size();
-		ia.push_back((ia.back()) + nb +1);
-	}
-
-	//set up ja
-	ja.reserve(vertices.size()*6);
-	int sz;
-	for(int i = 0; i < vertices.size(); i++){
-		j=0;
-		nb = neighbors[i][j];
-		sz = neighbors[i].size();
-		while(nb < i && j < sz){
-			nb = neighbors[i][j];
-			ja.push_back(nb);
-			j++;
+	n = 10;
+	for(int i =0; i < 10; i++){
+		ia.push_back(2*i+1);
+		ja.push_back(i+1);
+		a.push_back( i+5);
+		if(i<9){
+			ja.push_back(i+2);
+			a.push_back( 2);
 		}
-
-		ja.push_back(i);
 		
-		if(j < sz && neighbors[i][j] == i){
-			//should not happen
-			throw new std::exception("Assertion failed !!!!! matrix not well constructed, goto debug, my f(r)iend...");
-		}
+	}
+	ia.push_back(20);
+	b= new double[n][1];
+	x= new double[n][1];
 
-		while(j < sz){
-			nb = neighbors[i][j];
-			ja.push_back(nb);
-			j++;
-		}
+	for(int i = 0; i < 10; i++){
+		b[i][0] = i;
 	}
 
-	//set up values of the sparse matrix
-	a.reserve(ja.size());
+/*	//size of the matrix 
+	n = m.vertices.size();
+	//memory for the solution in the solving step => to be generalized to 3
+	b = new double[vertices.size()][1];
 	for(int i = 0; i < vertices.size(); i++){
-		j=0;
-		sz = neighbors[i].size();
-		minus_lambdaDt_div_m = -lambda * dt /sz;
-		while(nb < i && j < sz){
-//			nb = neighbors[i][j];
-			a.push_back(minus_lambdaDt_div_m);
-			j++;
-		}
-
-		a.push_back(1 + lambda * dt);
-
-		while(j < sz){
-//			nb = neighbors[i][j];
-			a.push_back(minus_lambdaDt_div_m);
-			j++;
-		}
+		b[i][0] = vertices[i].x;
+//		b[i][1] = vertices[i].y;
+//		b[i][2] = vertices[i].z;
 	}
+	x= new double[vertices.size()][1];
 
+	//find neighbors and sotre them in neighbors
+	findNeighbors(m.faces, neighbors);
+	setUpSparseMatrix(vertices, neighbors, lambda, dt);*/
+
+	delete[] neighbors;
 }
 
 ImplicitEulerSmoothing::~ImplicitEulerSmoothing(void)
 {
+	delete[] b;
+	delete[] x;
 
 }
 
@@ -109,7 +73,9 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 	//put killing this annoying library in the destructor. init stuff in the constructor.
 	//(muhahaha destoy it, destroy it...)
 
-	int      mtype = 1;        /* Real STRUCTURALLY symmetric matrix */
+	int      mtype = 11;        /* Real STRUCTURALLY symmetric matrix : 1*/
+
+    int      nrhs = 1;          /* Number of right hand sides. */
 
 	/* Internal solver memory pointer pt,                  */
 	/* 32-bit: int pt[64]; 64-bit: long int pt[64]         */
@@ -123,11 +89,28 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 
 	/* Number of processors. */
 	int      num_procs;
+	double   ddum;              /* Double dummy */
+	int      idum;              /* Integer dummy. */
 
 
 	///////////////Put this stuff in the constructor...
 	error = 0;
-	solver = 1; /* 0: direct solving, 1 iteratvie solving*/
+
+//set parameter here...
+	solver = 0; /* 0: direct solving, 1 iteratvie solving*/
+	maxfct = 1;		/* Maximum number of numerical factorizations.  */
+	mnum   = 1;         /* Which factorization to use. */
+
+	msglvl = 1;         /* Print statistical information  */
+
+	SYSTEM_INFO sysinfo; 	GetSystemInfo( &sysinfo );  	
+	num_procs = sysinfo.dwNumberOfProcessors;    
+	int_params[2]  = num_procs;
+	int_params[7] = 1;       /* Max numbers of iterative refinement steps. */
+	int_params[6] = 0;
+	//int_params[6] = 1; then the result is placed in b.
+
+
 	pardisoinit (pt,  &mtype, &solver, int_params, double_params, &error); 
 
 	if (error != 0) 
@@ -144,6 +127,110 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 	}
 	else
 		printf("[PARDISO]: License check was successful ... \n");
+
+
+
+	n = ia.size() -1;
+	pardiso_chkmatrix  (&mtype, &n, & a[0], & ia[0], &ja[0], &error);
+	if (error != 0) {
+		printf("\nERROR in consistency of matrix: %d", error);
+
+		exit(1);
+	}
+	else
+		printf("Matrice is well formed...\n");
+
+	pardiso_printstats (&mtype, &n, &a[0], &ia[0], &ja[0], &nrhs, &b[0][0], &error);
+	if (error != 0) {
+		printf("\nERROR right hand side: %d", error);
+		exit(1);
+	}
+
+
+	/* -------------------------------------------------------------------- */
+	/* ..  Reordering and Symbolic Factorization.  This step also allocates */
+	/*     all memory that is necessary for the factorization.              */
+	/* -------------------------------------------------------------------- */
+	phase = 11; 
+
+	pardiso (pt, &maxfct, &mnum, &mtype, &phase,
+		&n, &a[0], &ia[0], &ja[0], NULL, &nrhs,
+		int_params, &msglvl, NULL, NULL, &error, double_params);
+
+	if (error != 0) {
+		printf("\nERROR during symbolic factorization: %d", error);
+		exit(1);
+	}
+	printf("\nReordering completed ... ");
+	printf("\nNumber of nonzeros in factors  = %d", int_params[17]);
+	printf("\nNumber of factorization MFLOPS = %d", int_params[18]);
+
+
+	/* -------------------------------------------------------------------- */
+	/* ..  Numerical factorization.                                         */
+	/* -------------------------------------------------------------------- */    
+	phase = 22;
+	int_params[32] = 1; // compute determinant 
+
+	pardiso (pt, &maxfct, &mnum, &mtype, &phase,
+		&n, &a[0], &ia[0], &ja[0], NULL, &nrhs,
+		int_params, &msglvl, NULL, NULL, &error,  double_params);
+
+	if (error != 0) {
+		printf("\nERROR during numerical factorization: %d", error);
+		exit(2);
+	}
+	printf("\nFactorization completed ...\n ");
+
+	/* -------------------------------------------------------------------- */    
+	/* ..  Back substitution and iterative refinement.                      */
+	/* -------------------------------------------------------------------- */    
+	phase = 33;
+
+	int_params[7] = 1;       // Max numbers of iterative refinement steps. 
+
+	pardiso (pt, &maxfct, &mnum, &mtype, &phase,
+		&n, &a[0], &ia[0], &ja[0], NULL, &nrhs,
+		int_params, &msglvl, &b[0][0], &x[0][0], &error,  double_params);
+
+	if (error != 0) {
+		printf("\nERROR during solution: %d", error);
+		exit(3);
+	}
+
+
+
+	//Phases 1-3
+/*	phase = 13;
+	//may be this is even correct....
+
+
+	pardiso (pt, &maxfct, &mnum, &mtype, &phase,
+		&n, &a[0], &ia[0], &ja[0], &idum, &nrhs,
+		int_params, &msglvl, &b[0][0], &x[0][0], &error, double_params);
+*/
+	// Release memory...
+	phase = -1;                 // Release internal memory. 
+
+	pardiso (pt, &maxfct, &mnum, &mtype, &phase,
+		&n, NULL, &ia[0], &ja[0], &idum, &nrhs,
+		int_params, &msglvl, NULL, NULL, &error,  double_params);
+
+
+
+	//testing...
+
+	int i = 0;
+	double res = 0;
+	for(int j = ia[i]-1 ; j < ia[i+1]-1; j++){
+		res += a[ia[i] + ja[j] -2]*x[ja[j]-1][0];
+	}
+	cout << "diff; expected 0 ...." <<res -b[i][0]<<"\n";
+
+	cout <<"x\n";
+	for(i = 0; i < 10; i++){
+		cout<<x[i][0] <<"\n";
+	}
 }
 
 
@@ -152,7 +239,110 @@ void ImplicitEulerSmoothing::ifNotContainedAdd( vector<int> &v, int a )
 	vector<int>::iterator low;
 
 	low = lower_bound(v.begin(), v.end(),a);
-	if(*low < a){
+	if(low == v.end() || *low != a){
 		v.insert(low,1,a);
+	}
+}
+
+void ImplicitEulerSmoothing::findNeighbors( vector<tuple3i> &faces, vector<int> * neighbors ) 
+{
+	for(unsigned int i = 0; i < faces.size(); i++){
+
+		/*debug[faces[i].a]++;
+		debug[faces[i].b]++;
+		debug[faces[i].c]++;*/
+
+		//adds the integers such that the vector stays ordered.
+
+		ifNotContainedAdd(neighbors[faces[i].a], faces[i].b);
+		ifNotContainedAdd(neighbors[faces[i].b], faces[i].a);
+
+		ifNotContainedAdd(neighbors[faces[i].a], faces[i].c);
+		ifNotContainedAdd(neighbors[faces[i].c], faces[i].a);
+
+		ifNotContainedAdd(neighbors[faces[i].b], faces[i].c);
+		ifNotContainedAdd(neighbors[faces[i].c], faces[i].b);
+
+	}
+}
+
+void ImplicitEulerSmoothing::setUpSparseMatrix( vector<tuple3f> &vertices, vector<int> * neighbors, float lambda, float dt ) 
+{
+
+	float minus_lambdaDt_div_m;
+	//set up ia
+	ia.reserve(vertices.size()+1);
+	ia.push_back(0);
+	int j = 0;
+	int nb;
+	bool added_i;
+	for(unsigned int i = 0; i < vertices.size(); i++){
+		nb = neighbors[i].size();
+		ia.push_back((ia.back()) + nb +1);
+	}
+
+	//set up ja
+	ja.reserve(vertices.size()*6);
+	int sz;
+	int vsize = vertices.size();
+	for(int i = 0; i < vsize; i++){
+		j=0;
+		added_i = false;
+		nb = neighbors[i][j];
+		sz = neighbors[i].size();
+
+		for(j = 0; j < sz; j++){
+			nb = neighbors[i][j];
+			if(added_i == false && i < nb){
+				added_i = true;
+				ja.push_back(i);
+			}
+			ja.push_back(nb);
+		}
+
+		if(added_i == false){
+			added_i = true;
+			ja.push_back(i);
+		}
+
+
+	}
+
+	//set up values of the sparse matrix
+	a.reserve(ja.size());
+	for(int i = 0; i < vsize; i++){
+
+		j=0;
+		added_i = false;
+		nb = neighbors[i][j];
+		sz = neighbors[i].size();
+		minus_lambdaDt_div_m = -lambda * dt /sz;
+
+		for(j = 0; j < sz; j++){
+			nb = neighbors[i][j];
+			if(added_i == false && i < nb){
+				added_i = true;
+				a.push_back(1 + lambda * dt);
+			}
+			a.push_back(minus_lambdaDt_div_m);
+		}
+
+		if(added_i == false){
+
+			added_i = true;
+			a.push_back(1 + lambda * dt);
+		}
+
+	}
+
+	/* -------------------------------------------------------------------- */
+	/* ..  Convert matrix from 0-based C-notation to Fortran 1-based        */
+	/*     notation.                                                        */
+	/* -------------------------------------------------------------------- */
+	for (unsigned int i = 0; i < ia.size(); i++) {
+		ia[i] += 1;
+	}
+	for (unsigned int i = 0; i < ja.size(); i++) {
+		ja[i] += 1;
 	}
 }
