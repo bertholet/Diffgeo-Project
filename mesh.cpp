@@ -271,7 +271,7 @@ tuple3f mesh::intensities( unsigned int faceNr, tuple3f &direction )
 tuple3f mesh::intensitiesFlat( unsigned int faceNr, tuple3f &direction )
 {
 	float c = face_normals[faceNr].dot(direction);
-	c= ( c>0? c: -c);
+//	c= ( c>0? c: -c);
 	return tuple3f(c,c,c);
 }
 

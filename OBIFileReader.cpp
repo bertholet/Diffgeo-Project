@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "OBIFileReader.h"
 
 #include <stdlib.h>
@@ -123,7 +123,59 @@ void OBIFileReader::parse(const char * file){
 	cout << "read : \n" << vertices.size() << " vertices \n"
 		<< normals.size() << " normals \n"
 		<< tex.size() << " textures \n"
-		<< faces.size() << " faces. :-*";
+		<< faces.size() << " faces. :-*\n";
+
+	checkAllVerticesUsed();
+}
+
+void OBIFileReader::checkAllVerticesUsed( void )
+{
+	bool * arr = new bool[vertices.size()];
+	vector<int>  unusedVertices;
+
+		//if thou passes here, thee takest a moment to comemorate
+		//the exact place, were I, for the first time,
+		//overwrote memory not belonging to me
+		//resulting in a wunderfull unpredictable code behaviour...
+
+	for(unsigned int i = 0; i < vertices.size(); i++){
+		arr[i] = false;
+	}
+
+
+	for(unsigned int i = 0; i < faces.size(); i++){
+		arr[faces[i].a] = true;
+		arr[faces[i].b] = true;
+		arr[faces[i].c] = true;
+	}
+
+	for(int i = 0; i < vertices.size(); i++){
+		if(!arr[i]){
+			unusedVertices.push_back(i);
+		}
+	}
+	
+	cout << "Analysed parsed Mesh... " << unusedVertices.size() << " Vertices unused\n";
+
+/*	int unused;
+	for(int i = 0; i < unusedVertices.size()){
+		unused = unusedVertices[i];
+		vertices.erase(unused);
+
+		for(int j = 0; j < faces.size(); j++){
+			if(faces[j].a > unusedVertices[i]){
+
+			}
+			if(faces[j].a > unusedVertices[i]){
+
+			}
+			if(faces[j].a > unusedVertices[i]){
+
+			}
+		}
+	}*/
+
+	delete[] arr;
 }
 
 /*vector<tuple3i> OBIFileReader::getFaceNormals()

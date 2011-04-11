@@ -46,7 +46,7 @@ void implicitEulerTests(void){
 	//bunny = torus(2.f,1.f, 20, 50);
 	//smoother(bunny,0.1f, 0.1f);
 	cout << "Volume before smoothing:" << Operator::volume(bunny) <<"\n";
-	smoother->smootheMesh(bunny);
+	//smoother->smootheMesh(bunny);
 
 }
 
@@ -71,20 +71,20 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	//bunny= mesh("C:/Users/Petje/workspace/RA/objfiles/venusm.obj", tuple3f(1.f,0.f,0.f), 1.f/1000);
 	//bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 3);
-	bunny = ball(1, 40);
-	//bunny = torus(3.f,2.f, 100, 200);
+	//bunny = ball(1, 40);
+	bunny = torus(2.f,1.f, 30, 60);
 	//bunny = simplestCube();
-	//bunny.addNormalNoise(0.5f);
+	bunny.addNormalNoise(0.4f);
 	
 	cMap = new curvColormap(bunny);
 	//cMap = new gaussColormap(bunny);
 
 	smoother = new ImplicitEulerSmoothing(bunny,1, 1);
-	//implicitSmoothingDemo(argc,argv);
-	implicitEulerTests();
+	implicitSmoothingDemo(argc,argv);
+	//implicitEulerTests();
 	delete smoother;
 	//smoothingDemo(argc, argv);
-	displayScene(argc, argv);
+	//displayScene(argc, argv);
 	
 	//implicitEulerTests();
 

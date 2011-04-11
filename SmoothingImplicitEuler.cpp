@@ -4,16 +4,8 @@
 #include <Windows.h>
 #include "Operator.h"
 #include <math.h>
+#include "pardiso.h"
 
-/* PARDISO prototype. */
-extern "C" __declspec(dllimport) void pardisoinit (void   *, int    *,   int *, int *, double *, int *);
-extern "C" __declspec(dllimport) void pardiso     (void   *, int    *,   int *, int *,    int *, int *, 
-												   double *, int    *,    int *, int *,   int *, int *,
-												   int *, double *, double *, int *, double *);
-extern "C" __declspec(dllimport) void pardiso_chkmatrix  (int *, int *, double *, int *, int *, int *);
-extern "C" __declspec(dllimport) void pardiso_chkvec     (int *, int *, double *, int *);
-extern "C" __declspec(dllimport) void pardiso_printstats (int *, int *, double *, int *, int *, int *,
-														  double *, int *);
 using namespace std;
 
 
@@ -47,30 +39,19 @@ ImplicitEulerSmoothing::ImplicitEulerSmoothing( mesh &m, float lambda, float dt)
 		b[i][0] = i;
 	}*/
 
-	/*n = 10;
-	for(int i =0; i < 10; i++){
-		ia.push_back(i+1);
-		ja.push_back(i+1);
-		a.push_back( 5);
-	}
-	ia.push_back(11);
-	b= new double[n][1];
-	x= new double[n][1];
-
-	for(int i = 0; i < 10; i++){
-		b[i][0] = i;
-	}*/
 
 	//size of the matrix 
+
 	n = m.vertices.size();
-	//memory for the solution in the solving step => to be generalized to 3
-	b = new double[vertices.size()*NRHS];//][NRHS];
+	//Note: if x or b are matrices i.e. have multiple columns pardiso expects
+	//a parameter vector where the COLUMNS are enumerated one after the other.
+	//NOT & b[0][0] with b n x m array.
+	b = new double[vertices.size()*NRHS];
 	for(int i = 0; i < vertices.size(); i++){
 		b[i] = vertices[i].x; //b[i][0]
 		b[vertices.size()+i] = vertices[i].y;
 		b[2*vertices.size()+i] = vertices[i].z;
-		//b[i][1] = vertices[i].y;
-		//b[i][2] = vertices[i].z;
+
 	}
 	x= new double[vertices.size()*NRHS];
 
@@ -80,69 +61,59 @@ ImplicitEulerSmoothing::ImplicitEulerSmoothing( mesh &m, float lambda, float dt)
 	//correct up to here! ia, ja, a.
 
 	delete[] neighbors;
+
+	pardisoInitFactorize();
 }
 
 ImplicitEulerSmoothing::~ImplicitEulerSmoothing(void)
 {
+
+	// Release Pardiso memory...
+	phase = -1;                 // Release internal memory. 
+
+	pardiso (pt, &maxfct, &mnum, &matrix_type, &phase,
+		&n, NULL, &ia[0], &ja[0], NULL, &nr_eqs,
+		int_params, &print_stats, NULL, NULL, &error,  double_params);
+
 	delete[] b;
 	delete[] x;
 
 }
 
-void ImplicitEulerSmoothing::smootheMesh( mesh &m )
+
+void ImplicitEulerSmoothing::pardisoInitFactorize( void )
 {
-	float oldVolume = Operator::volume(m);
-	//refactor this stuff asap
-	//put killing this annoying library in the destructor. init stuff in the constructor.
-	//(muhahaha destoy it, destroy it...)
+	matrix_type = 1;        /* Real STRUCTURALLY symmetric matrix : 1*/
 
-	int      mtype = 1;        /* Real STRUCTURALLY symmetric matrix : 1*/
+	nr_eqs = NRHS;          /* Number of right hand sides. */
 
-    int      nrhs = NRHS;          /* Number of right hand sides. */
-
-	/* Internal solver memory pointer pt,                  */
-	/* 32-bit: int pt[64]; 64-bit: long int pt[64]         */
-	/* or void *pt[64] should be OK on both  architectures  */ 
-	void    *pt[64]; 
-
-	/* Pardiso control parameters. */
-	int      int_params[64];
-	double   double_params[64];
-	int      maxfct, mnum, phase, error, msglvl, solver;
-
-	/* Number of processors. */
-	int      num_procs;
-	double   ddum;              /* Double dummy */
-	int      idum;              /* Integer dummy. */
 
 
 	///////////////Put this stuff in the constructor...
 	error = 0;
 
-//set parameter here...
+	//set parameter here...
 	solver = 1; /* 0: direct solving, 1 iteratvie solving*/
 	maxfct = 1;		/* Maximum number of numerical factorizations.  */
 	mnum   = 1;         /* Which factorization to use. */
 
-	msglvl = 0;         /* Print statistical information  */
+	print_stats = 0;         /* Print statistical information  */
 
 	SYSTEM_INFO sysinfo; 	GetSystemInfo( &sysinfo );  	
 	num_procs = sysinfo.dwNumberOfProcessors;    
 	int_params[0] = 0; //use default params..
 	int_params[2]  = num_procs;
 
-
-	
-
 	//all parameters have to be set after init!. (but for param 2 = num_procs)
 	//int_params[3] = 91;	//hmhmhm
 	int_params[7] = 1;//1       /* Max numbers of iterative refinement steps. */
-	int_params[6] = 0;
-	//int_params[6] = 1; then the result is placed in b.
+	int_params[6] = 0;	//int_params[6] = 1; then the result is placed in b.
 	int_params[32] = 1; // compute determinant 
 
-	pardisoinit (pt,  &mtype, &solver, int_params, double_params, &error); 
 
+	pardisoinit (pt,  &matrix_type, &solver, int_params, double_params, &error); 
+
+	error = 0;
 	if (error != 0) 
 	{
 		if (error == -10 )
@@ -158,10 +129,99 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 	else
 		printf("[PARDISO]: License check was successful ... \n");
 
-
-
 	n = ia.size() -1;
-	pardiso_chkmatrix  (&mtype, &n, & a[0], & ia[0], &ja[0], &error);
+	pardiso_chkmatrix  (&matrix_type, &n, & a[0], & ia[0], &ja[0], &error);
+	if (error != 0) {
+		printf("\nERROR in consistency of matrix: %d", error);
+
+		exit(1);
+	}
+
+	//Phases 1-2
+	phase = 12;
+	//may be this is even correct....
+
+
+	pardiso (pt, &maxfct, &mnum, &matrix_type, &phase,
+		&n, &a[0], &ia[0], &ja[0], NULL, &nr_eqs,
+		int_params, &print_stats, NULL, NULL, &error, double_params);
+
+
+}
+
+
+void ImplicitEulerSmoothing::smootheMesh( mesh &m )
+{
+	float oldVolume = Operator::volume(m);
+	//refactor this stuff asap
+	//put killing this annoying library in the destructor. init stuff in the constructor.
+	//(muhahaha destoy it, destroy it...)
+
+//	int      matrix_type = 1;        /* Real STRUCTURALLY symmetric matrix : 1*/
+
+//    int      nrhs = NRHS;          /* Number of right hand sides. */
+
+	/* Internal solver memory pointer pt,                  */
+	/* 32-bit: int pt[64]; 64-bit: long int pt[64]         */
+	/* or void *pt[64] should be OK on both  architectures  */ 
+//	void    *pt[64]; 
+
+	/* Pardiso control parameters. */
+//	int      int_params[64];
+//	double   double_params[64];
+//	int      maxfct, mnum, phase, error, msglvl, solver;
+
+	/* Number of processors. */
+//	int      num_procs;
+
+
+
+	///////////////Put this stuff in the constructor...
+	error = 0;
+
+//set parameter here...
+//	solver = 1; /* 0: direct solving, 1 iteratvie solving*/
+//	maxfct = 1;		/* Maximum number of numerical factorizations.  */
+//	mnum   = 1;         /* Which factorization to use. */
+
+//	msglvl = 0;         /* Print statistical information  */
+
+//	SYSTEM_INFO sysinfo; 	GetSystemInfo( &sysinfo );  	
+//	num_procs = sysinfo.dwNumberOfProcessors;    
+//	int_params[0] = 0; //use default params..
+//	int_params[2]  = num_procs;
+
+
+	
+
+	//all parameters have to be set after init!. (but for param 2 = num_procs)
+	//int_params[3] = 91;	//hmhmhm
+//	int_params[7] = 1;//1       /* Max numbers of iterative refinement steps. */
+//	int_params[6] = 0;
+	//int_params[6] = 1; then the result is placed in b.
+//	int_params[32] = 1; // compute determinant 
+
+/*	pardisoinit (pt,  &matrix_type, &solver, int_params, double_params, &error); 
+
+	if (error != 0) 
+	{
+		if (error == -10 )
+			printf("No license file found \n");
+		if (error == -11 )
+			printf("License is expired \n");
+		if (error == -12 )
+			printf("Wrong username or hostname \n");
+
+		int ah;
+		cin >> ah;
+	}
+	else
+		printf("[PARDISO]: License check was successful ... \n");
+*/
+
+
+/*	n = ia.size() -1;
+	pardiso_chkmatrix  (&matrix_type, &n, & a[0], & ia[0], &ja[0], &error);
 	if (error != 0) {
 		printf("\nERROR in consistency of matrix: %d", error);
 
@@ -231,21 +291,22 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 */
 
 	//Phases 1-3
-	phase = 13;
+	//phase = 13;
 	//may be this is even correct....
 
+	phase = 33;
 
-	pardiso (pt, &maxfct, &mnum, &mtype, &phase,
-		&n, &a[0], &ia[0], &ja[0], &idum, &nrhs,
-		int_params, &msglvl, b, x, &error, double_params);
+	pardiso (pt, &maxfct, &mnum, &matrix_type, &phase,
+		&n, &a[0], &ia[0], &ja[0], NULL, &nr_eqs,
+		int_params, &print_stats, b, x, &error, double_params);
 
 	// Release memory...
-	phase = -1;                 // Release internal memory. 
+/*	phase = -1;                 // Release internal memory. 
 
-	pardiso (pt, &maxfct, &mnum, &mtype, &phase,
-		&n, NULL, &ia[0], &ja[0], &idum, &nrhs,
+	pardiso (pt, &maxfct, &mnum, &matrix_type, &phase,
+		&n, NULL, &ia[0], &ja[0], NULL, &nrhs,
 		int_params, &msglvl, NULL, NULL, &error,  double_params);
-
+*/
 
 
 	//testing...
@@ -278,7 +339,7 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 	float factor = pow(oldVolume / Operator::volume(m), 0.33333333f);
 	m.scaleVertices(factor);
 
-	cout<< "Volume: " << Operator::volume(m);
+	cout<< "Volume: " << Operator::volume(m)<< "\n";
 }
 
 
@@ -326,6 +387,10 @@ void ImplicitEulerSmoothing::setUpSparseMatrix( vector<tuple3f> &vertices, vecto
 	bool added_i;
 	for(unsigned int i = 0; i < vertices.size(); i++){
 		nb = neighbors[i].size();
+
+	/*	if(nb == 0){
+			throw new std::exception("Assertion failed. The mesh is malformed: it contains unconnected nodes");
+		}*/
 		ia.push_back((ia.back()) + nb +1);
 	}
 
@@ -336,16 +401,17 @@ void ImplicitEulerSmoothing::setUpSparseMatrix( vector<tuple3f> &vertices, vecto
 	for(int i = 0; i < vsize; i++){
 		j=0;
 		added_i = false;
-		nb = neighbors[i][j];
 		sz = neighbors[i].size();
-
-		for(j = 0; j < sz; j++){
+		if(sz != 0){
 			nb = neighbors[i][j];
-			if(added_i == false && i < nb){
-				added_i = true;
-				ja.push_back(i);
+			for(j = 0; j < sz; j++){
+				nb = neighbors[i][j];
+				if(added_i == false && i < nb){
+					added_i = true;
+					ja.push_back(i);
+				}
+				ja.push_back(nb);
 			}
-			ja.push_back(nb);
 		}
 
 		if(added_i == false){
@@ -362,17 +428,19 @@ void ImplicitEulerSmoothing::setUpSparseMatrix( vector<tuple3f> &vertices, vecto
 
 		j=0;
 		added_i = false;
-		nb = neighbors[i][j];
 		sz = neighbors[i].size();
-		minus_lambdaDt_div_m = -lambda * dt /sz;
-
-		for(j = 0; j < sz; j++){
+		if(sz != 0){
 			nb = neighbors[i][j];
-			if(added_i == false && i < nb){
-				added_i = true;
-				a.push_back(1 + lambda * dt);
+			minus_lambdaDt_div_m = -lambda * dt /sz;
+
+			for(j = 0; j < sz; j++){
+				nb = neighbors[i][j];
+				if(added_i == false && i < nb){
+					added_i = true;
+					a.push_back(1 + lambda * dt);
+				}
+				a.push_back(minus_lambdaDt_div_m);
 			}
-			a.push_back(minus_lambdaDt_div_m);
 		}
 
 		if(added_i == false){
@@ -404,9 +472,15 @@ void ImplicitEulerSmoothing::updateVerticesAndB( mesh & m )
 		m.vertices[i].y = (float)x[i + 1 * sz];
 		m.vertices[i].z = (float) x[i + 2* sz];
 	}
-	for(int i = 0; i < NRHS*sz; i++){
+
+	//swap x,b
+	double * temp;
+	temp = b;
+	b = x;
+	x= temp;
+	/*for(int i = 0; i < NRHS*sz; i++){
 		b[i] = x[i];
-	}
+	}*/
 }
 
 double ImplicitEulerSmoothing::calcBoxNormError(void) 

@@ -27,6 +27,8 @@ public:
 	vector<tuple3i> getFaces(){return faces;}
 	vector<tuple3i> getFaceNormals(){
 		return faces_normals;}
+
+	void checkAllVerticesUsed(void);
 	//int hasVertex(void);
 	//int hasFace(void);
 	
