@@ -3,3 +3,8 @@ Debug/*
 Deprecated/*
 *.vcproj.*
 *.vcproj
+*.aps
+*.rc
+*.ncb
+*.sln
+*.suo
