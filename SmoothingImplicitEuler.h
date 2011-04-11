@@ -16,6 +16,9 @@ class ImplicitEulerSmoothing
 	vector<int> ia, ja;
 	//values of the elements of the sparse matrix
 	vector<double> a;
+
+	//Pardiso parameter
+
 private:
 	void ifNotContainedAdd(vector<int> &v, int a);
 	void findNeighbors( vector<tuple3i> &faces, vector<int>  * result );
@@ -24,5 +27,8 @@ public:
 	ImplicitEulerSmoothing(mesh &m, float lambda, float dt);
 	~ImplicitEulerSmoothing(void);
 	void smootheMesh(mesh &m);
+
+	double calcBoxNormError(void);
+
 	void updateVerticesAndB( mesh & m );
 };

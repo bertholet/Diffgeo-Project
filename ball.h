@@ -6,5 +6,6 @@ class ball :
 {
 public:
 	ball(float r, int verticesPerHalfCycle);
+	ball(float r, int nrPhi, int nrPsi);
 	~ball(void);
 };

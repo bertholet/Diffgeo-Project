@@ -178,9 +178,13 @@ float Operator::volume( mesh &m )
 
 	int sz = m.faces.size();
 	float volume=0;
+	float temp;
 	for(int i = 0; i < sz; i++){
-		volume += ((m.vertices[m.faces[i].a] + m.vertices[m.faces[i].b] + m.vertices[m.faces[i].c]) * (1.f/3)).dot(
+		temp= ((m.vertices[m.faces[i].a] + m.vertices[m.faces[i].b] + m.vertices[m.faces[i].c]) * (1.f/3)).dot(
 			tuple3f::cross((m.vertices[m.faces[i].b] - m.vertices[m.faces[i].a]),m.vertices[m.faces[i].c] - m.vertices[m.faces[i].a]));
+
+		//temp = (temp>0?temp:-temp);
+		volume+=temp;
 	}
 	volume = (volume < 0? -volume:volume);
 	return volume / 6;

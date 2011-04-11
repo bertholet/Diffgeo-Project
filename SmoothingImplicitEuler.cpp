@@ -124,7 +124,7 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 	maxfct = 1;		/* Maximum number of numerical factorizations.  */
 	mnum   = 1;         /* Which factorization to use. */
 
-	msglvl = 1;         /* Print statistical information  */
+	msglvl = 0;         /* Print statistical information  */
 
 	SYSTEM_INFO sysinfo; 	GetSystemInfo( &sysinfo );  	
 	num_procs = sysinfo.dwNumberOfProcessors;    
@@ -139,6 +139,7 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 	int_params[7] = 1;//1       /* Max numbers of iterative refinement steps. */
 	int_params[6] = 0;
 	//int_params[6] = 1; then the result is placed in b.
+	int_params[32] = 1; // compute determinant 
 
 	pardisoinit (pt,  &mtype, &solver, int_params, double_params, &error); 
 
@@ -166,8 +167,8 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 
 		exit(1);
 	}
-	else
-		printf("Matrice is well formed...\n");
+//	else
+//		printf("Matrice is well formed...\n");
 
 	/*pardiso_printstats (&mtype, &n, &a[0], &ia[0], &ja[0], &nrhs, &b[0][0], &error);
 	if (error != 0) {
@@ -180,7 +181,7 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 	/* ..  Reordering and Symbolic Factorization.  This step also allocates */
 	/*     all memory that is necessary for the factorization.              */
 	/* -------------------------------------------------------------------- */
-	phase = 11; 
+/*	phase = 11; 
 
 	pardiso (pt, &maxfct, &mnum, &mtype, &phase,
 		&n, &a[0], &ia[0], &ja[0], NULL, &nrhs,
@@ -198,7 +199,7 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 	/* -------------------------------------------------------------------- */
 	/* ..  Numerical factorization.                                         */
 	/* -------------------------------------------------------------------- */    
-	phase = 22;
+/*	phase = 22;
 	int_params[32] = 1; // compute determinant 
 
 	pardiso (pt, &maxfct, &mnum, &mtype, &phase,
@@ -214,7 +215,7 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 	/* -------------------------------------------------------------------- */    
 	/* ..  Back substitution and iterative refinement.                      */
 	/* -------------------------------------------------------------------- */    
-	phase = 33;
+/*	phase = 33;
 
 	int_params[7] = 1;       // Max numbers of iterative refinement steps. 
 
@@ -227,17 +228,17 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 		exit(3);
 	}
 
-
+*/
 
 	//Phases 1-3
-/*	phase = 13;
+	phase = 13;
 	//may be this is even correct....
 
 
 	pardiso (pt, &maxfct, &mnum, &mtype, &phase,
 		&n, &a[0], &ia[0], &ja[0], &idum, &nrhs,
-		int_params, &msglvl, &b[0][0], &x[0][0], &error, double_params);
-*/
+		int_params, &msglvl, b, x, &error, double_params);
+
 	// Release memory...
 	phase = -1;                 // Release internal memory. 
 
@@ -250,29 +251,12 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 	//testing...
 
 	int i = 0;
-	/*double res = 0;
-	for(int j = 0 ; j < ia[i+1]-ia[i]; j++){
-		cout <<"* " << a[ia[i] + ja[j] -2] << ",";
-		res += a[ia[i] + j -1]*x[ja[ia[i]+ j -1]-1][0];
-	}
-	cout << "diff; expected 0 ...." <<res -b[i][0]<<"\n";
-*/
-	double res;
-	double err_=0;
-	for(int k = 0; k < nrhs; k++){
-		for(i = 0; i < n; i++){
-			res = 0;
-			for(int j = 0 ; j < ia[i+1]-ia[i]; j++){
-				res += a[ia[i] + j -1]*x[ja[ia[i]+ j -1]-1 + k*n];
-			}
-			res = res -b[i + k* n];
-			res = (res >0 ?  res: -res);
-			err_ = (res > err_? res: err_);
-		}
-	}
+
+	double err_= calcBoxNormError();
 	cout << "MAXIMUM ERROR: " << err_ << "\n";
+	
 	//print first values of x;
-	cout <<"x(1:8,:)\n";
+	/*cout <<"x(1:8,:)\n";
 	for(i = 0; i < 8; i++){
 		for (int j = 0; j < nrhs; j++){
 			cout<<x[i + j * n] <<",";
@@ -293,6 +277,8 @@ void ImplicitEulerSmoothing::smootheMesh( mesh &m )
 
 	float factor = pow(oldVolume / Operator::volume(m), 0.33333333f);
 	m.scaleVertices(factor);
+
+	cout<< "Volume: " << Operator::volume(m);
 }
 
 
@@ -421,4 +407,23 @@ void ImplicitEulerSmoothing::updateVerticesAndB( mesh & m )
 	for(int i = 0; i < NRHS*sz; i++){
 		b[i] = x[i];
 	}
+}
+
+double ImplicitEulerSmoothing::calcBoxNormError(void) 
+{
+	int i;
+	double res;
+	double err_ =0;
+	for(int k = 0; k < NRHS; k++){
+		for(i = 0; i < n; i++){
+			res = 0;
+			for(int j = 0 ; j < ia[i+1]-ia[i]; j++){
+				res += a[ia[i] + j -1]*x[ja[ia[i]+ j -1]-1 + k*n];
+			}
+			res = res -b[i + k* n];
+			res = (res >0 ?  res: -res);
+			err_ = (res > err_? res: err_);
+		}
+	}
+	return err_;
 }
