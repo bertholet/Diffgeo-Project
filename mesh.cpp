@@ -11,6 +11,7 @@ mesh::mesh(void)
 {
 	position = matrixFactory::translate(0,0,-5);
 	rotation = matrixFactory::id();
+	lighTransform = matrixFactory::id();
 	color.set(1.f,1.f,1.f);
 }
 
@@ -35,6 +36,7 @@ mesh::mesh( const char* file )
 
 	position = matrixFactory::translate(0,0,-5);
 	rotation = matrixFactory::id();
+	lighTransform = matrixFactory::id();
 	color.set(1.f,1.f,1.f);
 }
 
@@ -58,6 +60,7 @@ mesh::mesh( const char* file, tuple3f col )
 
 	position = matrixFactory::translate(0,0,-5);
 	rotation = matrixFactory::id();
+	lighTransform = matrixFactory::id();
 	color = col;
 }
 
@@ -130,13 +133,41 @@ void mesh::initFaceNormals()
 	}
 }
 
+void mesh::addNormalNoise( float max )
+{
+	static float const alpha = 0.25;
+	for(unsigned int i = 0; i < vertices.size(); i++){
+		vertices[i] += normals[i] *( ((float)rand())/RAND_MAX * max );
+	}
+}
+
+void mesh::scaleVertices( float scale )
+{
+	for(unsigned int i = 0; i < vertices.size(); i++){
+		vertices[i] *= scale;
+	}
+}
+
+void mesh::rotY( float f )
+{
+	matrixf rot = matrixFactory::rotateX(f);
+	position = rot*position;
+	lighTransform = lighTransform*rot.transpose();
+}
+
+void mesh::rotX(float f)
+{
+	matrixf rot = matrixFactory::rotateY(f);
+	position = rot*position;
+	lighTransform = lighTransform*rot.transpose();
+}
 
 
 void mesh::glDisplayVertices( void )
 {
-	matrixf rot = matrixFactory::rotateY(0.00101f);
+	//matrixf rot = matrixFactory::rotateY(0.00101f);
 
-	position = /*rot2*/rot*position;
+	//position = /*rot2*/rot*position;
 
 	glLoadMatrixf((GLfloat *) &position); 
 
@@ -152,40 +183,41 @@ void mesh::glDisplayVertices( void )
 
 void mesh::glDisplayLines( void )
 {
-	matrixf rot = matrixFactory::rotateY(0.00101f);
+	//matrixf rot = matrixFactory::rotateY(0.00101f);
 
-	position = /*rot2*/rot*position;
+	//position = /*rot2*/rot*position;
 
 	glLoadMatrixf((GLfloat *) &position); 
 
-	glBegin(GL_LINES);
 	glColor3f(1.f,1.f,1.f);
 	for (unsigned int i = 0; i < faces.size(); i++)
 	{
+		glBegin(GL_LINE_LOOP);
 		//glVertex3fv( (GLfloat *) & vertices[i]);
 		glVertex3fv( (GLfloat *) & vertices[faces[i].a]);
 
 		glVertex3fv((GLfloat *) & vertices[faces[i].b]);
 
 		glVertex3fv((GLfloat *) & vertices[faces[i].c]);
-
+		glEnd();
 	}
-	glEnd();
 }
 
 
 DirectionalLight l(tuple3f(0,0,-1), tuple3f(1,1,1));
 void mesh::glDisplay( void )
 {
-	matrixf rot = matrixFactory::rotateY(0.00101f);
-	matrixf rot2 = matrixFactory::rotateX(0.00253f);
-	matrixf rot3 = matrixFactory::rotateZ(0.0017f);
+//	matrixf rot = matrixFactory::rotateY(0.00101f);
+//	matrixf rot2 = matrixFactory::rotateX(0.00253f);
+//	matrixf rot3 = matrixFactory::rotateZ(0.0017f);
 	//matrixf t = matrixFactory::translate(0,0,-0.01);
 	tuple3f normal;
+	tuple3f localLightDir;
 	tuple3f c;
 
-	position = rot2*rot*position;
-	l.direction = rot.transpose()*rot2.transpose()*l.direction;
+//	position = rot2*rot*position;
+	//l.direction = rot.transpose()*rot2.transpose()*l.direction;
+	localLightDir = lighTransform * l.direction;
 
 	glLoadMatrixf((GLfloat *) &position); 
 	glBegin(GL_TRIANGLES);
@@ -196,7 +228,8 @@ void mesh::glDisplay( void )
 			//cout << "faces[i] :" << vertices[faces[i].x].x<< "," << vertices[faces[i].x].y << "," << vertices[faces[i].x].z << "\n";
 			//glVertex3f( vertices[faces[i].x].x, vertices[faces[i].x].y, vertices[faces[i].x].z);
 			//c= intensities(i, l.direction);
-			c= intensitiesFlat(i, l.direction);
+			//c= intensitiesFlat(i, l.direction);
+			c= intensitiesFlat(i, localLightDir);
 			
 
 			glColor3f(c.x*color.x,c.x*color.y,c.x*color.z);
@@ -223,23 +256,26 @@ void mesh::glDisplay( void )
 
 void mesh::glDisplay( colorMap & cMap )
 {
-	matrixf rot = matrixFactory::rotateY(0.00101f);
-	matrixf rot2 = matrixFactory::rotateX(0.00253f);
-	matrixf rot3 = matrixFactory::rotateZ(0.0017f);
+//	matrixf rot = matrixFactory::rotateY(0.00101f);
+//	matrixf rot2 = matrixFactory::rotateX(0.00253f);
+//	matrixf rot3 = matrixFactory::rotateZ(0.0017f);
 	//matrixf t = matrixFactory::translate(0,0,-0.01);
 	tuple3f normal;
 	tuple3f c;
+	tuple3f localLightDir;
 
 	//position = /*rot2*rot*/position;
-	l.direction = rot.transpose()/*rot2.transpose()*/*l.direction;
+//	l.direction = rot.transpose()/*rot2.transpose()*/*l.direction;
+
+	localLightDir = lighTransform * l.direction;
 
 	tuple3f color;
 	glLoadMatrixf((GLfloat *) &position); 
 	glBegin(GL_TRIANGLES);
 	for (unsigned int i = 0; i < faces.size(); i++)
 	{
-		c= intensitiesFlat(i, l.direction);
-
+//		c= intensitiesFlat(i, l.direction);
+		c= intensitiesFlat(i, localLightDir);
 		color = cMap.color(faces[i].a);
 		glColor3f(c.x*color.x,c.x*color.y,c.x*color.z);
 		glVertex3fv( (GLfloat *) & vertices[faces[i].a]);
@@ -270,8 +306,11 @@ tuple3f mesh::intensities( unsigned int faceNr, tuple3f &direction )
 
 tuple3f mesh::intensitiesFlat( unsigned int faceNr, tuple3f &direction )
 {
-	float c = face_normals[faceNr].dot(direction);
-//	c= ( c>0? c: -c);
+	tuple3f temp_normal = tuple3f::cross(vertices[faces[faceNr].a] - vertices[faces[faceNr].b], vertices[faces[faceNr].c] - vertices[faces[faceNr].b]);
+	temp_normal.normalize();
+	//float c = face_normals[faceNr].dot(direction);
+	float c = temp_normal.dot(direction);
+	c= ( c>0? c: -c);
 	return tuple3f(c,c,c);
 }
 
@@ -284,20 +323,8 @@ void mesh::addUniformNoise( float max )
 	}
 }
 
-void mesh::addNormalNoise( float max )
-{
-	static float const alpha = 0.25;
-	for(unsigned int i = 0; i < vertices.size(); i++){
-		vertices[i] += normals[i] *( ((float)rand())/RAND_MAX * max );
-	}
-}
 
-void mesh::scaleVertices( float scale )
-{
-	for(unsigned int i = 0; i < vertices.size(); i++){
-		vertices[i] *= scale;
-	}
-}
+
 
 
 

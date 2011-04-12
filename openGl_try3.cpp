@@ -20,6 +20,7 @@
 #include "Smoothing.h"
 #include "SmoothingImplicitEuler.h"
 #include "simplestCube.h"
+#include "cube.h"
 
 #define HEIGHT 1000
 #define WIDTH 1000
@@ -42,6 +43,27 @@ ImplicitEulerSmoothing * smoother;
 //curvColormap * cMap;
 Smoothing s;
 
+bool spacePressed =false;
+
+void processNormalKeys(unsigned char key, int x, int y) {
+
+	if (key == ' ')
+		spacePressed = !spacePressed;
+
+	if (key == 'd')
+		bunny.rotX(0.05f);
+
+	if (key == 'a')
+		bunny.rotX(-0.05f);
+
+	if (key == 'w')
+		bunny.rotY(0.05f);
+
+	if (key == 's')
+		bunny.rotY(-0.05f);
+		
+}
+
 void implicitEulerTests(void){
 	//bunny = torus(2.f,1.f, 20, 50);
 	//smoother(bunny,0.1f, 0.1f);
@@ -51,10 +73,10 @@ void implicitEulerTests(void){
 }
 
 void implicitSmoothing(void){
-	smoother->smootheMesh(bunny);
-
-	Operator::calcAllCurvNormals(bunny,cMap->curvNormals);
-
+	if(spacePressed){
+		smoother->smootheMesh(bunny);
+		Operator::calcAllCurvNormals(bunny,cMap->curvNormals);
+	}
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	bunny.glDisplay((colorMap&) *cMap);
@@ -72,9 +94,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	//bunny= mesh("C:/Users/Petje/workspace/RA/objfiles/venusm.obj", tuple3f(1.f,0.f,0.f), 1.f/1000);
 	//bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 3);
 	//bunny = ball(1, 40);
-	bunny = torus(2.f,1.f, 30, 60);
+	//bunny = torus(2.f,1.f, 30, 60);
 	//bunny = simplestCube();
-	bunny.addNormalNoise(0.4f);
+	bunny = cube(2,20);
+
+	bunny.addNormalNoise(0.1f);
 	
 	cMap = new curvColormap(bunny);
 	//cMap = new gaussColormap(bunny);
@@ -82,8 +106,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	smoother = new ImplicitEulerSmoothing(bunny,1, 1);
 	implicitSmoothingDemo(argc,argv);
 	//implicitEulerTests();
-	delete smoother;
+	delete smoother;//*/
 	//smoothingDemo(argc, argv);
+	
 	//displayScene(argc, argv);
 	
 	//implicitEulerTests();
@@ -103,6 +128,7 @@ void renderScene4(void){
 	//define if clockwise or countercloickwise numeration is used
 	//glFrontFace(GL_CCW);
 	//LOLglShadeModel(GL_FLAT);
+
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	bunny.glDisplay();
@@ -130,7 +156,7 @@ void renderScene5(void){
 void renderScenePoints(void){
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	bunny.glDisplayLines();
+	bunny.glDisplayVertices();
 	glFlush();
 
 	//glEnable(GL_DEPTH_TEST);
@@ -165,6 +191,8 @@ int glutAWindow(void (*callback)(void)){
 	int a = glutCreateWindow("Mein erstes GLUT fenster");
 	//glutDisplayFunc(renderScene5);
 	glutDisplayFunc(callback);
+
+	glutKeyboardFunc(processNormalKeys);
 	//glutIdleFunc(idle);
 	return a;
 }
@@ -176,7 +204,7 @@ void displayScene( int argc, _TCHAR* * argv )
 	cout << "volume is : " << Operator::volume(bunny) << " \n";
 
 	glutInit(&argc, (char **) argv);
-	glutAWindow(renderScene4);
+	glutAWindow(renderScene4);//Scene4
 	glewInit();
 
 	glMatrixMode(GL_PROJECTION);

@@ -13,6 +13,7 @@ class mesh
 protected:
 	matrixf position;
 	matrixf rotation;
+	matrixf lighTransform;
 		//the normals at the vertice positions
 	vector<tuple3f> normals;
 	//the normals to the faces.
@@ -38,6 +39,9 @@ public:
 	void addNormalNoise( float max );
 	void scaleVertices(float scale);
 
+	void rotX(float phi);
+	void rotY( float phi );
+
 	vector<tuple3f>& getVertices(void){return vertices;}
 	vector<tuple3i>& getFaces(){return faces;}
 	
@@ -48,5 +52,4 @@ public:
 	void addUniformNoise(float sigma);
 	tuple3f intensities( unsigned int faceNr, tuple3f &direction );
 	tuple3f intensitiesFlat( unsigned int faceNr, tuple3f &direction );
-
 };
