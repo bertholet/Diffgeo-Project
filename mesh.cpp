@@ -57,6 +57,7 @@ mesh::mesh( const char* file, tuple3f col )
 	initFaceNormals();
 
 	tex = f.getTex();
+	face_tex = f.getFaceTextures();
 
 	position = matrixFactory::translate(0,0,-5);
 	rotation = matrixFactory::id();
@@ -81,10 +82,11 @@ mesh::mesh( const char* file, tuple3f col, float scale )
 	initFaceNormals();
 
 	tex = f.getTex();
+	face_tex = f.getFaceTextures();
 
 	position = matrixFactory::scale(scale) * matrixFactory::translate(0,0,-5);
 	rotation = matrixFactory::id();
-
+	lighTransform = matrixFactory::id();
 	color = col;
 }
 
@@ -151,15 +153,15 @@ void mesh::scaleVertices( float scale )
 void mesh::rotY( float f )
 {
 	matrixf rot = matrixFactory::rotateX(f);
-	position = rot*position;
-	lighTransform = lighTransform*rot.transpose();
+	rotation = rotation*rot;
+	lighTransform = rot.transpose()*lighTransform;
 }
 
 void mesh::rotX(float f)
 {
 	matrixf rot = matrixFactory::rotateY(f);
-	position = rot*position;
-	lighTransform = lighTransform*rot.transpose();
+	rotation = rotation*rot;
+	lighTransform = rot.transpose()*lighTransform;
 }
 
 
@@ -169,7 +171,7 @@ void mesh::glDisplayVertices( void )
 
 	//position = /*rot2*/rot*position;
 
-	glLoadMatrixf((GLfloat *) &position); 
+	glLoadMatrixf((GLfloat *) &(rotation*position)); 
 
 	glBegin(GL_POINTS);
 	glColor3f(1.f,1.f,1.f);
@@ -187,7 +189,7 @@ void mesh::glDisplayLines( void )
 
 	//position = /*rot2*/rot*position;
 
-	glLoadMatrixf((GLfloat *) &position); 
+	glLoadMatrixf((GLfloat *) &(rotation*position)); 
 
 	glColor3f(1.f,1.f,1.f);
 	for (unsigned int i = 0; i < faces.size(); i++)
@@ -219,7 +221,7 @@ void mesh::glDisplay( void )
 	//l.direction = rot.transpose()*rot2.transpose()*l.direction;
 	localLightDir = lighTransform * l.direction;
 
-	glLoadMatrixf((GLfloat *) &position); 
+	glLoadMatrixf((GLfloat *) &(rotation*position)); 
 	glBegin(GL_TRIANGLES);
 	for (unsigned int i = 0; i < faces.size(); i++)
 		{
@@ -270,7 +272,7 @@ void mesh::glDisplay( colorMap & cMap )
 	localLightDir = lighTransform * l.direction;
 
 	tuple3f color;
-	glLoadMatrixf((GLfloat *) &position); 
+	glLoadMatrixf((GLfloat *) &(rotation*position)); 
 	glBegin(GL_TRIANGLES);
 	for (unsigned int i = 0; i < faces.size(); i++)
 	{
@@ -291,6 +293,41 @@ void mesh::glDisplay( colorMap & cMap )
 	}
 	glEnd();
 
+}
+
+void mesh::glTexDisplay(void){
+	tuple3f normal;
+	tuple3f c;
+	tuple3f localLightDir;
+
+	//position = /*rot2*rot*/position;
+	//	l.direction = rot.transpose()/*rot2.transpose()*/*l.direction;
+
+	localLightDir = lighTransform * l.direction;
+
+	tuple3f color(0.8f,0.8f,0.8f);
+//	tuple3i temp;
+	glLoadMatrixf((GLfloat *) &(rotation*position)); 
+	glBegin(GL_TRIANGLES);
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+//		temp = face_tex[i];
+
+		c= intensitiesFlat(i, localLightDir);
+		glColor3fv((GLfloat *) &c);
+		glTexCoord2fv((GLfloat *) &tex[face_tex[i].a]);
+		glVertex3fv( (GLfloat *) & vertices[faces[i].a]);
+
+		glColor3fv((GLfloat *) &c);
+		glTexCoord2fv((GLfloat *) &tex[face_tex[i].b]);
+		glVertex3fv((GLfloat *) & vertices[faces[i].b]);
+
+		glColor3fv((GLfloat *) &c);
+		glTexCoord2fv((GLfloat *) &tex[face_tex[i].c]);
+		glVertex3fv((GLfloat *) & vertices[faces[i].c]);
+
+	}
+	glEnd();
 }
 
 tuple3f mesh::intensities( unsigned int faceNr, tuple3f &direction )
@@ -321,6 +358,48 @@ void mesh::addUniformNoise( float max )
 		randm = tuple3f(((float)rand())/RAND_MAX *max,((float)rand())/RAND_MAX * max,((float)rand())/RAND_MAX * max);
 		vertices[i]+= randm;
 	}
+}
+
+void mesh::normalize( void )
+{
+	float maxx= vertices[0].x, minx = vertices[0].x,
+		 maxy= vertices[0].y, miny = vertices[0].y,
+		  maxz= vertices[0].z, minz = vertices[0].z;
+
+	for(vector<tuple3f>::iterator it = vertices.begin(); it != vertices.end(); it++){
+		if(it->x > maxx){
+			maxx = it->x;
+		}
+		if(it->y > maxy){
+			maxy = it->y;
+		}
+		if(it->z > maxz){
+			maxz = it->z;
+		}
+		if(it->x < minx){
+			minx = it->x;
+		}
+		if(it->y < miny){
+			miny = it->y;
+		}
+		if(it->z < minz){
+			minz = it->z;
+		}
+	}
+
+	float max = (maxx>maxy? maxx:maxy);
+	max = (max>maxz?max:maxz);
+	float min = (minx < miny?minx:miny);
+	min = (min < minz?min:minz);
+
+	float scale = 2.f/(max - min);
+	/*tuple3f translation((-maxx + minx)/2,(-maxy + miny)/2,(-maxz + minz)/2);
+	for(vector<tuple3f>::iterator it = vertices.begin(); it != vertices.end(); it++){
+		(*it)+=translation;
+	}*/
+	scaleVertices(scale);
+
+
 }
 
 

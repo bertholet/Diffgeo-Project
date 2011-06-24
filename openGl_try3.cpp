@@ -8,7 +8,6 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include <iostream>
-#include "Vertex.h"
 #include "OBIFileReader.h"
 #include "matrixf.h"
 #include "matrixFactory.h"
@@ -19,8 +18,9 @@
 #include "torus.h"
 #include "Smoothing.h"
 #include "SmoothingImplicitEuler.h"
-#include "simplestCube.h"
-#include "cube.h"
+#include "glWindowHelper.h"
+#include "squareTexture.h"
+#include "meshOperation.h"
 
 #define HEIGHT 1000
 #define WIDTH 1000
@@ -33,9 +33,8 @@ int glutAWindow(void);
 void displayScene( int argc, _TCHAR* * argv );
 void smoothingDemo( int argc, _TCHAR* * argv );
 void implicitSmoothingDemo( int argc, _TCHAR* * argv );
+void textureDemo(squareTexture & tex);
 
-Vertex * points;
-Vertex actualPoint;
 mesh bunny;
 curvColormap * cMap;
 ImplicitEulerSmoothing * smoother;
@@ -91,19 +90,22 @@ void implicitSmoothing(void){
 int _tmain(int argc, _TCHAR* argv[])
 {
 
-	//bunny= mesh("C:/Users/Petje/workspace/RA/objfiles/venusm.obj", tuple3f(1.f,0.f,0.f), 1.f/1000);
+	bunny= mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
 	//bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 3);
-	//bunny = ball(1, 40);
+	//bunny = ball(1, 80,40);
 	//bunny = torus(2.f,1.f, 30, 60);
 	//bunny = simplestCube();
-	bunny = cube(2,20);
+	//bunny = cube(2,20);
 
-	bunny.addNormalNoise(0.1f);
+	bunny.normalize();
+	
+	meshOperation::getHalf(bunny,bunny, tuple3f(0,0,1),0);
+	//bunny.addNormalNoise(0.05f);
 	
 	cMap = new curvColormap(bunny);
 	//cMap = new gaussColormap(bunny);
 
-	smoother = new ImplicitEulerSmoothing(bunny,1, 1);
+	smoother = new ImplicitEulerSmoothing(bunny,1, 0.1f);
 	implicitSmoothingDemo(argc,argv);
 	//implicitEulerTests();
 	delete smoother;//*/
@@ -111,13 +113,16 @@ int _tmain(int argc, _TCHAR* argv[])
 	
 	//displayScene(argc, argv);
 	
-	//implicitEulerTests();
+	/*//smoother = new ImplicitEulerSmoothing(bunny,1, 0.1f);
+	squareTexture s = squareTexture();
+	textureDemo(s);
+	//delete smoother;*/
+
+	//GLWindow window = GLWindow(300,150);
 
 	int a ;
 	cout << " rhablabla";
 	cin >> a;
-
-	delete cMap;
 	return 0;
 }
 
@@ -165,8 +170,10 @@ void renderScenePoints(void){
 }
 
 void smoothing(void){
-	s.smootheMesh_explicitEuler(bunny);
-		cMap->setNormals(s.normals);
+	if(spacePressed){
+		s.smootheMesh_explicitEuler(bunny);
+			cMap->setNormals(s.normals);
+	}
 
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -240,7 +247,9 @@ void implicitSmoothingDemo( int argc, _TCHAR* * argv )
 	cout << cMap->additionalInfo() << "\n";
 	cout << "volume is : " << Operator::volume(bunny) << " \n";
 
-	glutInit(&argc, (char **) argv);
+	glWindowHelper::glWindow(450,450,implicitSmoothing, processNormalKeys); 
+	glutMainLoop();
+	/*glutInit(&argc, (char **) argv);
 	glutAWindow(implicitSmoothing);
 	glewInit();
 
@@ -249,6 +258,38 @@ void implicitSmoothingDemo( int argc, _TCHAR* * argv )
 	gluPerspective(100.0,GLdouble(WIDTH)/HEIGHT, 2.0, 10000.0);
 	//glOrtho(0,WIDTH ,0, HEIGHT,-1,1);
 	glMatrixMode(GL_MODELVIEW);
+
+	glutMainLoop();*/
+}
+
+
+void texture(void){
+
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	bunny.glTexDisplay();
+	//bunny.glDisplay();
+	glFlush();
+
+	//glEnable(GL_DEPTH_TEST);
+	glutPostRedisplay();
+}
+
+void textureDemo(squareTexture &tex){
+	glWindowHelper::glWindow(450,450,texture, processNormalKeys); 
+
+	glTexEnvf(GL_TEXTURE_2D, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	GLuint tex_id;
+	glGenTextures(1, &tex_id);
+	glBindTexture(GL_TEXTURE_2D, tex_id);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex.szx,tex.szy,0,GL_RGBA, GL_FLOAT, &(tex.checkboard[0]));
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_DEPTH_TEST);
+
+	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
 	glutMainLoop();
 }

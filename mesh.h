@@ -19,7 +19,7 @@ protected:
 	//the normals to the faces.
 	vector<tuple3f> face_normals;
 	//the indices of the normals at the vertex points of the faces
-	vector<tuple3i> face_normals_perVertex; 
+	vector<tuple3i> face_normals_perVertex, face_tex; 
 	vector<tuple3f> tex;
 	tuple3f color;
 public:
@@ -41,6 +41,7 @@ public:
 
 	void rotX(float phi);
 	void rotY( float phi );
+	void normalize(void);
 
 	vector<tuple3f>& getVertices(void){return vertices;}
 	vector<tuple3i>& getFaces(){return faces;}
@@ -49,6 +50,7 @@ public:
 	void glDisplayLines(void);
 	void glDisplay(void);
 	void glDisplay(colorMap & cMap);
+	void glTexDisplay(void);
 	void addUniformNoise(float sigma);
 	tuple3f intensities( unsigned int faceNr, tuple3f &direction );
 	tuple3f intensitiesFlat( unsigned int faceNr, tuple3f &direction );

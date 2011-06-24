@@ -14,6 +14,7 @@ class OBIFileReader
 	vector<tuple3f> normals;
 	vector<tuple3i> faces;
 	vector<tuple3i> faces_normals;
+	vector<tuple3i> faces_textures;
 	vector<tuple3f> tex;
 
 public:
@@ -27,6 +28,8 @@ public:
 	vector<tuple3i> getFaces(){return faces;}
 	vector<tuple3i> getFaceNormals(){
 		return faces_normals;}
+	vector<tuple3i> getFaceTextures(){
+		return faces_textures;}
 
 	void checkAllVerticesUsed(void);
 	//int hasVertex(void);

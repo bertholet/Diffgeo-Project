@@ -61,9 +61,9 @@ void OBIFileReader::parse(const char * file){
 			normals.push_back(tuple);
 		}
 		else if(what1 == 'v' && what2 == 't'){
-			sscanf(buff.c_str(), "vt %f %f %f", &val1, &val2, &val3);
+			sscanf(buff.c_str(), "vt %f %f", &val1, &val2);
 			//cout << val1 << " " << val2 << " " << val3 << " is my tex\n";
-			tuple.set(val1, val2, val3);
+			tuple.set(val1, val2, 0.f);
 			tex.push_back(tuple);
 		}
 		else if(what1 == 'f' && what2 == ' '){
@@ -93,6 +93,22 @@ void OBIFileReader::parse(const char * file){
 				tuplei.set(lexical_cast<int>(tokens[2])-1,
 					lexical_cast<int>(tokens[4]) -1,
 					lexical_cast<int>(tokens[6]) -1);
+				faces_normals.push_back(tuplei);
+			}
+			else if(tokens.size() == 10){//assume there are onlyvertices and normals
+				tuplei.set(lexical_cast<int>(tokens[1])-1,
+					lexical_cast<int>(tokens[4]) -1,
+					lexical_cast<int>(tokens[7]) -1);
+				faces.push_back(tuplei);
+
+				tuplei.set(lexical_cast<int>(tokens[2])-1,
+					lexical_cast<int>(tokens[5]) -1,
+					lexical_cast<int>(tokens[8]) -1);
+				faces_textures.push_back(tuplei);
+
+				tuplei.set(lexical_cast<int>(tokens[3])-1,
+					lexical_cast<int>(tokens[6]) -1,
+					lexical_cast<int>(tokens[9]) -1);
 				faces_normals.push_back(tuplei);
 			}
 			else{
