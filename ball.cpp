@@ -120,129 +120,6 @@ ball::ball(float r, int verticesPerHalfCycle)
 	initFaceNormals();
 }
 
-ball::ball( float r, int nrPhi, int nrPhi2,int nrPsi )
-	{float x,y, z, delta, phi, psi;
-	int N = nrPhi, startIndex_actualRing, startIndex_lastRing, actualRing_size, lastRing_size,n;
-	int M = nrPsi;
-	float maxDelta = r * 2 * PI / nrPhi;
-	float maxDelta2= r* 2 * PI / nrPhi2;
-
-	vertices.push_back(tuple3f(0,0,-r));
-	//lastRing_indices.push_back(0);
-	startIndex_lastRing = 0;
-	lastRing_size =1;
-	
-	delta = maxDelta;
-	psi = - PI;
-	n = N;
-	while(psi< 0){
-		if(psi>0 && delta >maxDelta2){
-			delta = delta /2;
-			n = 2 * n;
-		}
-
-		psi += 1.f/ n *2 * PI;
-		z = r*cos(psi);
-	/*}
-	for(int i = 1; i <M; i++){
-		psi = 1.f / M * i * PI;
-		z = r*cos(psi);
-
-		n = N;
-		if(i>M/2 && delta >maxDelta2){
-			delta = delta /2;
-			n = 2 * n;
-		}*/
-
-		startIndex_actualRing = vertices.size();
-		actualRing_size = n;
-
-		for(int j = 0; j < n; j++)
-		{
-			phi = 2.f / n * j * PI;
-			x = r*sin(psi)*cos(phi);
-			y = r*sin(psi)*sin(phi);
-			vertices.push_back(tuple3f(x,y,z));
-		}
-
-		//update faces;
-		if(lastRing_size ==1){
-			for(int i = 0; i < actualRing_size; i++){
-				faces.push_back(tuple3i(startIndex_lastRing, 
-					i+startIndex_actualRing, 
-					startIndex_actualRing+(i+1)%(actualRing_size)));
-			}
-		}
-		else if(lastRing_size == 2* actualRing_size ){
-			for(int i = 0; i < actualRing_size; i++){
-				faces.push_back(tuple3i(
-					startIndex_lastRing + (2*i + 1),
-					startIndex_lastRing + 2*i,
-					startIndex_actualRing + i));
-				faces.push_back(tuple3i(
-					startIndex_lastRing + (2*i + 1),
-					startIndex_actualRing + i,
-					startIndex_actualRing + (i+1)%actualRing_size));
-				faces.push_back(tuple3i(
-					startIndex_lastRing + (2*i + 2)%lastRing_size,
-					startIndex_lastRing + 2*i+1,
-					startIndex_actualRing + (i+1)%actualRing_size));
-			}
-		}
-		else if (lastRing_size * 2 == actualRing_size){
-			for(int i = 0; i < lastRing_size; i++){
-				faces.push_back(tuple3i(
-					startIndex_lastRing + i,
-					startIndex_actualRing + 2*i,
-					startIndex_actualRing + (2*i+1)));
-				faces.push_back(tuple3i(
-					startIndex_lastRing + i,
-					startIndex_actualRing + 2*i+1,
-					startIndex_lastRing + (i+1)%lastRing_size));
-				faces.push_back(tuple3i(
-					startIndex_lastRing + (i+1)%lastRing_size,
-					startIndex_actualRing + 2*i+1,
-					startIndex_actualRing + (2*i+2)%actualRing_size));
-			}
-		}
-		else if(lastRing_size == actualRing_size){
-			for(int i = 0; i < lastRing_size; i++){
-				faces.push_back(tuple3i(
-					startIndex_lastRing + (i+1)%lastRing_size,
-					startIndex_lastRing + i,
-					startIndex_actualRing + i));
-				faces.push_back(tuple3i(startIndex_lastRing + (i+1)%lastRing_size,
-					startIndex_actualRing + i,
-					startIndex_actualRing + (i+1)%actualRing_size));
-			}
-		}
-		else{
-			throw std::exception("bad programming in ball.cpp, unexpected case happened.");
-		}
-
-
-		//updateLastRingIndices
-		startIndex_lastRing = startIndex_actualRing;
-		lastRing_size = actualRing_size;
-	}
-	vertices.push_back(tuple3f(0,0,-r));
-	startIndex_actualRing = vertices.size() -1;
-	for(int i = 0; i < lastRing_size; i++){
-		faces.push_back(tuple3i(
-			startIndex_lastRing + i,
-			startIndex_actualRing, 
-			startIndex_lastRing + (i+1)%lastRing_size));
-	}
-
-	normals = vertices;
-	for(unsigned int i= 0; i < normals.size(); i++){
-		normals[i].normalize();
-	}
-	face_normals_perVertex = faces;
-	initFaceNormals();
-}
-
-
 ball::ball( float r, int nrPhi, int nrPsi, bool FUN)
 {
 	float x,y, z, phi, psi;
@@ -384,6 +261,128 @@ ball::ball( float r, int nrPhi, int nrPsi )
 	for(unsigned int i= 0; i < normals.size(); i++){
 		normals[i].normalize();
 	}
+	initFaceNormals();
+}
+
+ball::ball( float r, int nrPhi, int nrPhi2,int nrPsi )
+	{float x,y, z, delta, phi, psi;
+	int N = nrPhi, startIndex_actualRing, startIndex_lastRing, actualRing_size, lastRing_size,n;
+	int M = nrPsi;
+	float maxDelta = r * 2 * PI / nrPhi;
+	float maxDelta2= r* 2 * PI / nrPhi2;
+
+	vertices.push_back(tuple3f(0,0,-r));
+	//lastRing_indices.push_back(0);
+	startIndex_lastRing = 0;
+	lastRing_size =1;
+	
+	delta = maxDelta;
+	psi = - PI;
+	n = N;
+	while(psi< 0){
+		if(psi>0 && delta >maxDelta2){
+			delta = delta /2;
+			n = 2 * n;
+		}
+
+		psi += 1.f/ n *2 * PI;
+		z = r*cos(psi);
+	/*}
+	for(int i = 1; i <M; i++){
+		psi = 1.f / M * i * PI;
+		z = r*cos(psi);
+
+		n = N;
+		if(i>M/2 && delta >maxDelta2){
+			delta = delta /2;
+			n = 2 * n;
+		}*/
+
+		startIndex_actualRing = vertices.size();
+		actualRing_size = n;
+
+		for(int j = 0; j < n; j++)
+		{
+			phi = 2.f / n * j * PI;
+			x = r*sin(psi)*cos(phi);
+			y = r*sin(psi)*sin(phi);
+			vertices.push_back(tuple3f(x,y,z));
+		}
+
+		//update faces;
+		if(lastRing_size ==1){
+			for(int i = 0; i < actualRing_size; i++){
+				faces.push_back(tuple3i(startIndex_lastRing, 
+					i+startIndex_actualRing, 
+					startIndex_actualRing+(i+1)%(actualRing_size)));
+			}
+		}
+		else if(lastRing_size == 2* actualRing_size ){
+			for(int i = 0; i < actualRing_size; i++){
+				faces.push_back(tuple3i(
+					startIndex_lastRing + (2*i + 1),
+					startIndex_lastRing + 2*i,
+					startIndex_actualRing + i));
+				faces.push_back(tuple3i(
+					startIndex_lastRing + (2*i + 1),
+					startIndex_actualRing + i,
+					startIndex_actualRing + (i+1)%actualRing_size));
+				faces.push_back(tuple3i(
+					startIndex_lastRing + (2*i + 2)%lastRing_size,
+					startIndex_lastRing + 2*i+1,
+					startIndex_actualRing + (i+1)%actualRing_size));
+			}
+		}
+		else if (lastRing_size * 2 == actualRing_size){
+			for(int i = 0; i < lastRing_size; i++){
+				faces.push_back(tuple3i(
+					startIndex_lastRing + i,
+					startIndex_actualRing + 2*i,
+					startIndex_actualRing + (2*i+1)));
+				faces.push_back(tuple3i(
+					startIndex_lastRing + i,
+					startIndex_actualRing + 2*i+1,
+					startIndex_lastRing + (i+1)%lastRing_size));
+				faces.push_back(tuple3i(
+					startIndex_lastRing + (i+1)%lastRing_size,
+					startIndex_actualRing + 2*i+1,
+					startIndex_actualRing + (2*i+2)%actualRing_size));
+			}
+		}
+		else if(lastRing_size == actualRing_size){
+			for(int i = 0; i < lastRing_size; i++){
+				faces.push_back(tuple3i(
+					startIndex_lastRing + (i+1)%lastRing_size,
+					startIndex_lastRing + i,
+					startIndex_actualRing + i));
+				faces.push_back(tuple3i(startIndex_lastRing + (i+1)%lastRing_size,
+					startIndex_actualRing + i,
+					startIndex_actualRing + (i+1)%actualRing_size));
+			}
+		}
+		else{
+			throw std::exception("bad programming in ball.cpp, unexpected case happened.");
+		}
+
+
+		//updateLastRingIndices
+		startIndex_lastRing = startIndex_actualRing;
+		lastRing_size = actualRing_size;
+	}
+	vertices.push_back(tuple3f(0,0,-r));
+	startIndex_actualRing = vertices.size() -1;
+	for(int i = 0; i < lastRing_size; i++){
+		faces.push_back(tuple3i(
+			startIndex_lastRing + i,
+			startIndex_actualRing, 
+			startIndex_lastRing + (i+1)%lastRing_size));
+	}
+
+	normals = vertices;
+	for(unsigned int i= 0; i < normals.size(); i++){
+		normals[i].normalize();
+	}
+	face_normals_perVertex = faces;
 	initFaceNormals();
 }
 
