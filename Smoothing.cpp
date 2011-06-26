@@ -42,7 +42,7 @@ int Smoothing::contains(vector<int> , int face){
 
 void Smoothing::smootheMesh_explicitEuler( mesh& m )
 {
-	float lambda= 1, dt= 0.000001f;
+	float lambda= 1, dt= 0.0001f;
 	float vol_old = Operator::volume(m), factor;
 	Operator::calcAllCurvNormals(m, normals);
 

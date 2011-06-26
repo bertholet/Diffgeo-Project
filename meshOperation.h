@@ -15,7 +15,7 @@ public:
 		vector<tuple3i> faces;
 		vector<tuple3f> vertices;
 
-		for(int i = 0; i < m.faces.size(); i++){
+		for(unsigned int i = 0; i < m.faces.size(); i++){
 
 			if(((tuple3f) m.vertices[m.faces[i].a]).dot(direction)>dist ||
 				((tuple3f) m.vertices[m.faces[i].b]).dot(direction)>dist||
@@ -45,7 +45,7 @@ public:
 
 		}
 
-		for(int i = 0; i < usedVertices.size(); i++){
+		for(unsigned int i = 0; i < usedVertices.size(); i++){
 			vertices.push_back(m.vertices[usedVertices[i]]);
 		}
 
@@ -53,5 +53,99 @@ public:
 		target.vertices = vertices;
 		target.initNormalsFromVertices();
 
+	}
+
+	static void getBorder(mesh & m, vector<int> & target){
+		
+		vector<int> *neighbors = new vector<int>[m.vertices.size()];
+
+		getNeighbors(m.faces, neighbors);
+		//vertex i is a border iff it has: only two neigbors
+		//or has one (two) neigbors connected with only one furter neigbor
+		
+		for(int i = 0; i < m.vertices.size(); i++){
+			if(isOnBorder(i, neighbors)){
+				target.push_back(i);
+			}
+		}
+
+		delete[] neighbors;
+
+	}
+
+	static void getNeighbors(vector<tuple3i> & faces, vector<int> * neighbors){
+			
+		for(unsigned int i = 0; i < faces.size(); i++){
+
+		/*debug[faces[i].a]++;
+		debug[faces[i].b]++;
+		debug[faces[i].c]++;*/
+		//adds the integers such that the vector stays ordered.
+
+			ifNotContainedAdd(neighbors[faces[i].a], faces[i].b);
+			ifNotContainedAdd(neighbors[faces[i].b], faces[i].a);
+
+			ifNotContainedAdd(neighbors[faces[i].a], faces[i].c);
+			ifNotContainedAdd(neighbors[faces[i].c], faces[i].a);
+
+			ifNotContainedAdd(neighbors[faces[i].b], faces[i].c);
+			ifNotContainedAdd(neighbors[faces[i].c], faces[i].b);
+
+		}
+	}
+
+private:
+	static void ifNotContainedAdd( vector<int> &v, int a )
+	{
+		vector<int>::iterator low;
+
+		low = lower_bound(v.begin(), v.end(),a);
+		if(low == v.end() || *low != a){
+			v.insert(low,1,a);
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	//if all edges are part of two closed triangle paths involving vertex_nr
+	//this is not a border vertex
+	//////////////////////////////////////////////////////////////////////////
+	static bool isOnBorder(int vertex_nr, vector<int> * neighbors){
+
+		//is not on border exactly if it is in two faces
+		//or h
+		bool isBorder =false;
+		vector<int> & oneRing = neighbors[vertex_nr];
+
+		if(oneRing.size() == 2){
+			return true;
+		}
+
+		vector<int>::iterator nbr, nbr2,nbr3, end, end3;
+		int count = 0;
+
+		//for each neighbor nbr: look at its neighbors nbr2. if nbr2 is a neighbor of
+		//the original node count ++
+		for(nbr = oneRing.begin(); nbr != oneRing.end(); nbr++){
+			count = 0;
+
+			nbr2 = neighbors[*nbr].begin();	
+			end  = neighbors[*nbr].end();	
+			//"neighbor's neighbor
+			for(;nbr2 != end; nbr2++){
+				nbr3 = neighbors[*nbr2].begin();	
+				end3= neighbors[*nbr2].end();
+				
+				//neighbor's neighbor is a neighbor of original node
+				for(;nbr3 != end3; nbr3++){
+					if(*nbr3 == vertex_nr){
+						count++;
+					}
+				}
+			}
+			if(count < 2){
+				return true;
+			}
+		}
+		return false;
 	}
 };

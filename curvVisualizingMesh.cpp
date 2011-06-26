@@ -3,6 +3,7 @@
 #include <math.h>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 
 curvColormap::curvColormap(mesh &myMesh)
@@ -107,4 +108,18 @@ tuple3f gaussColormap::color( int vertexNr )
 std::string gaussColormap::additionalInfo( void )
 {
 	return info;
+}
+
+std::string borderColorMap::additionalInfo( void )
+{
+	return info;
+}
+
+tuple3f borderColorMap::color( int vertexNr )
+{
+	if(vertexNr < sz && border[vertexNr]){
+		return col1;
+	}
+
+	return col2;
 }

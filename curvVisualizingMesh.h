@@ -34,3 +34,36 @@ public:
 	tuple3f color(int vertexNr);
 	string additionalInfo(void);
 };
+
+
+class borderColorMap:colorMap
+{
+	string info;
+	bool *border;
+	tuple3f col1,  col2;
+	int sz;
+public:
+	borderColorMap(vector<int> & border_, tuple3f color1, tuple3f color2){
+		sz = border_.back();
+		vector<int>::iterator it = border_.begin();
+
+		border = new bool[sz];
+		for(int i = 0; i < sz; i++){
+			if(*it == i){
+				it++;
+				border[i] = true;
+			} 
+			else{
+				border[i] = false;
+			}
+		}
+		col1 = color1;
+		col2 = color2;
+	}
+	~borderColorMap(){
+		delete border;
+	}
+
+	tuple3f color(int vertexNr);
+	string additionalInfo(void);
+};
