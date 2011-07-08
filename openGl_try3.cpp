@@ -93,8 +93,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		
 	//bunny = cube(2.f, 10);
-	bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/teapotTex.obj", tuple3f(1.f,0.f,0.f), 2.f);
-	//bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
+	//bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/teapotTex.obj", tuple3f(1.f,0.f,0.f), 2.f);
+	bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
 	//bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 3);
 	//bunny = ball(1, 80,40);
 	//bunny = torus(2.f,1.f, 30, 60);
@@ -105,7 +105,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	
 	meshOperation::getHalf(bunny,bunny, tuple3f(0,0,1),0);
 	vector<int> border;
-	meshOperation::getBorder(bunny,border);
+	vector<int> borderStarts;
+	meshOperation::getBorder(bunny,border, borderStarts);
 	//bunny.addNormalNoise(0.05f);
 	
 	//cMap = new curvColormap(bunny);

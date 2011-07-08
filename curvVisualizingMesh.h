@@ -5,6 +5,7 @@
 #include "colorMap.h"
 #include <vector>
 #include <string>
+#include <algorithm>
 
 class curvColormap : colorMap
 {
@@ -44,13 +45,12 @@ class borderColorMap:colorMap
 	int sz;
 public:
 	borderColorMap(vector<int> & border_, tuple3f color1, tuple3f color2){
-		sz = border_.back();
-		vector<int>::iterator it = border_.begin();
+		sz = max_(border_);
+		//vector<int>::iterator it = border_.begin();
 
 		border = new bool[sz];
 		for(int i = 0; i < sz; i++){
-			if(*it == i){
-				it++;
+			if(find(border_.begin(), border_.end(),i) != border_.end()){
 				border[i] = true;
 			} 
 			else{
@@ -66,4 +66,14 @@ public:
 
 	tuple3f color(int vertexNr);
 	string additionalInfo(void);
+	
+	int max_( vector<int> & border_ ){
+		int max = -1;
+		for(int i = 0 ; i < border_.size(); i++){
+			if(border_[i] > max){
+				max = border_[i];
+			}
+		}
+		return max;
+	}
 };

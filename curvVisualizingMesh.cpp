@@ -123,3 +123,4 @@ tuple3f borderColorMap::color( int vertexNr )
 
 	return col2;
 }
+

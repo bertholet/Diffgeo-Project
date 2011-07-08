@@ -55,9 +55,11 @@ public:
 
 	}
 
-	static void getBorder(mesh & m, vector<int> & target){
+	static void getBorder(mesh & m, vector<int> & target, vector<int> & starts){
 		
+		target.clear();
 		vector<int> *neighbors = new vector<int>[m.vertices.size()];
+		vector<int> border;
 
 		getNeighbors(m.faces, neighbors);
 		//vertex i is a border iff it has: only two neigbors
@@ -65,7 +67,21 @@ public:
 		
 		for(int i = 0; i < m.vertices.size(); i++){
 			if(isOnBorder(i, neighbors)){
-				target.push_back(i);
+				border.push_back(i);
+				//target.push_back(i);
+			}
+		}
+
+
+		int nextVertex;
+		while(!border.empty()){
+			nextVertex = (border.back());
+			border.pop_back();
+			
+			starts.push_back((target.size()));
+			target.push_back(nextVertex);
+			while((nextVertex = nextBorderVertex(nextVertex, border, neighbors)) >-1){
+				target.push_back(nextVertex);
 			}
 		}
 
@@ -103,6 +119,26 @@ private:
 		if(low == v.end() || *low != a){
 			v.insert(low,1,a);
 		}
+	}
+
+	static int nextBorderVertex( int vertex, vector<int> &border, vector<int> * neighbors )
+	{
+		vector<int> & nbrs = neighbors[vertex];
+
+		vector<int>::iterator it = nbrs.begin(), borderEl;
+		int result;
+
+		//check for each neighbor if it lies on the border until one is found.
+		for(it = nbrs.begin(); it != nbrs.end(); it++){
+			borderEl = lower_bound(border.begin(), border.end(),*it);
+			if(borderEl != border.end() && *borderEl == *it){
+				border.erase(borderEl);
+				result = *it;
+				return *it;
+			}
+		}
+		return -1;
+
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -148,4 +184,6 @@ private:
 		}
 		return false;
 	}
+
+
 };
