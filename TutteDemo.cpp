@@ -86,3 +86,30 @@ void TutteDemo::run( mesh &m )
 
 	glutMainLoop();
 }
+
+void TutteDemo::run( mesh &m, double (*weights ) (int, int,mesh &, vector<int>& /*nbr_i*/,
+		vector<int>&/*fc_i*/, vector<int>& /*border*/) )
+{
+	this->bunny = &m;
+	TutteEmbedding embedding;
+	embedding.calcTexturePos(m, weights);
+
+	glWindowHelper::glWindow(450,450, tutDemo::callback, tutDemo::processNormalKeys);
+
+	glTexEnvf(GL_TEXTURE_2D, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	GLuint tex_id;
+	glGenTextures(1, &tex_id);
+	glBindTexture(GL_TEXTURE_2D, tex_id);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex->szx,tex->szy,0,GL_RGBA, GL_FLOAT, 
+		&(tex->checkboard[0]));
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_DEPTH_TEST);
+
+	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+
+	glutMainLoop();
+}

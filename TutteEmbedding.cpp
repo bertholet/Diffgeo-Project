@@ -50,6 +50,40 @@ void TutteEmbedding::calcTexturePos( mesh &m )
 	delete[] x,y;
 }
 
+void TutteEmbedding::calcTexturePos( mesh &m, double (*weights ) (int, int,mesh &, vector<int>& /*nbr_i*/, vector<int>&/*fc_i*/, vector<int>& /*border*/) )
+{
+	vector<int> border;
+	vector<int> loops;
+	vector<double> b(m.getVertices().size());
+	meshOperation::getBorder(m,border,loops);
+
+	if(loops.size() > 1){
+		throw std::exception("Only a single border allowed with this Method");
+	}
+
+	vector<tuple3f> outerPos;
+	double * x = new double[m.getVertices().size()];
+	double * y = new double[m.getVertices().size()];
+
+	pardisoMatrix mat;
+	pardisoSolver parsolver(pardisoSolver::MT_STRUCTURALLY_SYMMETRIC,
+		pardisoSolver::SOLVER_ITERATIVE,
+		2);
+	setUp(mat, border, m, weights);
+	parsolver.setMatrix(mat, 1);
+
+	getBorderPos(outerPos, border.size());
+	setUpX(b, border,outerPos, m.getVertices().size());
+	parsolver.solve(x,&b[0]);
+
+	setUpY(b, border,outerPos, m.getVertices().size());
+	parsolver.solve(y,&b[0]);
+
+	m.setTextures_perVertex(x,y);
+
+	delete[] x,y;
+}
+
 void TutteEmbedding::getBorderPos( vector<tuple3f> & outerPos , int sz)
 {
 	for(int i = 0; i < sz;i++){
@@ -61,14 +95,21 @@ void TutteEmbedding::getBorderPos( vector<tuple3f> & outerPos , int sz)
 /* Set up Matrix                                                                     */
 /************************************************************************/
 void TutteEmbedding::setUp( pardisoMatrix &mat, vector<int> &border, mesh & m, 
-						   double (*weights ) (int /*i*/, int /*j*/, mesh & , vector<int>& /*neighbors_i*/, vector<int>& /*border*/))
+						   double (*weights ) (int /*i*/, int /*j*/, mesh & , 
+								vector<int>& /*neighbors_i*/,vector<int>& /*neighbor_faces_i*/,
+								vector<int>& /*border*/))
 {
 	int nrVertices = m.getVertices().size(), count;
 	bool a_ii_added = false;
 	vector<int> * neighbors = new vector<int>[nrVertices];
+	vector<int> * neighbor_faces = new vector<int>[nrVertices];
+	double factor;
+
 	vector<int> & nbrs_i = *neighbors;
+	vector<int> & nbr_fc_i = *neighbor_faces;
 	vector<int>::iterator j;
 	meshOperation::getNeighbors(m.getFaces(), neighbors);
+	meshOperation::getNeighborFaces(m.getFaces(), neighbor_faces);
 	//set up indices some values might be zero. values are assumed to be only at (i,j) if i and j are neighbors
 	
 	count = 1;
@@ -80,21 +121,29 @@ void TutteEmbedding::setUp( pardisoMatrix &mat, vector<int> &border, mesh & m,
 
 	for(int i = 0; i < nrVertices;i++){
 		nbrs_i = neighbors[i];
+		nbr_fc_i = neighbor_faces[i];
 		a_ii_added = false;
-	
+
+		//calculate normation factor
+		factor = 0;
+		for(j = nbrs_i.begin(); j!=nbrs_i.end(); j++){
+			factor += weights(i,*j,m,nbrs_i,nbr_fc_i,border);
+		}
+
 		for(j = nbrs_i.begin(); j!=nbrs_i.end(); j++){
 			if(i< *j &&! a_ii_added){
 				mat.ja.push_back(i+1);
 				a_ii_added = true;
-				mat.a.push_back(weights(i,i,m,nbrs_i,border));
+				mat.a.push_back(weights(i,i,m,nbrs_i,nbr_fc_i,border));
 			}
 			mat.ja.push_back((*j) +1);
-			mat.a.push_back(weights(i,*j,m,nbrs_i,border));
+			mat.a.push_back((factor <0.0001?0:weights(i,*j,m,nbrs_i,nbr_fc_i,border)/factor));
+
 		}
 		if(!a_ii_added){
 			mat.ja.push_back(i+1);
 			a_ii_added = true;
-			mat.a.push_back(weights(i,i,m,nbrs_i,border));
+			mat.a.push_back(weights(i,i,m,nbrs_i,nbr_fc_i,border));
 		}
 	}
 	
@@ -103,7 +152,7 @@ void TutteEmbedding::setUp( pardisoMatrix &mat, vector<int> &border, mesh & m,
 	}
 	
 	
-	delete[] neighbors; 
+	delete[] neighbors, neighbor_faces; 
 }
 
 /************************************************************************/

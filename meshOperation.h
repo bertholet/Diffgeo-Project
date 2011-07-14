@@ -66,6 +66,9 @@ public:
 		//or has one (two) neigbors connected with only one furter neigbor
 		int nrVertices = m.vertices.size();
 		for(int i = 0; i < nrVertices; i++){
+			if(i == 44){
+				i = 44;
+			}
 			if(isOnBorder(i, neighbors)){
 				border.push_back(i);
 				//target.push_back(i);
@@ -120,6 +123,32 @@ public:
 
 		}
 	}
+
+	static void getNeighborFaces(vector<tuple3i> & faces, vector<int> * neighbor_faces){
+			
+		for(int i = 0; i < (int) faces.size(); i++){
+
+		/*debug[faces[i].a]++;
+		debug[faces[i].b]++;
+		debug[faces[i].c]++;*/
+		//adds the integers such that the vector stays ordered.
+
+			neighbor_faces[faces[i].a].push_back(i);
+			neighbor_faces[faces[i].b].push_back(i);
+			neighbor_faces[faces[i].c].push_back(i);
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	//returns the index of the predecessor of v in the neighbors of the center_index
+	//vertex (by orientation induced from the face orientation)
+	//////////////////////////////////////////////////////////////////////////
+	static int getPrevious( int center_index, vector<int> & neighbor_faces, int v, mesh& m );
+	//////////////////////////////////////////////////////////////////////////
+	//returns the index of the successor of v in the neighbors of the center_index
+	//vertex (by orientation induced from the face orientation)
+	//////////////////////////////////////////////////////////////////////////
+	static int getNext( int center_idx, vector<int> & nbr_fc, int v , mesh& m );
 
 private:
 	static void ifNotContainedAdd( vector<int> &v, int a )

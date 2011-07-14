@@ -47,6 +47,7 @@ public:
 		return a.dot(b)/(t>0.0001f? t: 0.0001f);
 	}
 
+
 	static float cotPoints(tuple3f &a, tuple3f &b, tuple3f &c){
 		//cot at b of the triangle a, b,c
 		float a_bDotc_b =(a.x-b.x)*(c.x - b.x) + (a.y-b.y)*(c.y - b.y) + (a.z-b.z)*(c.z - b.z);
@@ -75,6 +76,12 @@ public:
 	static float a_bDotc_b( tuple3f &a, tuple3f &b , tuple3f & c )
 	{
 		return (a.x - b.x)*(c.x-b.x) + (a.y - b.y)*(c.y-b.y) + (a.z - b.z)*(c.z-b.z);
+	}
+
+	static float sinPoints(tuple3f &a, tuple3f &b, tuple3f &c){
+		float t = crossNorm(a-b,c-b);
+		t/= (a-b).norm() * (c-b).norm();
+		return t;
 	}
 
 	static float cosPoints( tuple3f& a, tuple3f& b, tuple3f& c ){
