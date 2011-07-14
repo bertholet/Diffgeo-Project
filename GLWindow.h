@@ -1,13 +1,13 @@
 #pragma once
 
 #include <vector>
-#include "Scene.h"
+//#include "Scene.h"
 #include "KeyListener.h"
 
 class GLWindow
 {
 private:
-	static Scene* scene;
+	//static Scene* scene;
 	int width;
 	int height;
 
@@ -20,19 +20,19 @@ private:
 			}*/
 		}
 
-	static void innerLoop(void)
+/*	static void innerLoop(void)
 	{
 		GLWindow::scene->glLoop();
-	}
+	}*/
 public:
 	GLWindow(int width, int height);
 	~GLWindow(void);
 
 	void display();
-	void GLWindow::setScene( Scene &s )
+/*	void GLWindow::setScene( Scene &s )
 	{
 		GLWindow:scene = &s;
-	}
+	}*/
 	void GLWindow::addKeyListener( KeyListener &l )
 	{
 		listener.push_back(l);

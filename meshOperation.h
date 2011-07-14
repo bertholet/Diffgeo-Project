@@ -64,8 +64,8 @@ public:
 		getNeighbors(m.faces, neighbors);
 		//vertex i is a border iff it has: only two neigbors
 		//or has one (two) neigbors connected with only one furter neigbor
-		
-		for(int i = 0; i < m.vertices.size(); i++){
+		int nrVertices = m.vertices.size();
+		for(int i = 0; i < nrVertices; i++){
 			if(isOnBorder(i, neighbors)){
 				border.push_back(i);
 				//target.push_back(i);
@@ -83,12 +83,23 @@ public:
 			while((nextVertex = nextBorderVertex(nextVertex, border, neighbors)) >-1){
 				target.push_back(nextVertex);
 			}
+
+			//assertion
+/*			if(find(neighbors[target.back()].begin(),
+				neighbors[target.back()].end(),
+				target[starts.back()])==neighbors[target.back()].end()){
+					throw std::exception("Assertion failed: border not a closed loop");
+			}*/
 		}
 
 		delete[] neighbors;
 
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	//Returns the neighbors by vertex nr, ordered in ascending order, each time.
+	//
+	//////////////////////////////////////////////////////////////////////////
 	static void getNeighbors(vector<tuple3i> & faces, vector<int> * neighbors){
 			
 		for(unsigned int i = 0; i < faces.size(); i++){

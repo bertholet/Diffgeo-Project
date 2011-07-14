@@ -28,7 +28,7 @@ void GLWindow::display()
 
 	int a = glutCreateWindow("GL Window");
 	//glutDisplayFunc(renderScene5);
-	glutDisplayFunc(&GLWindow::innerLoop);
+//	glutDisplayFunc(&GLWindow::innerLoop);
 	glutKeyboardFunc(&GLWindow::processNormalKeys);
 
 	glewInit();

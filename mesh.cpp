@@ -402,6 +402,18 @@ void mesh::normalize( void )
 
 }
 
+void mesh::setTextures_perVertex( double * x, double * y )
+{
+	tex.clear();
+	tex.reserve(vertices.size());
+
+	for(int i = 0; i < vertices.size(); i++){
+		tex.push_back(tuple3f((float)x[i], (float)y[i],0.f));
+	}
+
+	this->face_tex = faces;
+}
+
 
 
 

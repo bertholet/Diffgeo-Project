@@ -1,15 +1,16 @@
 #pragma once
+#include "StdAfx.h"
 #include "mesh.h"
 #include "squareTexture.h"
 
-class TextureDemo
+class TutteDemo
 {
 public:
 	static mesh * bunny;
 	squareTexture * tex;
-	TextureDemo(void);
-	~TextureDemo(void);
-
+	TutteDemo(void);
+	~TutteDemo(void);
 	void run(mesh &m);
-};
 
+	void loop();
+};

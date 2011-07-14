@@ -13,6 +13,12 @@ squareTexture::squareTexture(void)
 				if(j%60 < 30){
 					for(int k = 0; k < 4; k++){
 						checkboard[i*szy*4 + j*4+k] = 0.1f;
+						if(k==2){
+							checkboard[i*szy*4 + j*4+k] = 0.1f + (0.f +i)/szx/2;
+						}
+						if(k==1){
+							checkboard[i*szy*4 + j*4+k] = 0.1f + (0.f +j)/szy/2;
+						}
 					}
 				}
 				else{
@@ -25,7 +31,15 @@ squareTexture::squareTexture(void)
 				if(j%60 > 30){
 					for(int k = 0; k < 4; k++){
 						checkboard[i*szy*4 + j*4+k] = 0.1f;
+
+						if(k==2){
+							checkboard[i*szy*4 + j*4+k] = 0.1f + (0.f +i)/szx/2;
+						}
+						if(k==1){
+							checkboard[i*szy*4 + j*4+k] = 0.1f + (0.f +j)/szy/2;
+						}
 					}
+
 				}
 				else{
 					for(int k = 0; k < 4; k++){

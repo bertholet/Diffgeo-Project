@@ -22,6 +22,8 @@
 #include "squareTexture.h"
 #include "meshOperation.h"
 #include "cube.h"
+#include "TextureDemo.h"
+#include "TutteDemo.h"
 
 #define HEIGHT 1000
 #define WIDTH 1000
@@ -61,7 +63,6 @@ void processNormalKeys(unsigned char key, int x, int y) {
 
 	if (key == 's')
 		bunny.rotY(-0.05f);
-		
 }
 
 void implicitEulerTests(void){
@@ -93,8 +94,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		
 	//bunny = cube(2.f, 10);
-	//bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/teapotTex.obj", tuple3f(1.f,0.f,0.f), 2.f);
-	bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
+//	bunny= mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/teapotTex.obj", tuple3f(1.f,0.f,0.f), 2.f);
+	bunny= mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
 	//bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 3);
 	//bunny = ball(1, 80,40);
 	//bunny = torus(2.f,1.f, 30, 60);
@@ -114,7 +115,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	cMap = (colorMap *) new borderColorMap(border,tuple3f(0,0,1), tuple3f(1,0,0));
 	
 	
-	smoother = new ImplicitEulerSmoothing(bunny,1, 0.1f);
+	/*smoother = new ImplicitEulerSmoothing(bunny,1, 0.1f);
 	implicitSmoothingDemo(argc,argv);
 	//implicitEulerTests();
 	delete smoother;//*/
@@ -122,11 +123,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	//smoothingDemo(argc, argv);
 	
 	//displayScene(argc, argv);
-	
-	//smoother = new ImplicitEulerSmoothing(bunny,1, 0.1f);
+
+
+/*	TextureDemo demo;
+	demo.run(bunny);//*/
+	TutteDemo demo;
+	demo.run(bunny);
 /*	squareTexture s = squareTexture();
 	textureDemo(s);//*/
-	//delete smoother;
+	
 
 	//GLWindow window = GLWindow(300,150);
 

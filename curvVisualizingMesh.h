@@ -45,7 +45,7 @@ class borderColorMap:colorMap
 	int sz;
 public:
 	borderColorMap(vector<int> & border_, tuple3f color1, tuple3f color2){
-		sz = max_(border_);
+		sz = max_(border_)+1;
 		//vector<int>::iterator it = border_.begin();
 
 		border = new bool[sz];
@@ -69,7 +69,7 @@ public:
 	
 	int max_( vector<int> & border_ ){
 		int max = -1;
-		for(int i = 0 ; i < border_.size(); i++){
+		for(unsigned int i = 0 ; i < border_.size(); i++){
 			if(border_[i] > max){
 				max = border_[i];
 			}
