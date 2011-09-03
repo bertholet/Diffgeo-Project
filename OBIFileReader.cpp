@@ -25,6 +25,10 @@ OBIFileReader::~OBIFileReader(void)
 void OBIFileReader::parse(const char * file){
 	using namespace boost;
 	ifstream myStream(file, ifstream::in);
+	if(!myStream){
+		printf("File not found!");
+		throw std::exception("File was not found.");
+	}
 	string buff("");
 	char_separator<char> sep(" /");
 	typedef tokenizer<char_separator<char>> tokenizer_; 

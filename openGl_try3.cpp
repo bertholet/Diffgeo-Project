@@ -96,7 +96,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		
 	//bunny = cube(2.f, 10);
 //	bunny= mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/teapotTex.obj", tuple3f(1.f,0.f,0.f), 2.f);
-	bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
+	bunny= mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
 	//bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 3);
 	//bunny = ball(1, 80,40);
 	//bunny = torus(2.f,1.f, 30, 60);

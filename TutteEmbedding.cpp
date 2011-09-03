@@ -70,6 +70,7 @@ void TutteEmbedding::calcTexturePos( mesh &m, double (*weights ) (int, int,mesh 
 		pardisoSolver::SOLVER_ITERATIVE,
 		2);
 	setUp(mat, border, m, weights);
+	parsolver.checkMatrix(parsolver.MT_STRUCTURALLY_SYMMETRIC, mat);
 	parsolver.setMatrix(mat, 1);
 
 	getBorderPos(outerPos, border.size());
@@ -126,6 +127,9 @@ void TutteEmbedding::setUp( pardisoMatrix &mat, vector<int> &border, mesh & m,
 
 		//calculate normation factor
 		factor = 0;
+		if(i == 44){
+			i = 44;
+		}
 		for(j = nbrs_i.begin(); j!=nbrs_i.end(); j++){
 			factor += weights(i,*j,m,nbrs_i,nbr_fc_i,border);
 		}

@@ -37,6 +37,7 @@ double TutteWeights::uniform_weights(int i, int j, mesh & m, vector<int> & neigh
 double TutteWeights::unnormed_meanvalue_weights( int i, int j, mesh & m, vector<int> & neighbors_i,
 												vector<int> & nbr_fc_i, vector<int> & border )
 {
+	//ERROR IN HERE TODO!!!!
 	vector<int>::iterator idx;
 	int prev, next;
 	//ith vertex is on the border.
@@ -55,6 +56,7 @@ double TutteWeights::unnormed_meanvalue_weights( int i, int j, mesh & m, vector<
 	float tan_alpha1_2, tan_alpha2_2;
 	if(find(neighbors_i.begin(), neighbors_i.end(), j)!= neighbors_i.end()){
 
+		//ERROR IS IN THENEXT TWO LINES, sir.
 		prev = meshOperation::getPrevious(i,nbr_fc_i, j, m);	
 		next = meshOperation::getNext(i,nbr_fc_i, j, m);
 
