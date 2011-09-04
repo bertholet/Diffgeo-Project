@@ -117,8 +117,15 @@ std::string borderColorMap::additionalInfo( void )
 
 tuple3f borderColorMap::color( int vertexNr )
 {
-	if(vertexNr < sz && border[vertexNr]){
-		return col1;
+	if(vertexNr < sz && border[vertexNr] >-1){
+		if(border[vertexNr] %4 ==0 )
+			return tuple3f(0.f, 0, 1.f);
+		if(border[vertexNr] %4 ==1 )
+			return tuple3f(0,1.f,0);
+		if(border[vertexNr] %4 ==2 )
+			return tuple3f(0, 1.f, 1.f);
+		if(border[vertexNr] %4 ==3 )
+			return tuple3f(1.f, 1.f, 1.f);
 	}
 
 	return col2;

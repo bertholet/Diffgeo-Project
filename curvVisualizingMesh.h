@@ -40,21 +40,26 @@ public:
 class borderColorMap:colorMap
 {
 	string info;
-	bool *border;
+	int *border;
+	int components;
 	tuple3f col1,  col2;
 	int sz;
 public:
-	borderColorMap(vector<int> & border_, tuple3f color1, tuple3f color2){
+	borderColorMap(vector<int> & border_,vector<int> & borderStarts, tuple3f color1, tuple3f color2){
 		sz = max_(border_)+1;
 		//vector<int>::iterator it = border_.begin();
+		components = borderStarts.size();
+		printf("%d border components found \n", components);
 
-		border = new bool[sz];
+		border = new int[sz];
+		vector<int>::iterator end; 
 		for(int i = 0; i < sz; i++){
-			if(find(border_.begin(), border_.end(),i) != border_.end()){
-				border[i] = true;
-			} 
-			else{
-				border[i] = false;
+			border[i] = -1; //border[i] = false;
+			for(int j = 0; j < borderStarts.size(); j++){
+				end = (j == components -1 ? border_.end(): border_.begin() + borderStarts[j+1]);
+				if(find(border_.begin() + borderStarts[j], end, i) != end){
+					border[i] = j;
+				} 
 			}
 		}
 		col1 = color1;

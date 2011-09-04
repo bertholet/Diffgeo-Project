@@ -105,7 +105,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	bunny.normalize();
 	
-	meshOperation::getHalf(bunny,bunny, tuple3f(0,0,1),0);
+	meshOperation::getHalf(bunny,bunny, tuple3f(0,0,1),0.0f);
 	vector<int> border;
 	vector<int> borderStarts;
 	meshOperation::getBorder(bunny,border, borderStarts);
@@ -113,10 +113,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	
 	//cMap = new curvColormap(bunny);
 	//cMap = new gaussColormap(bunny);
-	cMap = (colorMap *) new borderColorMap(border,tuple3f(0,0,1), tuple3f(1,0,0));
+	cMap = (colorMap *) new borderColorMap(border,borderStarts,tuple3f(0,0,1), tuple3f(1,0,0));
 	
 	
-	/*smoother = new ImplicitEulerSmoothing(bunny,1, 0.1f);
+	smoother = new ImplicitEulerSmoothing(bunny,1, 0.1f);
 	implicitSmoothingDemo(argc,argv);
 	//implicitEulerTests();
 	delete smoother;//*/
@@ -128,7 +128,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 /*	TextureDemo demo;
 	demo.run(bunny);//*/
-	TutteDemo demo;
+/*	TutteDemo demo;
 	demo.run(bunny, TutteWeights::unnormed_meanvalue_weights);
 /*	squareTexture s = squareTexture();
 	textureDemo(s);//*/

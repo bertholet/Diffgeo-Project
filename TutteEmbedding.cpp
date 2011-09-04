@@ -58,6 +58,7 @@ void TutteEmbedding::calcTexturePos( mesh &m, double (*weights ) (int, int,mesh 
 	meshOperation::getBorder(m,border,loops);
 
 	if(loops.size() > 1){
+		printf("Error: Only a single border allowed with this Method! in tutteEmbedding::calcTexturePos");
 		throw std::exception("Only a single border allowed with this Method");
 	}
 

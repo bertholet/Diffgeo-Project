@@ -59,17 +59,20 @@ public:
 		
 		target.clear();
 		vector<int> *neighbors = new vector<int>[m.vertices.size()];
+		vector<int> *neighbor_faces = new vector<int>[m.vertices.size()];
 		vector<int> border;
 
 		getNeighbors(m.faces, neighbors);
+		getNeighborFaces(m.faces, neighbor_faces);
 		//vertex i is a border iff it has: only two neigbors
 		//or has one (two) neigbors connected with only one furter neigbor
+		//better: it has at least one neighbor with which it sheares only one face.
 		int nrVertices = m.vertices.size();
 		for(int i = 0; i < nrVertices; i++){
 			if(i == 44){
 				i = 44;
 			}
-			if(isOnBorder(i, neighbors)){
+			if(isOnBorder(i, neighbors, neighbor_faces, m)){
 				border.push_back(i);
 				//target.push_back(i);
 			}
@@ -95,7 +98,7 @@ public:
 			}*/
 		}
 
-		delete[] neighbors;
+		delete[] neighbors, neighbor_faces;
 
 	}
 
@@ -124,6 +127,10 @@ public:
 		}
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	//Returns an array of vectors. neighbor_faces[i] will be the indices of all faces
+	//neighboring the node i
+	//////////////////////////////////////////////////////////////////////////
 	static void getNeighborFaces(vector<tuple3i> & faces, vector<int> * neighbor_faces){
 			
 		for(int i = 0; i < (int) faces.size(); i++){
@@ -185,7 +192,7 @@ private:
 	//if all edges are part of two closed triangle paths involving vertex_nr
 	//this is not a border vertex
 	//////////////////////////////////////////////////////////////////////////
-	static bool isOnBorder(int vertex_nr, vector<int> * neighbors){
+	static bool isOnBorder(int vertex_nr, vector<int> * neighbors, vector<int> * neighbor_faces, mesh &m){
 
 		//is not on border exactly if it is in two faces
 		//or h
@@ -196,12 +203,32 @@ private:
 			return true;
 		}
 
-		vector<int>::iterator nbr, nbr2,nbr3, end, end3;
+		vector<int>::iterator nbr, nbr_fc_idx,nbr2,nbr3, end, end3;
+		tuple3i nbr_fc = (m.faces[0]);
 		int count = 0;
 
+		for(nbr = oneRing.begin(); nbr != oneRing.end(); nbr++){
+			nbr_fc_idx = neighbor_faces[vertex_nr].begin();
+			end = neighbor_faces[vertex_nr].end();
+			count = 0; // counts nr of faces shared
+			for(;nbr_fc_idx!= end; nbr_fc_idx++){
+				nbr_fc = m.faces[*nbr_fc_idx];
+				if(nbr_fc.a == *nbr || nbr_fc.b == *nbr || nbr_fc.c == *nbr ){
+					count ++;
+					if(count == 2){
+						break; // two neighbors can only share 2 faces
+					}
+				}
+			}
+			if(count == 1){
+				return true;
+			}
+
+		}//*/
+		//old algorithm
 		//for each neighbor nbr: look at its neighbors nbr2. if nbr2 is a neighbor of
 		//the original node count ++
-		for(nbr = oneRing.begin(); nbr != oneRing.end(); nbr++){
+/*		for(nbr = oneRing.begin(); nbr != oneRing.end(); nbr++){
 			count = 0;
 
 			nbr2 = neighbors[*nbr].begin();	
@@ -221,7 +248,7 @@ private:
 			if(count < 2){
 				return true;
 			}
-		}
+		}//*/
 		return false;
 	}
 

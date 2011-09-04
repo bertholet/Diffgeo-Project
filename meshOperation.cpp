@@ -13,6 +13,9 @@ int meshOperation::getPrevious( int center_index, vector<int> & neighbor_faces, 
 {
 	vector<tuple3i> & faces = m.getFaces(); 
 	tuple3i & face = faces[0];
+	if(center_index ==1563 && v == 839){
+		v = 839;
+	}
 	for(vector<int>::iterator it = neighbor_faces.begin(); it != neighbor_faces.end(); it++){
 		face = faces[*it];
 		if(face.a == v && face.b == center_index){
