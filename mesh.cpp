@@ -11,6 +11,7 @@ mesh::mesh(void)
 {
 	position = matrixFactory::translate(0,0,-5);
 	rotation = matrixFactory::id();
+	showOrientation = false;
 	lighTransform = matrixFactory::id();
 	color.set(1.f,1.f,1.f);
 }
@@ -38,6 +39,7 @@ mesh::mesh( const char* file )
 	rotation = matrixFactory::id();
 	lighTransform = matrixFactory::id();
 	color.set(1.f,1.f,1.f);
+	showOrientation = false;
 }
 
 mesh::mesh( const char* file, tuple3f col )
@@ -63,6 +65,8 @@ mesh::mesh( const char* file, tuple3f col )
 	rotation = matrixFactory::id();
 	lighTransform = matrixFactory::id();
 	color = col;
+
+	showOrientation = false;
 }
 
 mesh::mesh( const char* file, tuple3f col, float scale )
@@ -88,6 +92,8 @@ mesh::mesh( const char* file, tuple3f col, float scale )
 	rotation = matrixFactory::id();
 	lighTransform = matrixFactory::id();
 	color = col;
+
+	showOrientation = false;
 }
 
 mesh::~mesh(void)
@@ -354,7 +360,8 @@ tuple3f mesh::intensitiesFlat( unsigned int faceNr, tuple3f &direction )
 	temp_normal.normalize();
 	//float c = face_normals[faceNr].dot(direction);
 	float c = temp_normal.dot(direction);
-	c= ( c>0? c: -c);
+	if(!showOrientation)
+		c= ( c>0? c: -c);
 	return tuple3f(c,c,c);
 }
 

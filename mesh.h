@@ -22,6 +22,7 @@ protected:
 	vector<tuple3i> face_normals_perVertex, face_tex; 
 	vector<tuple3f> tex;
 	tuple3f color;
+	bool showOrientation;
 public:
 	vector<tuple3f> vertices;
 	//index of the vertices of a face
@@ -56,4 +57,8 @@ public:
 	tuple3f intensities( unsigned int faceNr, tuple3f &direction );
 	tuple3f intensitiesFlat( unsigned int faceNr, tuple3f &direction );
 	void setTextures_perVertex( double * x, double * y );
+
+	void setShowOrientation(bool b){
+		showOrientation = b;
+	}
 };

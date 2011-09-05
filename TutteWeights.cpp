@@ -69,9 +69,10 @@ double TutteWeights::unnormed_meanvalue_weights( int i, int j, mesh & m, vector<
 		tan_alpha1_2 = (1- tuple3f::cosPoints(verts[prev], verts[i], verts[j]))/
 			tuple3f::sinPoints(verts[prev], verts[i], verts[j]);
 		tan_alpha2_2 = (1- tuple3f::cosPoints(verts[next], verts[i], verts[j]))/
-			tuple3f::sinPoints(verts[next], verts[i], verts[j]);
+			//tuple3f::sinPoints(verts[next], verts[i], verts[j]);
+			tuple3f::sinPoints(verts[j], verts[i], verts[next]);
 
-		return (tan_alpha1_2 + tan_alpha2_2)/(verts[i]-verts[j]).norm();
+		return (tan_alpha1_2 + tan_alpha2_2)/(verts[i]-verts[j]).norm(); //norm
 		
 	}
 
@@ -79,7 +80,42 @@ double TutteWeights::unnormed_meanvalue_weights( int i, int j, mesh & m, vector<
 }
 
 double TutteWeights::cotan_weights( int i, int j, mesh & m, vector<int> & neighbors_i,
-								   vector<int> & neighbor_fc_i, vector<int> & border )
+								   vector<int> & nbr_fc_i, vector<int> & border )
 {
+	vector<int>::iterator idx;
+	int prev, next;
+	//ith vertex is on the border.
+	if((idx = find(border.begin(), border.end(), i))!= border.end()){
+		if(i!=j){
+			return 0;
+		}
+		return 1;
+	}
+	//i is not on the border
+	if(i==j){
+		return -1;
+	}
+	//jth vertex is a neighbor of i
+	vector<tuple3f> & verts =m.getVertices();
+	float cot_alpha1, cot_alpha2;
+
+	if(find(neighbors_i.begin(), neighbors_i.end(), j)!= neighbors_i.end()){
+
+		prev = meshOperation::getPrevious(i,nbr_fc_i, j, m);	
+		next = meshOperation::getNext(i,nbr_fc_i, j, m);
+		if(prev == -1 || next == -1){
+			prev = meshOperation::getPrevious(i,nbr_fc_i, j, m);	
+			next = meshOperation::getNext(i,nbr_fc_i, j, m);
+		}
+
+		cot_alpha1 = (tuple3f::cosPoints(verts[j], verts[prev], verts[i]))/
+			tuple3f::sinPoints(verts[j], verts[prev], verts[i]);
+		cot_alpha2 = (tuple3f::cosPoints(verts[i], verts[next], verts[j]))/
+			//tuple3f::sinPoints(verts[next], verts[i], verts[j]);
+			tuple3f::sinPoints(verts[i], verts[next], verts[j]);
+
+		return (cot_alpha1 + cot_alpha2)/(verts[i]-verts[j]).normSqr(); //norm
+
+	}
 	return 0;
 }

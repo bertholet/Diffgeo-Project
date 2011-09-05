@@ -107,7 +107,7 @@ int _tmain(int argc, _TCHAR* argv[])
 //	bunny= mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/teapotTex.obj", tuple3f(1.f,0.f,0.f), 2.f);
 	bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
 	//bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 3);
-	//bunny = ball(1, 80,40);
+//	bunny = ball(1, 80,40);
 	//bunny = torus(2.f,1.f, 30, 60);
 	//bunny = simplestCube();
 	//bunny = cube(2.f,20);
@@ -124,7 +124,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	//cMap = new gaussColormap(bunny);
 	cMap = (colorMap *) new borderColorMap(border,borderStarts,tuple3f(0,0,1), tuple3f(1,0,0));
 	
-	
+//	bunny.setShowOrientation(true);
 /*	smoother = new ImplicitEulerSmoothing(bunny,1, 0.1f);
 	implicitSmoothingDemo(argc,argv);
 	//implicitEulerTests();
@@ -138,7 +138,7 @@ int _tmain(int argc, _TCHAR* argv[])
 /*	TextureDemo demo;
 	demo.run(bunny);//*/
 	TutteDemo demo;
-	demo.run(bunny, TutteWeights::unnormed_meanvalue_weights);
+	demo.run(bunny, TutteWeights::cotan_weights);
 /*	squareTexture s = squareTexture();
 	textureDemo(s);//*/
 	
