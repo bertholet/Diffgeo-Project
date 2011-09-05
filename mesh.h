@@ -41,6 +41,7 @@ public:
 
 	void rotX(float phi);
 	void rotY( float phi );
+	void scaleXYZ(float scale );
 	void normalize(void);
 
 	vector<tuple3f>& getVertices(void){return vertices;}

@@ -69,9 +69,6 @@ public:
 		//better: it has at least one neighbor with which it sheares only one face.
 		int nrVertices = m.vertices.size();
 		for(int i = 0; i < nrVertices; i++){
-			if(i == 44){
-				i = 44;
-			}
 			if(isOnBorder(i, neighbors, neighbor_faces, m)){
 				border.push_back(i);
 				//target.push_back(i);
@@ -86,7 +83,7 @@ public:
 			
 			starts.push_back((target.size()));
 			target.push_back(nextVertex);
-			while((nextVertex = nextBorderVertex(nextVertex, border, neighbors)) >-1){
+			while((nextVertex = nextBorderVertex(nextVertex, border, neighbors, neighbor_faces, m)) >-1){
 				target.push_back(nextVertex);
 			}
 
@@ -168,23 +165,47 @@ private:
 		}
 	}
 
-	static int nextBorderVertex( int vertex, vector<int> &border, vector<int> * neighbors )
+	//////////////////////////////////////////////////////////////////////////
+	// Retruns the next border vertex and ERASES it from border
+	//////////////////////////////////////////////////////////////////////////
+	static int nextBorderVertex( int vertex, vector<int> &border, 
+		vector<int> * neighbors, vector<int> * neighbor_faces, mesh &m )
 	{
 		vector<int> & nbrs = neighbors[vertex];
-
+		vector<int> & nbr_fcs = neighbor_faces[vertex];
+		vector<int> borderEls;
 		vector<int>::iterator it = nbrs.begin(), borderEl;
-		int result;
 
 		//check for each neighbor if it lies on the border until one is found.
 		for(it = nbrs.begin(); it != nbrs.end(); it++){
 			borderEl = lower_bound(border.begin(), border.end(),*it);
 			if(borderEl != border.end() && *borderEl == *it){
-				border.erase(borderEl);
+				/*border.erase(borderEl);
 				result = *it;
-				return *it;
+				return *it;*/
+				//an element could be on the border and a neighbor, without
+				//being connected to vertex by a border.
+				if(countPosOrientedOccurrences(neighbor_faces[vertex], vertex, *borderEl, m) ==1)
+				{
+					borderEls.push_back(*it);
+				}
 			}
 		}
-		return -1;
+		if(borderEls.size() == 0){
+			return -1;
+		}
+		if(borderEls.size() == 1)
+		{	
+			border.erase(lower_bound(border.begin(), border.end(), borderEls.back()));
+			return (borderEls.back());
+		}
+		else{
+			//dangling trianlge did occur
+			printf("Dangling triangle detected in MeshOpetation.h : nextBorderVertex(...), at vertexNr %d: %d matches \n", vertex, borderEls.size());
+			border.erase(lower_bound(border.begin(), border.end(), borderEls.back()));
+			return (borderEls.back());
+			
+		}
 
 	}
 
@@ -252,5 +273,25 @@ private:
 		return false;
 	}
 
-
+	//////////////////////////////////////////////////////////////////////////
+	//counts nr of occurences of (a,b) as positively oriented edge
+	//in the faces indicised bayface_indexes
+	//////////////////////////////////////////////////////////////////////////
+	static int countPosOrientedOccurrences(vector<int> & face_indexes, int a, int b, mesh & m){
+		vector<int>::iterator nbr_fc_idx,end;
+		tuple3i nbr_fc;
+		int count = 0;
+		nbr_fc_idx = face_indexes.begin();
+		end = face_indexes.end();
+		// counts nr of faces shared
+		for(;nbr_fc_idx!= end; nbr_fc_idx++){
+			nbr_fc = m.faces[*nbr_fc_idx];
+			if(nbr_fc.a == a && nbr_fc.b == b || 
+				nbr_fc.b == a && nbr_fc.c == b|| 
+				nbr_fc.c == a && nbr_fc.a == b ){
+				count ++;
+			}
+		}
+		return count;
+	}
 };

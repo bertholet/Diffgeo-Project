@@ -19,7 +19,7 @@ extern "C" __declspec(dllimport) void pardiso_printstats (int *, int *, double *
 
 /************************************************************************/
 /* A wrapper class for the pardiso solver. Note: there are more
-*  possible Attributes and configurations than by this wrapper
+*  possible Attributes and configurations than accessible by this wrapper
 */
 /************************************************************************/
 class pardisoSolver{
@@ -37,15 +37,17 @@ private:
 	void init_intParams(int nrRefinementSteps);
 	void checkError_init() 
 	{
-		error = 0;
+		//error = 0;
 		if (error != 0) 
 		{
 			if (error == -10 )
 				printf("No license file found \n");
-			if (error == -11 )
+			else if (error == -11 )
 				printf("License is expired \n");
-			if (error == -12 )
+			else if (error == -12 )
 				printf("Wrong username or hostname \n");
+			else
+				printf("Error %d has occurred\n", error);
 
 		}
 		else
@@ -63,6 +65,7 @@ public:
 	pardisoSolver(
 			int  matrix_typ, int solver,
 			int nr_refinement_steps){
+		error = 0;
 		matrix = NULL; 
 		matrix_type = matrix_typ;
 		init_intParams(nr_refinement_steps);

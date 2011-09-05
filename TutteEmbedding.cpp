@@ -128,9 +128,7 @@ void TutteEmbedding::setUp( pardisoMatrix &mat, vector<int> &border, mesh & m,
 
 		//calculate normation factor
 		factor = 0;
-		if(i == 44){
-			i = 44;
-		}
+
 		for(j = nbrs_i.begin(); j!=nbrs_i.end(); j++){
 			factor += weights(i,*j,m,nbrs_i,nbr_fc_i,border);
 		}

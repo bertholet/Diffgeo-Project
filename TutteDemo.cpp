@@ -18,17 +18,24 @@ namespace tutDemo{
 		if (key == ' ')
 			spacePressed = !spacePressed;
 
-		if (key == 'd')
+		else if (key == 'd')
 			actualDemo->bunny->rotX(0.05f);
 
-		if (key == 'a')
+		else if (key == 'a')
 			actualDemo->bunny->rotX(-0.05f);
 
-		if (key == 'w')
+		else if (key == 'w')
 			actualDemo->bunny->rotY(0.05f);
 
-		if (key == 's')
+		else if (key == 's')
 			actualDemo->bunny->rotY(-0.05f);
+
+		else if (key == 'z'){
+			actualDemo->bunny->scaleXYZ(1.05f);
+		}
+		else if (key == 'u'){
+			actualDemo->bunny->scaleXYZ(0.95f);
+		}
 	}
 
 	void callback(void){

@@ -164,6 +164,13 @@ void mesh::rotX(float f)
 	lighTransform = rot.transpose()*lighTransform;
 }
 
+void mesh::scaleXYZ(float f)
+{
+	matrixf rot = matrixFactory::scale(f);
+	rotation = rotation*rot;
+	//lighTransform = rot.transpose()*lighTransform;
+}
+
 
 void mesh::glDisplayVertices( void )
 {

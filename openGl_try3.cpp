@@ -48,22 +48,31 @@ Smoothing s;
 
 bool spacePressed =false;
 
+
 void processNormalKeys(unsigned char key, int x, int y) {
 
 	if (key == ' ')
 		spacePressed = !spacePressed;
 
-	if (key == 'd')
+	else if (key == 'd')
 		bunny.rotX(0.05f);
 
-	if (key == 'a')
+	else if (key == 'a')
 		bunny.rotX(-0.05f);
 
-	if (key == 'w')
+	else if (key == 'w')
 		bunny.rotY(0.05f);
 
-	if (key == 's')
+	else if (key == 's')
 		bunny.rotY(-0.05f);
+
+	else if (key == 'z'){
+		bunny.scaleXYZ(1.05f);
+	}
+	else if (key == 'u'){
+		bunny.scaleXYZ(0.95f);
+	}
+
 }
 
 void implicitEulerTests(void){
@@ -96,7 +105,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		
 	//bunny = cube(2.f, 10);
 //	bunny= mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/teapotTex.obj", tuple3f(1.f,0.f,0.f), 2.f);
-	bunny= mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
+	bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
 	//bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 3);
 	//bunny = ball(1, 80,40);
 	//bunny = torus(2.f,1.f, 30, 60);
@@ -105,7 +114,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	bunny.normalize();
 	
-	meshOperation::getHalf(bunny,bunny, tuple3f(0,0,1),0.0f);
+	meshOperation::getHalf(bunny,bunny, tuple3f(0,0,1),0.05f);
 	vector<int> border;
 	vector<int> borderStarts;
 	meshOperation::getBorder(bunny,border, borderStarts);
@@ -116,7 +125,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	cMap = (colorMap *) new borderColorMap(border,borderStarts,tuple3f(0,0,1), tuple3f(1,0,0));
 	
 	
-	smoother = new ImplicitEulerSmoothing(bunny,1, 0.1f);
+/*	smoother = new ImplicitEulerSmoothing(bunny,1, 0.1f);
 	implicitSmoothingDemo(argc,argv);
 	//implicitEulerTests();
 	delete smoother;//*/
@@ -128,7 +137,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 /*	TextureDemo demo;
 	demo.run(bunny);//*/
-/*	TutteDemo demo;
+	TutteDemo demo;
 	demo.run(bunny, TutteWeights::unnormed_meanvalue_weights);
 /*	squareTexture s = squareTexture();
 	textureDemo(s);//*/

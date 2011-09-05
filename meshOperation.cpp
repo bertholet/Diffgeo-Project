@@ -12,7 +12,7 @@ meshOperation::~meshOperation(void)
 int meshOperation::getPrevious( int center_index, vector<int> & neighbor_faces, int v, mesh  & m)
 {
 	vector<tuple3i> & faces = m.getFaces(); 
-	tuple3i & face = faces[0];
+	tuple3i face;
 	if(center_index ==1563 && v == 839){
 		v = 839;
 	}
@@ -35,7 +35,7 @@ int meshOperation::getPrevious( int center_index, vector<int> & neighbor_faces, 
 int meshOperation::getNext( int center_idx, vector<int> & neighbor_faces, int v, mesh  & m )
 {
 	vector<tuple3i> & faces = m.getFaces(); 
-	tuple3i & face = faces[0];
+	tuple3i  face;
 	for(vector<int>::iterator it = neighbor_faces.begin(); it != neighbor_faces.end(); it++){
 		face = faces[*it];
 		if(face.a == v && face.c == center_idx){
