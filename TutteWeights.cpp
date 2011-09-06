@@ -108,14 +108,184 @@ double TutteWeights::cotan_weights( int i, int j, mesh & m, vector<int> & neighb
 			next = meshOperation::getNext(i,nbr_fc_i, j, m);
 		}
 
-		cot_alpha1 = (tuple3f::cosPoints(verts[j], verts[prev], verts[i]))/
-			tuple3f::sinPoints(verts[j], verts[prev], verts[i]);
-		cot_alpha2 = (tuple3f::cosPoints(verts[i], verts[next], verts[j]))/
-			//tuple3f::sinPoints(verts[next], verts[i], verts[j]);
-			tuple3f::sinPoints(verts[i], verts[next], verts[j]);
+		cot_alpha1 = tuple3f::cotPoints(verts[j], verts[prev], verts[i]);
+		cot_alpha2 = tuple3f::cotPoints(verts[i], verts[next], verts[j]);
 
 		return (cot_alpha1 + cot_alpha2)/(verts[i]-verts[j]).normSqr(); //norm
 
 	}
 	return 0;
 }
+
+//////////////////////////////////////////////////////////////////////////
+// The weights following  the paper Discrete Diff geo
+//////////////////////////////////////////////////////////////////////////
+double TutteWeights::cotan_weights_divAvor( int i, int j, mesh & m, 
+										  vector<int> & neighbors_i, 
+										  vector<int> & nbr_fc_i, 
+										  vector<int> & border )
+{
+	vector<int>::iterator idx;
+	int prev, next;
+	//ith vertex is on the border.
+	if((idx = find(border.begin(), border.end(), i))!= border.end()){
+		if(i!=j){
+			return 0;
+		}
+		return 1;
+	}
+	//i is not on the border
+	if(i==j){
+		return -1;
+	}
+	//jth vertex is a neighbor of i
+	vector<tuple3f> & verts =m.getVertices();
+	float cot_alpha1, cot_alpha2, tempcot1, tempcot2;
+	int nbr;
+
+	if(find(neighbors_i.begin(), neighbors_i.end(), j)!= neighbors_i.end()){
+
+		prev = meshOperation::getPrevious(i,nbr_fc_i, j, m);	
+		next = meshOperation::getNext(i,nbr_fc_i, j, m);
+		if(prev == -1 || next == -1){
+			printf("Error in Tutteweights::cotanweights_adiv");
+		}
+
+		cot_alpha1 = tuple3f::cotPoints(verts[j], verts[prev], verts[i]);
+		cot_alpha2 = tuple3f::cotPoints(verts[i], verts[next], verts[j]);
+
+		float Avornoi = 0;
+		for(int k = 0; k < neighbors_i.size(); k++){
+			/*if(tuple3f::a_bDotc_b(verts[k], verts[i], verts[prev]) <0 )
+			{
+				
+			}
+			else if(tuple3f::a_bDotc_b(verts[k], verts[prev], verts[i]) <0 ||
+				tuple3f::a_bDotc_b(verts[k], verts[prev], verts[i])<0)
+			{
+
+			}
+			else 
+			{
+
+			}
+			else{
+				Avornoi += (tuple3f::cotPoints(verts[k], verts[prev], verts[i]) +
+					tuple3f::cotPoints(verts[i], verts[next], verts[k])) *
+					(verts[i]-verts[k]).normSqr();
+			}*/
+			nbr = neighbors_i[k];
+			prev = meshOperation::getPrevious(i,nbr_fc_i, nbr, m);	
+			next = meshOperation::getNext(i,nbr_fc_i,nbr, m);
+			tempcot1 = tuple3f::cotPoints(verts[nbr], verts[prev], verts[i]);
+			tempcot1 = (tempcot1 >0 ? tempcot1: -tempcot1);
+			tempcot2 = tuple3f::cotPoints(verts[i], verts[next], verts[nbr]);
+			tempcot2 = (tempcot2 >0 ? tempcot2: -tempcot2);
+			Avornoi += (tempcot1 +
+				tempcot2) *
+				(verts[i]-verts[nbr]).normSqr();
+		}
+
+		return (cot_alpha1 + cot_alpha2)/Avornoi;//(verts[i]-verts[j]).normSqr(); //norm
+
+	}
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// The weights following  the paper Discrete Diff geo
+//////////////////////////////////////////////////////////////////////////
+double TutteWeights::cotan_weights_divAmix( int i, int j, mesh & m, 
+										  vector<int> & neighbors_i, 
+										  vector<int> & nbr_fc_i, 
+										  vector<int> & border )
+{
+	vector<int>::iterator idx;
+	int prev, next;
+	//ith vertex is on the border.
+	if((idx = find(border.begin(), border.end(), i))!= border.end()){
+		if(i!=j){
+			return 0;
+		}
+		return 1;
+	}
+	//i is not on the border
+	if(i==j){
+		return -1;
+	}
+	//jth vertex is a neighbor of i
+	vector<tuple3f> & verts =m.getVertices();
+	float cot_alpha1, cot_alpha2, tempcot1, tempcot2;
+	int nbr;
+
+	if(find(neighbors_i.begin(), neighbors_i.end(), j)!= neighbors_i.end()){
+
+		prev = meshOperation::getPrevious(i,nbr_fc_i, j, m);	
+		next = meshOperation::getNext(i,nbr_fc_i, j, m);
+		if(prev == -1 || next == -1){
+			printf("Error in Tutteweights::cotanweights_adiv");
+		}
+
+		cot_alpha1 = tuple3f::cotPoints(verts[j], verts[prev], verts[i]);
+		cot_alpha2 = tuple3f::cotPoints(verts[i], verts[next], verts[j]);
+
+		float Amix = 0, areaT;
+		for(int k = 0; k < neighbors_i.size(); k++){
+			nbr = neighbors_i[k];
+			prev = meshOperation::getPrevious(i,nbr_fc_i, nbr, m);	
+		//	next = meshOperation::getNext(i,nbr_fc_i,nbr, m);
+			areaT = tuple3f::cross((verts[nbr] - verts[i]),(verts[prev] - verts[i])).norm()/2;
+
+			if(tuple3f::a_bDotc_b(verts[nbr], verts[i], verts[prev]) <0 )
+			{
+				Amix += areaT/2;
+			}
+			else if(tuple3f::a_bDotc_b(verts[nbr], verts[prev], verts[i]) <0 ||
+				tuple3f::a_bDotc_b(verts[prev], verts[nbr], verts[i])<0)
+			{
+				Amix += areaT/4;
+			}
+			else{
+				tempcot1 = tuple3f::cotPoints(verts[nbr], verts[prev], verts[i]);
+				tempcot1 = (tempcot1 >0 ? tempcot1: -tempcot1);
+				tempcot2 = tuple3f::cotPoints(verts[i], verts[nbr], verts[prev]);
+				tempcot2 = (tempcot2 >0 ? tempcot2: -tempcot2);
+				Amix += tempcot1 * (verts[i]-verts[nbr]).normSqr() +
+					tempcot2 * (verts[i]-verts[prev]).normSqr();
+			}
+
+		}
+
+		return (cot_alpha1 + cot_alpha2)/Amix;//(verts[i]-verts[j]).normSqr(); //norm
+
+	}
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//borders
+//////////////////////////////////////////////////////////////////////////
+
+
+void TutteWeights::circleBorder( vector<tuple3f> & outerPos , vector<int> & border, vector<int> & loops, mesh & m)
+{
+	int sz = border.size();
+	for(int i = 0; i < sz;i++){
+		outerPos.push_back(tuple3f((sin(i*2* PI/sz)+1.f)/2.f,(cos(i*2* PI/sz)+1.f)/2.f,0.f));
+	}
+}
+
+void TutteWeights::distWeightCircBorder( vector<tuple3f> & outerPos , vector<int> & border, vector<int> & loops, mesh & m)
+{
+	int sz = border.size();
+	float length = meshOperation::getLength(border, m);
+	float ln = 0;
+	for(int i = 0; i < sz;i++){
+		outerPos.push_back(tuple3f((sin(ln/length * 2* PI)+1.f)/2.f,(cos(ln/length * 2* PI)+1.f)/2.f,0.f));
+		if(i < sz-1){
+			ln += (m.vertices[border[i+1]] - m.vertices[border[i]]).norm();
+		}
+	}
+}
+
+

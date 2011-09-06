@@ -154,6 +154,20 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	static int getNext( int center_idx, vector<int> & nbr_fc, int v , mesh& m );
 
+	//////////////////////////////////////////////////////////////////////////
+	// Returns the length of the polygon train denoted by the vertex indices
+	// "vertices"
+	//////////////////////////////////////////////////////////////////////////
+	static float getLength(vector<int> & vertices, mesh & m){
+		float length = 0;
+		for(int i = 0; i < vertices.size()-1; i++){
+			length += (m.vertices[vertices[i+1]] - m.vertices[vertices[i]]).norm();
+		}
+
+		length += (m.vertices[vertices.back()] - m.vertices[vertices.front()]).norm();
+		return length;
+	}
+
 private:
 	static void ifNotContainedAdd( vector<int> &v, int a )
 	{
@@ -294,4 +308,5 @@ private:
 		}
 		return count;
 	}
+
 };

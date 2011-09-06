@@ -38,7 +38,7 @@ void TutteEmbedding::calcTexturePos( mesh &m )
 	setUp(mat, border, m, TutteWeights::uniform_weights);
 	parsolver.setMatrix(mat, 1);
 
-	getBorderPos(outerPos, border.size());
+	TutteWeights::circleBorder(outerPos, border, loops, m);
 	setUpX(b, border,outerPos, m.getVertices().size());
 	parsolver.solve(x,&b[0]);
 
@@ -50,7 +50,24 @@ void TutteEmbedding::calcTexturePos( mesh &m )
 	delete[] x,y;
 }
 
-void TutteEmbedding::calcTexturePos( mesh &m, double (*weights ) (int, int,mesh &, vector<int>& /*nbr_i*/, vector<int>&/*fc_i*/, vector<int>& /*border*/) )
+void TutteEmbedding::calcTexturePos( mesh &m, 
+									double (*weights ) (int, int, mesh &, 
+									vector<int>& /*nbr_i*/, 
+									vector<int>&/*fc_i*/, 
+									vector<int>& /*border*/)){
+
+	calcTexturePos(m,weights, TutteWeights::circleBorder);
+}
+
+void TutteEmbedding::calcTexturePos( mesh &m, 
+									double (*weights ) (int, int, mesh &, 
+										vector<int>& /*nbr_i*/, 
+										vector<int>&/*fc_i*/, 
+										vector<int>& /*border*/),
+									void (*getBorderPos ) (vector<tuple3f> & /*outerPos*/, 
+										vector<int> & /*border*/, 
+										vector<int> & /*loops*/, 
+										mesh & /*m*/))
 {
 	vector<int> border;
 	vector<int> loops;
@@ -74,7 +91,8 @@ void TutteEmbedding::calcTexturePos( mesh &m, double (*weights ) (int, int,mesh 
 	parsolver.checkMatrix(parsolver.MT_STRUCTURALLY_SYMMETRIC, mat);
 	parsolver.setMatrix(mat, 1);
 
-	getBorderPos(outerPos, border.size());
+	getBorderPos(outerPos, border, loops,m);
+	//getBorderPos(outerPos,border,m);
 	setUpX(b, border,outerPos, m.getVertices().size());
 	parsolver.solve(x,&b[0]);
 
@@ -86,12 +104,6 @@ void TutteEmbedding::calcTexturePos( mesh &m, double (*weights ) (int, int,mesh 
 	delete[] x,y;
 }
 
-void TutteEmbedding::getBorderPos( vector<tuple3f> & outerPos , int sz)
-{
-	for(int i = 0; i < sz;i++){
-		outerPos.push_back(tuple3f((sin(i*2* PI/sz)+1.f)/2.f,(cos(i*2* PI/sz)+1.f)/2.f,0.f));
-	}
-}
 
 /************************************************************************/
 /* Set up Matrix                                                                     */

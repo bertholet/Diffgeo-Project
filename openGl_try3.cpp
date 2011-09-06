@@ -114,7 +114,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	bunny.normalize();
 	
-	meshOperation::getHalf(bunny,bunny, tuple3f(0,0,1),0.05f);
+	//meshOperation::getHalf(bunny,bunny, tuple3f(-1,0,0),-0.05f); //dragon.obj config
+	meshOperation::getHalf(bunny,bunny, tuple3f(0,0,1), 0.05f);
 	vector<int> border;
 	vector<int> borderStarts;
 	meshOperation::getBorder(bunny,border, borderStarts);
@@ -138,7 +139,7 @@ int _tmain(int argc, _TCHAR* argv[])
 /*	TextureDemo demo;
 	demo.run(bunny);//*/
 	TutteDemo demo;
-	demo.run(bunny, TutteWeights::cotan_weights);
+	demo.run(bunny, TutteWeights::unnormed_meanvalue_weights, TutteWeights::distWeightCircBorder);
 /*	squareTexture s = squareTexture();
 	textureDemo(s);//*/
 	

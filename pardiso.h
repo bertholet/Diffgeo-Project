@@ -143,7 +143,7 @@ public:
 		if (err != 0) {
 			printf("\nERROR in consistency of matrix: %d", err);
 
-			exit(1);
+			throw std::exception("Pardiso::checkmatrix error");
 		}
 	}
 
