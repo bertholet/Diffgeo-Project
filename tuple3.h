@@ -93,6 +93,13 @@ public:
 		return a_bDotc_b(a,b,c) / (b-a).norm() /(c-b).norm();
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	//returns a
+	static float angle(tuple3f& a, tuple3f& b,tuple3f& c){
+		return acos(cosPoints(a,b,c));
+	}
+
+
 	tuple3f operator + (tuple3f &other){
 		return tuple3f(x + other.x, y+ other.y, z + other.z);
 	}

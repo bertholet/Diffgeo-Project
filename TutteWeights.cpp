@@ -288,4 +288,27 @@ void TutteWeights::distWeightCircBorder( vector<tuple3f> & outerPos , vector<int
 	}
 }
 
+void TutteWeights::angleApproxBorder( vector<tuple3f> & outerPos , vector<int> & border
+			, vector<int> & loops, mesh & m, vector<int> * nbrs)
+{
+	vector<float> angles(border.size());
+	int bdr, loopsz, loopSt, prev, next;
+	float angle;
+	for(int lp = 0; lp < loops.size(); lp++){
+
+		loopSt = loops[lp];
+		loopsz = (lp == loops.size() -1? border.size(): loops[lp+1]) 
+			- loopSt;
+
+		for(bdr =0; bdr < loopsz; bdr++){
+			angle = 0; 	
+			prev = (bdr == 0? loopsz-1 : bdr-1);
+			next = (bdr == loopsz-1? 0 : bdr+1);
+			
+			//meshOperation::sumAnglesWheel(border[prev], border[bdr], border[next], nbrs, m);
+
+		}
+	}
+}
+
 

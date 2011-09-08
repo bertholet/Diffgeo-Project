@@ -70,6 +70,7 @@ void TutteDemo::loop()
 
 void TutteDemo::run( mesh &m )
 {
+
 	this->bunny = &m;
 	TutteEmbedding embedding;
 	embedding.calcTexturePos(m);
@@ -130,6 +131,7 @@ void TutteDemo::run( mesh &m,
 					vector<int> & /*border*/, vector<int> & /*loops*/, 
 					mesh & /*m*/) )
 {
+	//m.faces[-1];
 	this->bunny = &m;
 	TutteEmbedding embedding;
 	embedding.calcTexturePos(m, weights, getBorderPos);

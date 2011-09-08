@@ -115,7 +115,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	bunny.normalize();
 	
 	//meshOperation::getHalf(bunny,bunny, tuple3f(-1,0,0),-0.05f); //dragon.obj config
-	meshOperation::getHalf(bunny,bunny, tuple3f(0,0,1), 0.05f);
+//	meshOperation::getHalf(bunny,bunny, tuple3f(-0.25f,1,0), 0.1f); //dragon.obj config
+	meshOperation::getHalf(bunny,bunny, tuple3f(0,0,1), 0.05f); //dragon.obj config
+//	meshOperation::getHalf(bunny,bunny, tuple3f(0,1,0), 0.05f); //dragon.obj config
 	vector<int> border;
 	vector<int> borderStarts;
 	meshOperation::getBorder(bunny,border, borderStarts);
@@ -123,10 +125,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	
 	//cMap = new curvColormap(bunny);
 	//cMap = new gaussColormap(bunny);
-	cMap = (colorMap *) new borderColorMap(border,borderStarts,tuple3f(0,0,1), tuple3f(1,0,0));
+/*	cMap = (colorMap *) new borderColorMap(border,borderStarts,tuple3f(0,0,1), tuple3f(1,0,0));
 	
-//	bunny.setShowOrientation(true);
-/*	smoother = new ImplicitEulerSmoothing(bunny,1, 0.1f);
+	//	bunny.setShowOrientation(true);
+	smoother = new ImplicitEulerSmoothing(bunny,1, 0.1f);
 	implicitSmoothingDemo(argc,argv);
 	//implicitEulerTests();
 	delete smoother;//*/
@@ -139,7 +141,7 @@ int _tmain(int argc, _TCHAR* argv[])
 /*	TextureDemo demo;
 	demo.run(bunny);//*/
 	TutteDemo demo;
-	demo.run(bunny, TutteWeights::unnormed_meanvalue_weights, TutteWeights::distWeightCircBorder);
+	demo.run(bunny, TutteWeights::cotan_weights_divAvor, TutteWeights::circleBorder);
 /*	squareTexture s = squareTexture();
 	textureDemo(s);//*/
 	

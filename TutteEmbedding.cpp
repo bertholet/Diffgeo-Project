@@ -24,6 +24,7 @@ void TutteEmbedding::calcTexturePos( mesh &m )
 	meshOperation::getBorder(m,border,loops);
 
 	if(loops.size() > 1){
+		printf("Error in calcTexturePos");
 		throw std::exception("Only a single border allowed with this Method");
 	}
 
@@ -119,8 +120,8 @@ void TutteEmbedding::setUp( pardisoMatrix &mat, vector<int> &border, mesh & m,
 	vector<int> * neighbor_faces = new vector<int>[nrVertices];
 	double factor;
 
-	vector<int> & nbrs_i = *neighbors;
-	vector<int> & nbr_fc_i = *neighbor_faces;
+	//vector<int> & nbrs_i = NULL;
+	//vector<int> * nbr_fc_i = NULL;
 	vector<int>::iterator j;
 	meshOperation::getNeighbors(m.getFaces(), neighbors);
 	meshOperation::getNeighborFaces(m.getFaces(), neighbor_faces);
@@ -134,8 +135,8 @@ void TutteEmbedding::setUp( pardisoMatrix &mat, vector<int> &border, mesh & m,
 	}
 
 	for(int i = 0; i < nrVertices;i++){
-		nbrs_i = neighbors[i];
-		nbr_fc_i = neighbor_faces[i];
+		vector<int> & nbrs_i = neighbors[i];
+		vector<int> & nbr_fc_i = (neighbor_faces[i]);
 		a_ii_added = false;
 
 		//calculate normation factor
