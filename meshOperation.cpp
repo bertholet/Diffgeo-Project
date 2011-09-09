@@ -53,20 +53,26 @@ int meshOperation::getNext( int center_idx, int v, mesh  & m )
 	return -1;
 }
 
-float meshOperation::sumAnglesWheel( int from, int at, int to, mesh & m )
+float meshOperation::sumAnglesWheel( int from, int center, int to, mesh & m )
 {
-	vector<int> & nbrs = m.getNeighbors()[at];
-	vector<int> & nbr_fcs = m.getNeighborFaces()[at];
+	vector<int> & nbrs = m.getNeighbors()[center];
+	vector<int> & nbr_fcs = m.getNeighborFaces()[center];
+	vector<tuple3i> debug;
+	for(int i = 0; i < nbr_fcs.size(); i++){
+		debug.push_back(m.getFaces()[nbr_fcs[i]]);
+	}
+
 	int actual = from, next, lps = 0;
 	float angle = 0;
 
 	do{
-		next = meshOperation::getNext(at,from, m);
+		next = meshOperation::getPrevious(center,actual, m);
 		if(next < 0 || lps > nbrs.size()){
 			throw std::runtime_error("Assertion failed at sum Angle Wheel");
 		}
-		angle += tuple3f::angle( m.vertices[actual], m.vertices[at], m.vertices[next]);
+		angle += tuple3f::angle( m.vertices[actual], m.vertices[center], m.vertices[next]);
 		actual = next;
+		lps++;
 	}
 	while (actual != to);
 	

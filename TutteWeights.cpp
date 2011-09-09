@@ -291,14 +291,19 @@ void TutteWeights::distWeightCircBorder( vector<tuple3f> & outerPos , vector<int
 void TutteWeights::angleApproxBorder( vector<tuple3f> & outerPos , vector<int> & border
 			, vector<int> & loops, mesh & m)
 {
-	vector<float> angles(border.size());
+	vector<float> angles, lengthQuota; //length next segment over last segment
+	angles.reserve(border.size());
+	lengthQuota.reserve(border.size());
+
 	int bdr, loopsz, loopSt, prev, next;
-	float angle;
+	float angle, length, sum, scale;
+
 	for(int lp = 0; lp < loops.size(); lp++){
 
 		loopSt = loops[lp];
 		loopsz = (lp == loops.size() -1? border.size(): loops[lp+1]) 
 			- loopSt;
+		sum = 0;
 
 		for(bdr =0; bdr < loopsz; bdr++){
 			prev = (bdr == 0? loopsz-1 : bdr-1);
@@ -306,8 +311,19 @@ void TutteWeights::angleApproxBorder( vector<tuple3f> & outerPos , vector<int> &
 			
 			angle = meshOperation::sumAnglesWheel(border[prev], 
 				border[bdr], border[next], m);
+			sum+= angle;
 			angles.push_back(angle);
+
+			length = (m.getVertices()[border[next]] - m.getVertices()[border[bdr]]).norm()/
+				(m.getVertices()[border[bdr]] - m.getVertices()[border[prev]]).norm();
+			lengthQuota.push_back(length);
+
 		}
+		scale = (loopsz-2) * PI / sum;
+		for(bdr =0; bdr < loopsz; bdr++){
+			angles[loopSt + bdr] = angles[loopSt + bdr] * scale;
+		}
+
 
 		printf("");
 	}

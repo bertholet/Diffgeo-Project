@@ -186,7 +186,7 @@ private:
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	// Retruns the next border vertex and ERASES it from border
+	// Retruns the next border vertex and !ERASES! it from border.
 	//////////////////////////////////////////////////////////////////////////
 	static int nextBorderVertex( int vertex, vector<int> &border, mesh &m )
 	{

@@ -142,7 +142,7 @@ int _tmain(int argc, _TCHAR* argv[])
 /*	TextureDemo demo;
 	demo.run(bunny);//*/
 	TutteDemo demo;
-	demo.run(*bunny, TutteWeights::cotan_weights_divAvor, TutteWeights::circleBorder);
+	demo.run(*bunny, TutteWeights::cotan_weights_divAvor, TutteWeights::angleApproxBorder);
 /*	squareTexture s = squareTexture();
 	textureDemo(s);//*/
 	
