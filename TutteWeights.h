@@ -20,9 +20,11 @@ namespace TutteWeights{
 		vector<int> & border );
 
 
-	void circleBorder( vector<tuple3f> & outerPos , vector<int> & border, vector<int> & loops, mesh &);
-	void distWeightCircBorder( vector<tuple3f> & outerPos , vector<int> & border, vector<int> & loops, mesh &);
-	void angleApproxBorder( vector<tuple3f> & outerPos , vector<int> & border
-		, vector<int> & loops, mesh &, vector<int> * nbrs);
+	void circleBorder( vector<tuple3f> & outerPos , vector<int> & border, 
+		vector<int> & loops, mesh &);
+	void distWeightCircBorder( vector<tuple3f> & outerPos , vector<int> & border, 
+		vector<int> & loops, mesh &);
+	void angleApproxBorder( vector<tuple3f> & outerPos , vector<int> & border, 
+		vector<int> & loops, mesh & m);
 }
 #endif

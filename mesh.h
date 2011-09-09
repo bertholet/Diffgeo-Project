@@ -21,6 +21,10 @@ protected:
 	//the indices of the normals at the vertex points of the faces
 	vector<tuple3i> face_normals_perVertex, face_tex; 
 	vector<tuple3f> tex;
+
+	// nbrs[i] is a vector with the indices of the neighbors
+	vector<int> * nbrs;
+	vector<int> * nbr_fcs;
 	tuple3f color;
 	bool showOrientation;
 public:
@@ -34,6 +38,7 @@ public:
 	mesh(const char* file, tuple3f col, float scale);
 	~mesh(void);
 
+	void reset(vector<tuple3f> & _vertices, vector<tuple3i> & _faces);
 	void initNormalsFromVertices();
 	void initFaceNormals();
 
@@ -47,6 +52,8 @@ public:
 
 	vector<tuple3f>& getVertices(void){return vertices;}
 	vector<tuple3i>& getFaces(){return faces;}
+	vector<int> * getNeighbors() { return nbrs;}
+	vector<int> * getNeighborFaces(){return nbr_fcs;}
 	
 	void glDisplayVertices(void);
 	void glDisplayLines(void);
@@ -61,4 +68,7 @@ public:
 	void setShowOrientation(bool b){
 		showOrientation = b;
 	}
+
+private:
+	void init( const char* file, tuple3f & col, float scale );
 };

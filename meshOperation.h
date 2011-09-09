@@ -49,27 +49,26 @@ public:
 			vertices.push_back(m.vertices[usedVertices[i]]);
 		}
 
-		target.faces = faces;
-		target.vertices = vertices;
-		target.initNormalsFromVertices();
+		target.reset(vertices,faces);
 
 	}
 
 	static void getBorder(mesh & m, vector<int> & target, vector<int> & starts){
 		
 		target.clear();
-		vector<int> *neighbors = new vector<int>[m.vertices.size()];
-		vector<int> *neighbor_faces = new vector<int>[m.vertices.size()];
-		vector<int> border;
+/*		vector<int> *neighbors = new vector<int>[m.vertices.size()];
+		vector<int> *neighbor_faces = new vector<int>[m.vertices.size()]; 
+*/		vector<int> border;
 
-		getNeighbors(m.faces, neighbors);
+/*		getNeighbors(m.faces, neighbors);
 		getNeighborFaces(m.faces, neighbor_faces);
-		//vertex i is a border iff it has: only two neigbors
+*/		//vertex i is a border iff it has: only two neigbors
 		//or has one (two) neigbors connected with only one furter neigbor
 		//better: it has at least one neighbor with which it sheares only one face.
 		int nrVertices = m.vertices.size();
 		for(int i = 0; i < nrVertices; i++){
-			if(isOnBorder(i, neighbors, neighbor_faces, m)){
+//			if(isOnBorder(i, neighbors, neighbor_faces, m)){
+			if(isOnBorder(i, m)){
 				border.push_back(i);
 				//target.push_back(i);
 			}
@@ -83,7 +82,8 @@ public:
 			
 			starts.push_back((target.size()));
 			target.push_back(nextVertex);
-			while((nextVertex = nextBorderVertex(nextVertex, border, neighbors, neighbor_faces, m)) >-1){
+//			while((nextVertex = nextBorderVertex(nextVertex, border, neighbors, neighbor_faces, m)) >-1){
+			while((nextVertex = nextBorderVertex(nextVertex, border, m)) >-1){
 				target.push_back(nextVertex);
 			}
 
@@ -95,7 +95,7 @@ public:
 			}*/
 		}
 
-		delete[] neighbors, neighbor_faces;
+//		delete[] neighbors, neighbor_faces;
 
 	}
 
@@ -147,12 +147,12 @@ public:
 	//returns the index of the predecessor of v in the neighbors of the center_index
 	//vertex (by orientation induced from the face orientation)
 	//////////////////////////////////////////////////////////////////////////
-	static int getPrevious( int center_index, vector<int> & neighbor_faces, int v, mesh& m );
+	static int getPrevious( int center_index, int v, mesh& m );
 	//////////////////////////////////////////////////////////////////////////
 	//returns the index of the successor of v in the neighbors of the center_index
 	//vertex (by orientation induced from the face orientation)
 	//////////////////////////////////////////////////////////////////////////
-	static int getNext( int center_idx, vector<int> & nbr_fc, int v , mesh& m );
+	static int getNext( int center_idx, int v , mesh& m );
 
 	//////////////////////////////////////////////////////////////////////////
 	// Returns the length of the polygon train denoted by the vertex indices
@@ -160,13 +160,19 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	static float getLength(vector<int> & vertices, mesh & m){
 		float length = 0;
-		for(int i = 0; i < vertices.size()-1; i++){
+		for(unsigned int i = 0; i < vertices.size()-1; i++){
 			length += (m.vertices[vertices[i+1]] - m.vertices[vertices[i]]).norm();
 		}
 
 		length += (m.vertices[vertices.back()] - m.vertices[vertices.front()]).norm();
 		return length;
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+	//sums the angle (pos oriented) between the edges specified by the indices
+	// (at from) and (at to)
+	//////////////////////////////////////////////////////////////////////////
+	static float sumAnglesWheel( int from, int at, int to, mesh & m );
 
 private:
 	static void ifNotContainedAdd( vector<int> &v, int a )
@@ -182,11 +188,10 @@ private:
 	//////////////////////////////////////////////////////////////////////////
 	// Retruns the next border vertex and ERASES it from border
 	//////////////////////////////////////////////////////////////////////////
-	static int nextBorderVertex( int vertex, vector<int> &border, 
-		vector<int> * neighbors, vector<int> * neighbor_faces, mesh &m )
+	static int nextBorderVertex( int vertex, vector<int> &border, mesh &m )
 	{
-		vector<int> & nbrs = neighbors[vertex];
-		vector<int> & nbr_fcs = neighbor_faces[vertex];
+		vector<int> & nbrs = m.getNeighbors()[vertex];
+		vector<int> & nbr_fcs = m.getNeighborFaces()[vertex];
 		vector<int> borderEls;
 		vector<int>::iterator it = nbrs.begin(), borderEl;
 
@@ -199,7 +204,7 @@ private:
 				return *it;*/
 				//an element could be on the border and a neighbor, without
 				//being connected to vertex by a border.
-				if(countPosOrientedOccurrences(neighbor_faces[vertex], vertex, *borderEl, m) ==1)
+				if(countPosOrientedOccurrences(nbr_fcs, vertex, *borderEl, m) ==1)
 				{
 					borderEls.push_back(*it);
 				}
@@ -227,8 +232,10 @@ private:
 	//if all edges are part of two closed triangle paths involving vertex_nr
 	//this is not a border vertex
 	//////////////////////////////////////////////////////////////////////////
-	static bool isOnBorder(int vertex_nr, vector<int> * neighbors, vector<int> * neighbor_faces, mesh &m){
+	static bool isOnBorder(int vertex_nr, mesh &m){
 
+		vector<int> * neighbors = m.getNeighbors();
+		vector<int> * neighbor_faces = m.getNeighborFaces();
 		//is not on border exactly if it is in two faces
 		//or h
 		bool isBorder =false;
@@ -308,5 +315,6 @@ private:
 		}
 		return count;
 	}
+
 
 };

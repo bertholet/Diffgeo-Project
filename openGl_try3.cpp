@@ -39,7 +39,7 @@ void smoothingDemo( int argc, _TCHAR* * argv );
 void implicitSmoothingDemo( int argc, _TCHAR* * argv );
 void textureDemo(squareTexture & tex);
 
-mesh bunny;
+mesh * bunny;
 colorMap * cMap;
 ImplicitEulerSmoothing * smoother;
 
@@ -55,22 +55,22 @@ void processNormalKeys(unsigned char key, int x, int y) {
 		spacePressed = !spacePressed;
 
 	else if (key == 'd')
-		bunny.rotX(0.05f);
+		bunny->rotX(0.05f);
 
 	else if (key == 'a')
-		bunny.rotX(-0.05f);
+		bunny->rotX(-0.05f);
 
 	else if (key == 'w')
-		bunny.rotY(0.05f);
+		bunny->rotY(0.05f);
 
 	else if (key == 's')
-		bunny.rotY(-0.05f);
+		bunny->rotY(-0.05f);
 
 	else if (key == 'z'){
-		bunny.scaleXYZ(1.05f);
+		bunny->scaleXYZ(1.05f);
 	}
 	else if (key == 'u'){
-		bunny.scaleXYZ(0.95f);
+		bunny->scaleXYZ(0.95f);
 	}
 
 }
@@ -78,19 +78,19 @@ void processNormalKeys(unsigned char key, int x, int y) {
 void implicitEulerTests(void){
 	//bunny = torus(2.f,1.f, 20, 50);
 	//smoother(bunny,0.1f, 0.1f);
-	cout << "Volume before smoothing:" << Operator::volume(bunny) <<"\n";
+	cout << "Volume before smoothing:" << Operator::volume(*bunny) <<"\n";
 	//smoother->smootheMesh(bunny);
 
 }
 
 void implicitSmoothing(void){
 	if(spacePressed){
-		smoother->smootheMesh(bunny);
+		smoother->smootheMesh(*bunny);
 		//Operator::calcAllCurvNormals(bunny,cMap->curvNormals); //TODO UNCOMMENT!! REFACTOR!
 	}
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	bunny.glDisplay((colorMap&) *cMap);
+	bunny->glDisplay((colorMap&) *cMap);
 	//bunny.glDisplay();
 	glFlush();
 
@@ -105,30 +105,31 @@ int _tmain(int argc, _TCHAR* argv[])
 		
 	//bunny = cube(2.f, 10);
 //	bunny= mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/teapotTex.obj", tuple3f(1.f,0.f,0.f), 2.f);
-	bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
+	bunny = new mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
 	//bunny= mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 3);
 //	bunny = ball(1, 80,40);
 	//bunny = torus(2.f,1.f, 30, 60);
 	//bunny = simplestCube();
 	//bunny = cube(2.f,20);
 
-	bunny.normalize();
-	
+
+	bunny->normalize();
+
 	//meshOperation::getHalf(bunny,bunny, tuple3f(-1,0,0),-0.05f); //dragon.obj config
 //	meshOperation::getHalf(bunny,bunny, tuple3f(-0.25f,1,0), 0.1f); //dragon.obj config
-	meshOperation::getHalf(bunny,bunny, tuple3f(0,0,1), 0.05f); //dragon.obj config
+	meshOperation::getHalf(*bunny,*bunny, tuple3f(0,0,1), 0.05f); //dragon.obj config
 //	meshOperation::getHalf(bunny,bunny, tuple3f(0,1,0), 0.05f); //dragon.obj config
 	vector<int> border;
 	vector<int> borderStarts;
-	meshOperation::getBorder(bunny,border, borderStarts);
+	meshOperation::getBorder(*bunny,border, borderStarts);
 	//bunny.addNormalNoise(0.05f);
 	
 	//cMap = new curvColormap(bunny);
 	//cMap = new gaussColormap(bunny);
 /*	cMap = (colorMap *) new borderColorMap(border,borderStarts,tuple3f(0,0,1), tuple3f(1,0,0));
 	
-	//	bunny.setShowOrientation(true);
-	smoother = new ImplicitEulerSmoothing(bunny,1, 0.1f);
+	//	bunny->setShowOrientation(true);
+	smoother = new ImplicitEulerSmoothing(*bunny,1, 0.1f);
 	implicitSmoothingDemo(argc,argv);
 	//implicitEulerTests();
 	delete smoother;//*/
@@ -141,7 +142,7 @@ int _tmain(int argc, _TCHAR* argv[])
 /*	TextureDemo demo;
 	demo.run(bunny);//*/
 	TutteDemo demo;
-	demo.run(bunny, TutteWeights::cotan_weights_divAvor, TutteWeights::circleBorder);
+	demo.run(*bunny, TutteWeights::cotan_weights_divAvor, TutteWeights::circleBorder);
 /*	squareTexture s = squareTexture();
 	textureDemo(s);//*/
 	
@@ -165,7 +166,7 @@ void renderScene4(void){
 
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	bunny.glDisplay();
+	bunny->glDisplay();
 	glFlush();
 
 	glEnable(GL_DEPTH_TEST);
@@ -180,7 +181,7 @@ void renderScene5(void){
 	//LOLglShadeModel(GL_FLAT);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	bunny.glDisplay((colorMap&) *cMap);
+	bunny->glDisplay((colorMap&) *cMap);
 	glFlush();
 
 	//glEnable(GL_DEPTH_TEST);
@@ -190,7 +191,7 @@ void renderScene5(void){
 void renderScenePoints(void){
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	bunny.glDisplayVertices();
+	bunny->glDisplayVertices();
 	glFlush();
 
 	//glEnable(GL_DEPTH_TEST);
@@ -200,16 +201,16 @@ void renderScenePoints(void){
 
 void smoothing(void){
 	if(spacePressed){
-		s.smootheMesh_explicitEuler(bunny);
+		s.smootheMesh_explicitEuler(*bunny);
 //			cMap->setNormals(s.normals); //TODO UNCOMMENT; REFACTOR
 	}
 
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	bunny.glDisplay((colorMap&)*cMap);
+	bunny->glDisplay((colorMap&)*cMap);
 	glFlush();
 
-	cout << "Volume is : " << Operator::volume(bunny) <<"\n";
+	cout << "Volume is : " << Operator::volume(*bunny) <<"\n";
 
 	//glEnable(GL_DEPTH_TEST);
 	glutPostRedisplay();
@@ -237,7 +238,7 @@ void displayScene( int argc, _TCHAR* * argv )
 {
 
 	cout << cMap->additionalInfo() << "\n";
-	cout << "volume is : " << Operator::volume(bunny) << " \n";
+	cout << "volume is : " << Operator::volume(*bunny) << " \n";
 
 	glutInit(&argc, (char **) argv);
 	glutAWindow(renderScene4);//Scene4
@@ -256,7 +257,7 @@ void displayScene( int argc, _TCHAR* * argv )
 void smoothingDemo( int argc, _TCHAR* * argv ) 
 {
 	cout << cMap->additionalInfo() << "\n";
-	cout << "volume is : " << Operator::volume(bunny) << " \n";
+	cout << "volume is : " << Operator::volume(*bunny) << " \n";
 
 	glutInit(&argc, (char **) argv);
 	glutAWindow(smoothing);
@@ -274,7 +275,7 @@ void smoothingDemo( int argc, _TCHAR* * argv )
 void implicitSmoothingDemo( int argc, _TCHAR* * argv ) 
 {
 	cout << cMap->additionalInfo() << "\n";
-	cout << "volume is : " << Operator::volume(bunny) << " \n";
+	cout << "volume is : " << Operator::volume(*bunny) << " \n";
 
 	glWindowHelper::glWindow(450,450,implicitSmoothing, processNormalKeys); 
 	glutMainLoop();
@@ -295,7 +296,7 @@ void implicitSmoothingDemo( int argc, _TCHAR* * argv )
 void texture(void){
 
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	bunny.glTexDisplay();
+	bunny->glTexDisplay();
 	//bunny.glDisplay();
 	glFlush();
 

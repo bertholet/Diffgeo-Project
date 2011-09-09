@@ -59,11 +59,11 @@ double TutteWeights::unnormed_meanvalue_weights( int i, int j, mesh & m, vector<
 	
 	if(find(neighbors_i.begin(), neighbors_i.end(), j)!= neighbors_i.end()){
 
-		prev = meshOperation::getPrevious(i,nbr_fc_i, j, m);	
-		next = meshOperation::getNext(i,nbr_fc_i, j, m);
+		prev = meshOperation::getPrevious(i, j, m);	
+		next = meshOperation::getNext(i, j, m);
 		if(prev == -1 || next == -1){
-			prev = meshOperation::getPrevious(i,nbr_fc_i, j, m);	
-			next = meshOperation::getNext(i,nbr_fc_i, j, m);
+			prev = meshOperation::getPrevious(i, j, m);	
+			next = meshOperation::getNext(i, j, m);
 		}
 
 		tan_alpha1_2 = (1- tuple3f::cosPoints(verts[prev], verts[i], verts[j]))/
@@ -101,11 +101,11 @@ double TutteWeights::cotan_weights( int i, int j, mesh & m, vector<int> & neighb
 
 	if(find(neighbors_i.begin(), neighbors_i.end(), j)!= neighbors_i.end()){
 
-		prev = meshOperation::getPrevious(i,nbr_fc_i, j, m);	
-		next = meshOperation::getNext(i,nbr_fc_i, j, m);
+		prev = meshOperation::getPrevious(i, j, m);	
+		next = meshOperation::getNext(i, j, m);
 		if(prev == -1 || next == -1){
-			prev = meshOperation::getPrevious(i,nbr_fc_i, j, m);	
-			next = meshOperation::getNext(i,nbr_fc_i, j, m);
+			prev = meshOperation::getPrevious(i, j, m);	
+			next = meshOperation::getNext(i, j, m);
 		}
 
 		cot_alpha1 = tuple3f::cotPoints(verts[j], verts[prev], verts[i]);
@@ -145,8 +145,8 @@ double TutteWeights::cotan_weights_divAvor( int i, int j, mesh & m,
 
 	if(find(neighbors_i.begin(), neighbors_i.end(), j)!= neighbors_i.end()){
 
-		prev = meshOperation::getPrevious(i,nbr_fc_i, j, m);	
-		next = meshOperation::getNext(i,nbr_fc_i, j, m);
+		prev = meshOperation::getPrevious(i, j, m);	
+		next = meshOperation::getNext(i, j, m);
 		if(prev == -1 || next == -1){
 			printf("Error in Tutteweights::cotanweights_adiv");
 		}
@@ -175,8 +175,8 @@ double TutteWeights::cotan_weights_divAvor( int i, int j, mesh & m,
 					(verts[i]-verts[k]).normSqr();
 			}*/
 			nbr = neighbors_i[k];
-			prev = meshOperation::getPrevious(i,nbr_fc_i, nbr, m);	
-			next = meshOperation::getNext(i,nbr_fc_i,nbr, m);
+			prev = meshOperation::getPrevious(i, nbr, m);	
+			next = meshOperation::getNext(i,nbr, m);
 			tempcot1 = tuple3f::cotPoints(verts[nbr], verts[prev], verts[i]);
 			tempcot1 = (tempcot1 >0 ? tempcot1: -tempcot1);
 			tempcot2 = tuple3f::cotPoints(verts[i], verts[next], verts[nbr]);
@@ -220,8 +220,8 @@ double TutteWeights::cotan_weights_divAmix( int i, int j, mesh & m,
 
 	if(find(neighbors_i.begin(), neighbors_i.end(), j)!= neighbors_i.end()){
 
-		prev = meshOperation::getPrevious(i,nbr_fc_i, j, m);	
-		next = meshOperation::getNext(i,nbr_fc_i, j, m);
+		prev = meshOperation::getPrevious(i, j, m);	
+		next = meshOperation::getNext(i, j, m);
 		if(prev == -1 || next == -1){
 			printf("Error in Tutteweights::cotanweights_adiv");
 		}
@@ -232,7 +232,7 @@ double TutteWeights::cotan_weights_divAmix( int i, int j, mesh & m,
 		float Amix = 0, areaT;
 		for(int k = 0; k < neighbors_i.size(); k++){
 			nbr = neighbors_i[k];
-			prev = meshOperation::getPrevious(i,nbr_fc_i, nbr, m);	
+			prev = meshOperation::getPrevious(i, nbr, m);	
 		//	next = meshOperation::getNext(i,nbr_fc_i,nbr, m);
 			areaT = tuple3f::cross((verts[nbr] - verts[i]),(verts[prev] - verts[i])).norm()/2;
 
@@ -289,7 +289,7 @@ void TutteWeights::distWeightCircBorder( vector<tuple3f> & outerPos , vector<int
 }
 
 void TutteWeights::angleApproxBorder( vector<tuple3f> & outerPos , vector<int> & border
-			, vector<int> & loops, mesh & m, vector<int> * nbrs)
+			, vector<int> & loops, mesh & m)
 {
 	vector<float> angles(border.size());
 	int bdr, loopsz, loopSt, prev, next;
@@ -301,13 +301,15 @@ void TutteWeights::angleApproxBorder( vector<tuple3f> & outerPos , vector<int> &
 			- loopSt;
 
 		for(bdr =0; bdr < loopsz; bdr++){
-			angle = 0; 	
 			prev = (bdr == 0? loopsz-1 : bdr-1);
 			next = (bdr == loopsz-1? 0 : bdr+1);
 			
-			//meshOperation::sumAnglesWheel(border[prev], border[bdr], border[next], nbrs, m);
-
+			angle = meshOperation::sumAnglesWheel(border[prev], 
+				border[bdr], border[next], m);
+			angles.push_back(angle);
 		}
+
+		printf("");
 	}
 }
 

@@ -4,6 +4,7 @@
 #include "matrixFactory.h"
 #include "DirectionalLight.h"
 #include "Operator.h"
+#include "meshOperation.h"
 
 
 
@@ -13,69 +14,45 @@ mesh::mesh(void)
 	rotation = matrixFactory::id();
 	showOrientation = false;
 	lighTransform = matrixFactory::id();
+
+	nbrs = NULL;
+	nbr_fcs = NULL;
 	color.set(1.f,1.f,1.f);
 }
 
 mesh::mesh( const char* file )
 {
-	OBIFileReader f;
-	f.parse(file);
-	vertices = f.getVertices();
-	faces = f.getFaces();
-
-	if(f.getNormals().size() != 0){
-		normals = f.getNormals();
-		face_normals_perVertex = f.getFaceNormals();
-	}
-	else{
-		initNormalsFromVertices();
-	}
-
-	initFaceNormals();
-
-	tex = f.getTex();
-
-	position = matrixFactory::translate(0,0,-5);
-	rotation = matrixFactory::id();
-	lighTransform = matrixFactory::id();
-	color.set(1.f,1.f,1.f);
-	showOrientation = false;
+	init(file, tuple3f(0,0,1.f), 1.f);
 }
 
 mesh::mesh( const char* file, tuple3f col )
 {
-	OBIFileReader f;
-	f.parse(file);
-	vertices = f.getVertices();
-	faces = f.getFaces();
-
-	if(f.getNormals().size() != 0){
-		normals = f.getNormals();
-		face_normals_perVertex = f.getFaceNormals();
-	}
-	else{
-		initNormalsFromVertices();
-	}
-	initFaceNormals();
-
-	tex = f.getTex();
-	face_tex = f.getFaceTextures();
-
-	position = matrixFactory::translate(0,0,-5);
-	rotation = matrixFactory::id();
-	lighTransform = matrixFactory::id();
-	color = col;
-
-	showOrientation = false;
+	init(file,col,1.f);
 }
 
 mesh::mesh( const char* file, tuple3f col, float scale )
+{
+	init(file,col,scale);
+}
+
+mesh::~mesh(void)
+{
+	delete[] nbrs;
+	delete[] nbr_fcs;
+}
+
+void mesh::init( const char* file, tuple3f & col, float scale )
 {
 	OBIFileReader f;
 	f.parse(file);
 	vertices = f.getVertices();
 	faces = f.getFaces();
 
+	nbrs = new vector<int>[vertices.size()];
+	nbr_fcs = new vector<int>[vertices.size()];
+	meshOperation::getNeighbors(faces, nbrs);
+	meshOperation::getNeighborFaces(faces, nbr_fcs);
+
 	if(f.getNormals().size() != 0){
 		normals = f.getNormals();
 		face_normals_perVertex = f.getFaceNormals();
@@ -87,6 +64,7 @@ mesh::mesh( const char* file, tuple3f col, float scale )
 
 	tex = f.getTex();
 	face_tex = f.getFaceTextures();
+
 
 	position = matrixFactory::scale(scale) * matrixFactory::translate(0,0,-5);
 	rotation = matrixFactory::id();
@@ -96,11 +74,18 @@ mesh::mesh( const char* file, tuple3f col, float scale )
 	showOrientation = false;
 }
 
-mesh::~mesh(void)
+void mesh::reset( vector<tuple3f> & _vertices, vector<tuple3i> &_faces )
 {
+	vertices = _vertices;
+	faces = _faces;
+	this->initNormalsFromVertices();
+	delete[] nbrs, nbr_fcs;
+	nbrs = new vector<int>[vertices.size()];
+	nbr_fcs = new vector<int>[vertices.size()];
+	meshOperation::getNeighbors(faces, nbrs);
+	meshOperation::getNeighborFaces(faces, nbr_fcs);
 
 }
-
 void mesh::initNormalsFromVertices()
 {
 	cout << ">> Normals are generated, no normals read!\n";
@@ -427,6 +412,8 @@ void mesh::setTextures_perVertex( double * x, double * y )
 
 	this->face_tex = faces;
 }
+
+
 
 
 
