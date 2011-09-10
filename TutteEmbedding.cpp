@@ -20,7 +20,7 @@ void TutteEmbedding::calcTexturePos( mesh &m )
 {
 	vector<int> border;
 	vector<int> loops;
-	vector<double> b(m.getVertices().size());
+	vector<double> b;
 	meshOperation::getBorder(m,border,loops);
 
 	if(loops.size() > 1){
@@ -72,7 +72,7 @@ void TutteEmbedding::calcTexturePos( mesh &m,
 {
 	vector<int> border;
 	vector<int> loops;
-	vector<double> b(m.getVertices().size());
+	vector<double> b;
 	meshOperation::getBorder(m,border,loops);
 
 	if(loops.size() > 1){
