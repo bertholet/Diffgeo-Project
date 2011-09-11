@@ -84,6 +84,8 @@ void TutteEmbedding::calcTexturePos( mesh &m,
 	double * x = new double[m.getVertices().size()];
 	double * y = new double[m.getVertices().size()];
 
+	getBorderPos(outerPos, border, loops,m);
+
 	pardisoMatrix mat;
 	pardisoSolver parsolver(pardisoSolver::MT_STRUCTURALLY_SYMMETRIC,
 		pardisoSolver::SOLVER_ITERATIVE,
@@ -92,7 +94,7 @@ void TutteEmbedding::calcTexturePos( mesh &m,
 	parsolver.checkMatrix(parsolver.MT_STRUCTURALLY_SYMMETRIC, mat);
 	parsolver.setMatrix(mat, 1);
 
-	getBorderPos(outerPos, border, loops,m);
+	//getBorderPos(outerPos, border, loops,m);
 	//getBorderPos(outerPos,border,m);
 	setUpX(b, border,outerPos, m.getVertices().size());
 	parsolver.solve(x,&b[0]);

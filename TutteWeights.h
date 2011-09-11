@@ -3,6 +3,7 @@
 #define UNIFORM
 #include "mesh.h"
 #include <vector>
+#include "pardisoMatrix.h"
 
 
 namespace TutteWeights{
@@ -26,5 +27,8 @@ namespace TutteWeights{
 		vector<int> & loops, mesh &);
 	void angleApproxBorder( vector<tuple3f> & outerPos , vector<int> & border, 
 		vector<int> & loops, mesh & m);
+
+	void setUp_angleMat(vector<float> &angles, vector<float> &lambdas, pardisoMatrix & target);
+	float angleMat(int i, int j, vector<float> &angles, vector<float> &lambdas);
 }
 #endif

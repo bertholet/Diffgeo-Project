@@ -53,6 +53,38 @@ public:
 
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	//scale textures to [0,1]x[0,1]
+	//////////////////////////////////////////////////////////////////////////
+	static void normalizeTexture(vector<tuple3f> &tex){
+		float maxx= tex[0].x, minx = tex[0].x,
+			maxy= tex[0].y, miny = tex[0].y;
+
+		for(vector<tuple3f>::iterator it = tex.begin(); it != tex.end(); it++){
+			if(it->x > maxx){
+				maxx = it->x;
+			}
+			if(it->y > maxy){
+				maxy = it->y;
+			}
+			if(it->x < minx){
+				minx = it->x;
+			}
+			if(it->y < miny){
+				miny = it->y;
+			}
+		}
+
+		float scale = (maxx-minx>maxy-miny? maxx-minx:maxy-miny);
+		scale = 1.f/scale;
+		for(vector<tuple3f>::iterator it = tex.begin(); it != tex.end(); it++){
+			it->x = it->x-minx;
+			it->y = it->y-miny;
+			it->x *= scale;
+			it->y *=scale;
+		}
+	}
+
 	static void getBorder(mesh & m, vector<int> & target, vector<int> & starts){
 		
 		target.clear();

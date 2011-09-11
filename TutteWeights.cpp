@@ -5,6 +5,7 @@
 #include <math.h>
 #include "tuple3.h"
 #include <iostream>
+#include "pardiso.h"
 
 double TutteWeights::uniform_weights(int i, int j, mesh & m, vector<int> & neighbors_i,
 									 vector<int> & neighbor_fc_i, vector<int> & border)
@@ -291,12 +292,13 @@ void TutteWeights::distWeightCircBorder( vector<tuple3f> & outerPos , vector<int
 void TutteWeights::angleApproxBorder( vector<tuple3f> & outerPos , vector<int> & border
 			, vector<int> & loops, mesh & m)
 {
-	vector<float> angles, lengthQuota; //length next segment over last segment
+	vector<float> angles, lambdas; //length next segment over last segment
 	angles.reserve(border.size());
-	lengthQuota.reserve(border.size());
+	lambdas.reserve(border.size());
+	outerPos.clear();
 
 	int bdr, loopsz, loopSt, prev, next;
-	float angle, length, sum, scale;
+	float angle, length, sum, scale_factor,scale;
 
 	for(int lp = 0; lp < loops.size(); lp++){
 
@@ -312,21 +314,194 @@ void TutteWeights::angleApproxBorder( vector<tuple3f> & outerPos , vector<int> &
 			angle = meshOperation::sumAnglesWheel(border[prev], 
 				border[bdr], border[next], m);
 			sum+= angle;
-			angles.push_back(angle);
+			angles.push_back(PI-angle);
 
 			length = (m.getVertices()[border[next]] - m.getVertices()[border[bdr]]).norm()/
 				(m.getVertices()[border[bdr]] - m.getVertices()[border[prev]]).norm();
-			lengthQuota.push_back(length);
+			lambdas.push_back(length);
 
 		}
-		scale = (loopsz-2) * PI / sum;
+		scale_factor = (loopsz-2) * PI / sum;
 		for(bdr =0; bdr < loopsz; bdr++){
-			angles[loopSt + bdr] = angles[loopSt + bdr] * scale;
+			angles[loopSt + bdr] = angles[loopSt + bdr] * scale_factor;
 		}
 
+		pardisoMatrix mat;
 
+		setUp_angleMat(angles, lambdas, mat);
+		pardisoSolver solver = pardisoSolver(pardisoSolver::MT_STRUCTURALLY_SYMMETRIC,
+			pardisoSolver::SOLVER_ITERATIVE,2);
+		solver.checkMatrix(pardisoSolver::MT_STRUCTURALLY_SYMMETRIC, mat);
+		solver.setMatrix(mat,1);
+
+		vector<double> x,b;
+		x.reserve(2*loopsz);
+		b.reserve(2*loopsz);
+		for(int k=0; k < 2*loopsz; k++){
+			b.push_back(0);
+			x.push_back(0);
+		}
+		b[1] = (m.getVertices()[border[1]]-m.getVertices()[border[0]]).norm();
+
+		solver.solve(&(x[0]),&(b[0]));
+		
+		for(int k=0; k < loopsz; k++){
+			outerPos.push_back(tuple3f(x[k], x[k+loopsz],0));
+		}
+		meshOperation::normalizeTexture(outerPos);
 		printf("");
 	}
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+//0 based notation
+//////////////////////////////////////////////////////////////////////////
+float TutteWeights::angleMat( int ind1, int ind2, vector<float> & angles, vector<float> & lambdas )
+{
+	int sz = angles.size();
+	int i = (ind1<ind2?ind1:ind2);
+	int j= (ind1<ind2?ind2:ind1);
+	float alpha_im1 =angles[(i-1+sz)% sz];
+	float alpha_i = angles[i% sz];
+	float alpha_ip1=angles[(i+1)% sz];
+	float lambda_im1 =lambdas[(i-1+sz)% sz];
+	float lambda_i = lambdas[ i % sz];
+	float lambda_ip1=lambdas[(i+1)% sz];
+
+	float out = 0;
+	if(i<sz &&j < sz){
+		if((i-2 + sz)%sz == j){
+			out = lambda_im1 * cos(alpha_im1);
+		}
+		else if( (i-1 + sz)% sz == j){
+			out = -lambda_im1*cos(alpha_im1)-1-lambda_i*cos(alpha_i) -(lambda_i)*(lambda_i);
+		}
+		else if(i == j){
+			out = 2 + 2*lambda_i*cos(alpha_i) +(lambda_i)*(lambda_i) +(lambda_ip1)*(lambda_ip1);
+		}
+		else if((i+1)% sz == j){
+			out = -lambda_i*cos(alpha_i)-1-lambda_ip1*cos(alpha_ip1) -(lambda_ip1)*(lambda_ip1);
+		}
+		else if((i+2)% sz == j){
+			out = lambda_ip1*cos(alpha_ip1);
+		}
+	}
+	else if(i<sz && j >=sz){ 
+		if((i-2 +sz)%sz + sz== j){
+			out = lambda_im1*sin(alpha_im1);
+		}
+		else if( (i-1+sz)% sz + sz == j){
+			out = -lambda_im1*sin(alpha_im1)-lambda_i*sin(alpha_i);
+		}
+		else if(i + sz == j){
+			out = 0;
+		}
+		else if((i+1)% sz + sz == j){
+			out = lambda_i*sin(alpha_i) + lambda_ip1*sin(alpha_ip1);
+		}
+		else if( (i+2)% sz + sz == j){
+			out = -lambda_ip1*sin(alpha_ip1);
+		}
+	}
+	else if(i>=sz && j >=sz){
+		if((i-2+sz)% sz + sz== j){
+			out = lambda_im1*cos(alpha_im1);
+		}
+		else if((i-1 + sz)% sz + sz == j){
+			out = -lambda_im1*cos(alpha_im1)-1-lambda_i*cos(alpha_i) -(lambda_i)*(lambda_i);
+		}
+		else if(i == j){
+			out = 2 + 2*lambda_i*cos(alpha_i) +(lambda_i*lambda_i) + lambda_ip1*lambda_ip1;
+		}
+		else if((i+1)% sz + sz == j){
+			out = -lambda_i*cos(alpha_i)-1-lambda_ip1*cos(alpha_ip1) -lambda_ip1*lambda_ip1;
+		}
+		else if((i+2)% sz + sz == j){
+			out = lambda_ip1*cos(alpha_ip1);
+		}
+	}
+
+	if((i==0&&j==0)|| (i==1 &&j==1)||(i==sz &&j==sz)||(i==sz+1 &&j==sz+1) ){
+		out = out+1;
+	}
+
+	return out;
+}
+
+void TutteWeights::setUp_angleMat( vector<float> &angles, vector<float> &lambdas, pardisoMatrix & target )
+{
+	int sz = angles.size();
+	int par_j,j;
+	target.ia.clear();
+	target.ja.clear();
+	target.a.clear();
+
+	for(int i= 0; i< 2*sz; i++){
+		target.ia.push_back(target.a.size()+1);
+		if(i%sz-2>=0 && i%sz+2 < sz){
+			for(par_j=i-2; par_j <=i+2; par_j++){
+				j= (par_j+sz)%sz; //% of negatives is ill defined
+				target.ja.push_back(j+1);
+				target.a.push_back(angleMat(i,j,angles,lambdas));
+			}
+			for(par_j=i-2; par_j <=i+2; par_j++){
+				j= (par_j+sz)%sz + sz;
+				target.ja.push_back(j+1);
+				target.a.push_back(angleMat(i,j,angles,lambdas));
+			}
+		}
+		//stupid indices have to be ordered ascendingly. just stupid.
+		else if(i%sz-2 <0){
+
+			for(par_j=0; par_j <=i%sz+2; par_j++){
+				j= (par_j+sz)%sz; //% of negatives is ill defined
+				target.ja.push_back(j+1);
+				target.a.push_back(angleMat(i,j,angles,lambdas));
+			}
+			for(par_j=i%sz-2; par_j <0; par_j++){
+				j= (par_j+sz)%sz; //% of negatives is ill defined
+				target.ja.push_back(j+1);
+				target.a.push_back(angleMat(i,j,angles,lambdas));
+			}
+
+			for(par_j=0; par_j <=i%sz+2; par_j++){
+				j= (par_j+sz)%sz + sz;
+				target.ja.push_back(j+1);
+				target.a.push_back(angleMat(i,j,angles,lambdas));
+			}
+			for(par_j=i%sz-2; par_j <0; par_j++){
+				j= (par_j+sz)%sz + sz;
+				target.ja.push_back(j+1);
+				target.a.push_back(angleMat(i,j,angles,lambdas));
+			}
+
+		}
+		else if(i%sz+2>=sz){
+			for(par_j=sz; par_j <=i%sz+2; par_j++){
+				j= (par_j+sz)%sz; //% of negatives is ill defined
+				target.ja.push_back(j+1);
+				target.a.push_back(angleMat(i,j,angles,lambdas));
+			}
+			for(par_j=i%sz-2; par_j <sz; par_j++){
+				j= (par_j+sz)%sz; //% of negatives is ill defined
+				target.ja.push_back(j+1);
+				target.a.push_back(angleMat(i,j,angles,lambdas));
+			}
+
+			for(par_j=sz; par_j <=i%sz+2; par_j++){
+				j= (par_j+sz)%sz + sz;
+				target.ja.push_back(j+1);
+				target.a.push_back(angleMat(i,j,angles,lambdas));
+			}
+			for(par_j=i%sz-2; par_j <sz; par_j++){
+				j= (par_j+sz)%sz + sz;
+				target.ja.push_back(j+1);
+				target.a.push_back(angleMat(i,j,angles,lambdas));
+			}
+		}
+	}
+	target.ia.push_back(target.a.size()+1);
 }
 
 
