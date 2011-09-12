@@ -315,7 +315,7 @@ void TutteWeights::angleApproxBorder( vector<tuple3f> & outerPos , vector<int> &
 			angle = meshOperation::sumAnglesWheel(border[prev], 
 				border[bdr], border[next], m);
 			sum+= angle;
-			angles.push_back(PI-angle);
+			angles.push_back(angle); //was pi -angle...
 
 			length = (m.getVertices()[border[next]] - m.getVertices()[border[bdr]]).norm()/
 				(m.getVertices()[border[bdr]] - m.getVertices()[border[prev]]).norm();
@@ -324,7 +324,7 @@ void TutteWeights::angleApproxBorder( vector<tuple3f> & outerPos , vector<int> &
 		}
 		scale_factor = (loopsz-2) * PI / sum;
 		for(bdr =0; bdr < loopsz; bdr++){
-			angles[loopSt + bdr] = angles[loopSt + bdr] * scale_factor;
+			angles[loopSt + bdr] = PI - angles[loopSt + bdr] * scale_factor;
 		}
 
 		pardisoMatrix mat;
