@@ -57,10 +57,7 @@ float meshOperation::sumAnglesWheel( int from, int center, int to, mesh & m )
 {
 	vector<int> & nbrs = m.getNeighbors()[center];
 	vector<int> & nbr_fcs = m.getNeighborFaces()[center];
-	vector<tuple3i> debug;
-	for(int i = 0; i < nbr_fcs.size(); i++){
-		debug.push_back(m.getFaces()[nbr_fcs[i]]);
-	}
+
 
 	int actual = from, next, lps = 0;
 	float angle = 0;
@@ -75,7 +72,7 @@ float meshOperation::sumAnglesWheel( int from, int center, int to, mesh & m )
 		lps++;
 	}
 	while (actual != to);
-	
+
 	return angle;
 }
 
