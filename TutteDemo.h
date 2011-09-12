@@ -2,11 +2,13 @@
 #include "StdAfx.h"
 #include "mesh.h"
 #include "squareTexture.h"
+#include "drawing2d.h"
 
 class TutteDemo
 {
 public:
 	static mesh * bunny;
+	static drawing2d * texMesh;
 	squareTexture * tex;
 	TutteDemo(void);
 	~TutteDemo(void);
@@ -21,4 +23,5 @@ public:
 		mesh & /*m*/));
 
 	void loop();
+	void loopTex(void);
 };

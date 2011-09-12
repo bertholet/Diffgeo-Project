@@ -79,7 +79,9 @@ void mesh::reset( vector<tuple3f> & _vertices, vector<tuple3i> &_faces )
 	vertices = _vertices;
 	faces = _faces;
 	this->initNormalsFromVertices();
-	delete[] nbrs, nbr_fcs;
+	if(nbrs!= NULL&&nbr_fcs != NULL){
+		delete[] nbrs, nbr_fcs;
+	}
 	nbrs = new vector<int>[vertices.size()];
 	nbr_fcs = new vector<int>[vertices.size()];
 	meshOperation::getNeighbors(faces, nbrs);
@@ -160,6 +162,12 @@ void mesh::scaleXYZ(float f)
 	matrixf rot = matrixFactory::scale(f);
 	rotation = rotation*rot;
 	//lighTransform = rot.transpose()*lighTransform;
+}
+
+
+void mesh::setPosition( tuple3f & pos )
+{
+	this->position = matrixFactory::translate(pos.x,pos.y,pos.z);
 }
 
 
@@ -408,6 +416,18 @@ void mesh::setTextures_perVertex( double * x, double * y )
 
 	for(int i = 0; i < vertices.size(); i++){
 		tex.push_back(tuple3f((float)x[i], (float)y[i],0.f));
+	}
+
+	this->face_tex = faces;
+}
+
+void mesh::setTextures_perVertex( vector<tuple3f> & textures )
+{
+	tex.clear();
+	tex.reserve(vertices.size());
+
+	for(int i = 0; i < vertices.size(); i++){
+		tex.push_back(textures[i]);
 	}
 
 	this->face_tex = faces;

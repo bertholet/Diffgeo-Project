@@ -274,7 +274,6 @@ void TutteWeights::circleBorder( vector<tuple3f> & outerPos , vector<int> & bord
 	for(int i = 0; i < sz;i++){
 		outerPos.push_back(tuple3f((sin(i*2* PI/sz)+1.f)/2.f,(cos(i*2* PI/sz)+1.f)/2.f,0.f));
 	}
-
 }
 
 void TutteWeights::distWeightCircBorder( vector<tuple3f> & outerPos , vector<int> & border, vector<int> & loops, mesh & m)
@@ -293,13 +292,22 @@ void TutteWeights::distWeightCircBorder( vector<tuple3f> & outerPos , vector<int
 void TutteWeights::angleApproxBorder( vector<tuple3f> & outerPos , vector<int> & border
 			, vector<int> & loops, mesh & m)
 {
+<<<<<<< HEAD
+	vector<float> angles, lengthQuota; //length next segment over last segment
+	angles.reserve(border.size());
+	lengthQuota.reserve(border.size());
+
+	int bdr, loopsz, loopSt, prev, next;
+	float angle, length, sum, scale;
+=======
 	vector<float> angles, lambdas; //length next segment over last segment
 	angles.reserve(border.size());
 	lambdas.reserve(border.size());
 	outerPos.clear();
 
 	int bdr, loopsz, loopSt, prev, next;
-	float angle, length, sum, scale_factor;
+	float angle, length, sum, scale_factor,scale;
+>>>>>>> 11f0c9655ecb1c6ea73be69bb9dcafd9ce1dd7c2
 
 	for(int lp = 0; lp < loops.size(); lp++){
 
@@ -315,6 +323,20 @@ void TutteWeights::angleApproxBorder( vector<tuple3f> & outerPos , vector<int> &
 			angle = meshOperation::sumAnglesWheel(border[prev], 
 				border[bdr], border[next], m);
 			sum+= angle;
+<<<<<<< HEAD
+			angles.push_back(angle);
+
+			length = (m.getVertices()[border[next]] - m.getVertices()[border[bdr]]).norm()/
+				(m.getVertices()[border[bdr]] - m.getVertices()[border[prev]]).norm();
+			lengthQuota.push_back(length);
+
+		}
+		scale = (loopsz-2) * PI / sum;
+		for(bdr =0; bdr < loopsz; bdr++){
+			angles[loopSt + bdr] = angles[loopSt + bdr] * scale;
+		}
+
+=======
 			angles.push_back(PI-angle);
 
 			length = (m.getVertices()[border[next]] - m.getVertices()[border[bdr]]).norm()/
@@ -343,11 +365,9 @@ void TutteWeights::angleApproxBorder( vector<tuple3f> & outerPos , vector<int> &
 			x.push_back(0);
 		}
 		b[1] = (m.getVertices()[border[1]]-m.getVertices()[border[0]]).norm();
-		b[loopsz+1] = (m.getVertices()[border[1]]-m.getVertices()[border[0]]).norm();
+>>>>>>> 11f0c9655ecb1c6ea73be69bb9dcafd9ce1dd7c2
 
 		solver.solve(&(x[0]),&(b[0]));
-
-
 		
 		for(int k=0; k < loopsz; k++){
 			outerPos.push_back(tuple3f(x[k], x[k+loopsz],0));
@@ -391,22 +411,21 @@ float TutteWeights::angleMat( int ind1, int ind2, vector<float> & angles, vector
 			out = lambda_ip1*cos(alpha_ip1);
 		}
 	}
-	else if(i<sz && j >=sz){
-		//changed all signs!!!!!!!!!
+	else if(i<sz && j >=sz){ 
 		if((i-2 +sz)%sz + sz== j){
-			out = -lambda_im1*sin(alpha_im1);
+			out = lambda_im1*sin(alpha_im1);
 		}
 		else if( (i-1+sz)% sz + sz == j){
-			out = +lambda_im1*sin(alpha_im1)+lambda_i*sin(alpha_i);
+			out = -lambda_im1*sin(alpha_im1)-lambda_i*sin(alpha_i);
 		}
 		else if(i + sz == j){
 			out = 0;
 		}
 		else if((i+1)% sz + sz == j){
-			out = -lambda_i*sin(alpha_i) - lambda_ip1*sin(alpha_ip1);
+			out = lambda_i*sin(alpha_i) + lambda_ip1*sin(alpha_ip1);
 		}
 		else if( (i+2)% sz + sz == j){
-			out = +lambda_ip1*sin(alpha_ip1);
+			out = -lambda_ip1*sin(alpha_ip1);
 		}
 	}
 	else if(i>=sz && j >=sz){

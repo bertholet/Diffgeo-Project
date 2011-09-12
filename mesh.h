@@ -54,6 +54,7 @@ public:
 	vector<tuple3i>& getFaces(){return faces;}
 	vector<int> * getNeighbors() { return nbrs;}
 	vector<int> * getNeighborFaces(){return nbr_fcs;}
+	vector<tuple3f> & getTexCoords(){return tex;}
 	
 	void glDisplayVertices(void);
 	void glDisplayLines(void);
@@ -64,10 +65,12 @@ public:
 	tuple3f intensities( unsigned int faceNr, tuple3f &direction );
 	tuple3f intensitiesFlat( unsigned int faceNr, tuple3f &direction );
 	void setTextures_perVertex( double * x, double * y );
+	void setTextures_perVertex( vector<tuple3f> & textures );
 
 	void setShowOrientation(bool b){
 		showOrientation = b;
 	}
+	void setPosition( tuple3f &pos );
 
 private:
 	void init( const char* file, tuple3f & col, float scale );
