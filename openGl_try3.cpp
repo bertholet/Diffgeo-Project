@@ -105,9 +105,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		
 	//bunny = cube(2.f, 10);
 //	bunny= mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/teapotTex.obj", tuple3f(1.f,0.f,0.f), 2.f);
-//	bunny = new mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
+	bunny = new mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/dragon.obj", tuple3f(1.f,0.f,0.f), 2.f);
 //	bunny= new mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2);
-	bunny = new ball(1,20,10);
+//	bunny = new ball(1,20,10);
 	//	bunny = ball(1, 80,40);
 	//bunny = torus(2.f,1.f, 30, 60);
 	//bunny = simplestCube();
@@ -116,10 +116,10 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	bunny->normalize();
 
-	//meshOperation::getHalf(bunny,bunny, tuple3f(-1,0,0),-0.05f); //dragon.obj config
-//	meshOperation::getHalf(bunny,bunny, tuple3f(-0.25f,1,0), 0.1f); //dragon.obj config
-	meshOperation::getHalf(*bunny,*bunny, tuple3f(0,0,1), 0.05f); //dragon.obj config
-//	meshOperation::getHalf(bunny,bunny, tuple3f(0,1,0), 0.05f); //dragon.obj config
+	meshOperation::getHalf(*bunny,*bunny, tuple3f(-1,0,0),-0.05f); //dragon.obj config
+	//meshOperation::getHalf(*bunny,*bunny, tuple3f(-0.25f,1,0), 0.1f); //dragon.obj config
+//	meshOperation::getHalf(*bunny,*bunny, tuple3f(0,0,1), 0.05f);  
+//	meshOperation::getHalf(*bunny,*bunny, tuple3f(0,0,1), 0.05f); // dragon.obj: 2 border
 	vector<int> border;
 	vector<int> borderStarts;
 	meshOperation::getBorder(*bunny,border, borderStarts);
