@@ -52,6 +52,66 @@ public:
 		target.reset(vertices,faces);
 
 	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	// Detects dangling border positions, i.e. vertices that have more than 2 
+	// adjascend border edges (but 2k of them). This will k-plicate such vertices
+	// and put them into the mesh such that the border 
+	// (and possibly the mesh) falls in more components
+	//////////////////////////////////////////////////////////////////////////
+	static void undangle(mesh & m){
+		vector<int> criticalPoints, borderCompRepresentants, facesToChange;
+		
+		vector<int>::iterator vertex;
+		vector<int>:: iterator nbrs;
+		vector<int> * nbr_fcs;
+		int borderEdges=0, nbr, nextNbr, newVertex_id ;
+
+		for(int vertex= 0; vertex != m.getVertices().size(); vertex++){
+			nbr_fcs = & m.getNeighborFaces()[*vertex];
+			borderEdges =0;
+			borderCompRepresentants.clear();
+			//critical neighbors will have one neighbor per "border component"
+			for(nbrs = m.getNeighbors()[*vertex].begin(); nbrs != m.getNeighbors()[*vertex].end(); nbrs++){
+				//positive oriented border edges
+				if(countPosOrientedOccurrences(*nbr_fcs, *vertex, *nbrs,m) -
+					countNegOrientedOccurrences(*nbr_fcs, *vertex, *nbrs,m) >0){//!= 0){
+						borderEdges++;
+						borderCompRepresentants.push_back(*nbrs);
+				}
+			}
+
+			if(borderEdges > 1){//2){
+				//split neighborhood
+				criticalPoints.push_back(*vertex);
+				for(nbrs = borderCompRepresentants.begin(); nbrs!= borderCompRepresentants.end(); nbrs++){
+					//first border component
+					if(nbrs!=borderCompRepresentants.begin()){
+						//duplicate vertex
+						newVertex_id = m.getVertices().size();
+						m.getVertices().push_back(m.getVertices()[*vertex]);
+						
+						nbr = *nbrs;
+						nextNbr = getNext(*vertex,nbr,m);
+						while(nextNbr>-1){
+							replace_vbc_newv(*vertex, nbr, nextNbr,newVertex_id, m);
+							nbr = nextNbr;
+							nextNbr = getNext(*vertex,nextNbr,m);
+						}
+					}
+				}
+			}
+		}
+		printf("Found %d dangling border points", criticalPoints.size());
+	}
+
+	static int countComponents(mesh &m){
+
+	}
+
+	static void reduceToLargestComponent(mesh &m){
+
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	//scale textures to [0,1]x[0,1]
@@ -177,7 +237,7 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	//returns the index of the predecessor of v in the neighbors of the center_index
-	//vertex (by orientation induced from the face orientation)
+	//vertex (by orientation induced from the face orientation) or -1 if none exists
 	//////////////////////////////////////////////////////////////////////////
 	static int getPrevious( int center_index, int v, mesh& m );
 	//////////////////////////////////////////////////////////////////////////
@@ -289,13 +349,13 @@ private:
 				nbr_fc = m.faces[*nbr_fc_idx];
 				if(nbr_fc.a == *nbr || nbr_fc.b == *nbr || nbr_fc.c == *nbr ){
 					count ++;
-					if(count == 2){
-						break; // two neighbors can only share 2 faces
-					}
 				}
 			}
 			if(count == 1){
 				return true;
+			}
+			if(count >2){
+				printf("meshOperation::isOnBorder: detected edge contained in %d faces!", count);
 			}
 
 		}//*/
@@ -348,5 +408,50 @@ private:
 		return count;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	//counts nr of occurences of (a,b) as positively oriented edge
+	//in the faces indicised bayface_indexes
+	//////////////////////////////////////////////////////////////////////////
+	static int countNegOrientedOccurrences(vector<int> & face_indexes, int a, int b, mesh & m){
+		vector<int>::iterator nbr_fc_idx,end;
+		tuple3i nbr_fc;
+		int count = 0;
+		nbr_fc_idx = face_indexes.begin();
+		end = face_indexes.end();
+		// counts nr of faces shared
+		for(;nbr_fc_idx!= end; nbr_fc_idx++){
+			nbr_fc = m.faces[*nbr_fc_idx];
+			if(nbr_fc.a == a && nbr_fc.c == b || 
+				nbr_fc.b == a && nbr_fc.a == b|| 
+				nbr_fc.c == a && nbr_fc.b == b ){
+					count ++;
+			}
+		}
+		return count;
+	}
 
+	//////////////////////////////////////////////////////////////////////////
+	// replaces vertex by newVertex in the face specified by vertex, nbr1, nbr2
+	//////////////////////////////////////////////////////////////////////////
+	static void replace_vbc_newv(int vertex, int nbr1, int nbr2, int newVertex, mesh& m){
+		vector<int> & nbr_fcs = m.getNeighborFaces()[vertex];
+		bool replaced = false;
+		for(vector<int>::iterator fcID = nbr_fcs.begin(); fcID!= nbr_fcs.end(); fcID++){
+			if(nbr_fcs[i].a = vertex && nbr_fcs[i].b = nbr1 && nbr_fcs[i].c = nbr2){
+				nbr_fcs[i].a = newVertex;
+				replaced = true;
+			}
+			else if(nbr_fcs[i].b = vertex && nbr_fcs[i].c = nbr1 && nbr_fcs[i].a = nbr2){
+				nbr_fcs[i].b = newVertex;
+				replaced = true;
+			}
+			else if(nbr_fcs[i].c = vertex && nbr_fcs[i].a = nbr1 && nbr_fcs[i].b= nbr2){
+				nbr_fcs[i].c = newVertex;
+				replaced = true;
+			}
+		}
+		if(!replaced){
+			throw std::runtime_error("Assertion failed in replace_v_abc");
+		}
+	}
 };
