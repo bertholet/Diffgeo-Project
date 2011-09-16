@@ -116,10 +116,49 @@ public:
 	static void reduceToLargestComponent(mesh &m){
 		vector<vector<int>> components;
 		vector<int> stack;
+		vector<int> done;
+		vector<int>::iterator low;
+		vector<vector<int>> & nbrs = m.getNeighbors();
+		int nrComponents =0;
+		int node,j;
 
 		for(unsigned int i = 0; i < m.getVertices().size();i++){
+			low = lower_bound(done.begin(), done.end(),i);
+			if(low == done.end() || *low != i){
+				components.push_back(vector<int>()); 
+				vector<int> & comp = components.back();
+				stack.push_back(i);
+				while(stack.size() !=0){
+					node = stack.back();
+					stack.pop_back();
+					ifNotContainedInsert(done, node);
 
+					low = lower_bound(comp.begin(), comp.end(),node);
+					if(low == comp.end() || *low != node){
+						comp.insert(low, node);
+					}
+					
+					for(j = 0; j < nbrs[node].size(); j++){
+						low = lower_bound(done.begin(), done.end(),nbrs[node][j]);
+						if(low == done.end() || *low != nbrs[node][j]){
+							ifNotContainedInsert(stack, nbrs[node][j]);
+						}
+					}
+				}
+				nrComponents++;
+			}
 		}
+
+		printf("Found %d components. \n", nrComponents);
+
+		int max=0, maxi = -1;
+		for(int i = 0; i < components.size(); i++){
+			if(components[i].size() > max){
+				maxi = i;
+				max = components[i].size();
+			}
+		}
+
 	}
 
 	//////////////////////////////////////////////////////////////////////////
