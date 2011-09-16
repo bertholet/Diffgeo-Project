@@ -62,20 +62,21 @@ public:
 	static void undangle(mesh & m){
 		vector<int> criticalPoints, borderCompRepresentants, facesToChange;
 		
-		vector<int>::iterator vertex;
-		vector<int>:: iterator nbrs;
+		int vertex;
+		vector<int>::iterator nbrs;
 		vector<int> * nbr_fcs;
-		int borderEdges=0, nbr, nextNbr, newVertex_id ;
+		int borderEdges=0, nbr, nextNbr, newVertex_id, 
+			nrVertices = m.getVertices().size();
 
-		for(int vertex= 0; vertex != m.getVertices().size(); vertex++){
-			nbr_fcs = & m.getNeighborFaces()[*vertex];
+		for(vertex= 0; vertex < nrVertices; vertex++){
+			nbr_fcs = & (m.getNeighborFaces()[vertex]);
 			borderEdges =0;
 			borderCompRepresentants.clear();
 			//critical neighbors will have one neighbor per "border component"
-			for(nbrs = m.getNeighbors()[*vertex].begin(); nbrs != m.getNeighbors()[*vertex].end(); nbrs++){
+			for(nbrs = (m.getNeighbors()[vertex]).begin(); nbrs != (m.getNeighbors()[vertex]).end(); nbrs++){
 				//positive oriented border edges
-				if(countPosOrientedOccurrences(*nbr_fcs, *vertex, *nbrs,m) -
-					countNegOrientedOccurrences(*nbr_fcs, *vertex, *nbrs,m) >0){//!= 0){
+				if(countPosOrientedOccurrences(*nbr_fcs, vertex, *nbrs,m) -
+					countNegOrientedOccurrences(*nbr_fcs, vertex, *nbrs,m) >0){//!= 0){
 						borderEdges++;
 						borderCompRepresentants.push_back(*nbrs);
 				}
@@ -83,26 +84,29 @@ public:
 
 			if(borderEdges > 1){//2){
 				//split neighborhood
-				criticalPoints.push_back(*vertex);
+				criticalPoints.push_back(vertex);
 				for(nbrs = borderCompRepresentants.begin(); nbrs!= borderCompRepresentants.end(); nbrs++){
-					//first border component
+					//first border component can keep the old vertex.
 					if(nbrs!=borderCompRepresentants.begin()){
 						//duplicate vertex
 						newVertex_id = m.getVertices().size();
-						m.getVertices().push_back(m.getVertices()[*vertex]);
+						m.getVertices().push_back(m.getVertices()[vertex]);
 						
 						nbr = *nbrs;
-						nextNbr = getNext(*vertex,nbr,m);
+						nextNbr = getNext(vertex,nbr,m);
 						while(nextNbr>-1){
-							replace_vbc_newv(*vertex, nbr, nextNbr,newVertex_id, m);
+							replace_vbc_newv(vertex, nbr, nextNbr,newVertex_id, m);
 							nbr = nextNbr;
-							nextNbr = getNext(*vertex,nextNbr,m);
+							nextNbr = getNext(vertex,nextNbr,m);
 						}
 					}
 				}
 			}
 		}
-		printf("Found %d dangling border points", criticalPoints.size());
+
+		m.reset(m.vertices, m.faces);
+		printf("Found %d dangling border points\n", criticalPoints.size());
+
 	}
 
 	static int countComponents(mesh &m){
@@ -110,7 +114,12 @@ public:
 	}
 
 	static void reduceToLargestComponent(mesh &m){
+		vector<vector<int>> components;
+		vector<int> stack;
 
+		for(unsigned int i = 0; i < m.getVertices().size();i++){
+
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -193,9 +202,10 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	//Returns the neighbors by vertex nr, ordered in ascending order, each time.
-	//
+	//Stores them in "neighbors", a preallocated and preinitialized vector of sz
+	// nrVertices
 	//////////////////////////////////////////////////////////////////////////
-	static void getNeighbors(vector<tuple3i> & faces, vector<int> * neighbors){
+	static void getNeighbors(vector<tuple3i> & faces, vector<vector<int>> & neighbors){
 			
 		for(unsigned int i = 0; i < faces.size(); i++){
 
@@ -204,23 +214,24 @@ public:
 		debug[faces[i].c]++;*/
 		//adds the integers such that the vector stays ordered.
 
-			ifNotContainedAdd(neighbors[faces[i].a], faces[i].b);
-			ifNotContainedAdd(neighbors[faces[i].b], faces[i].a);
+			ifNotContainedInsert(neighbors[faces[i].a], faces[i].b);
+			ifNotContainedInsert(neighbors[faces[i].b], faces[i].a);
 
-			ifNotContainedAdd(neighbors[faces[i].a], faces[i].c);
-			ifNotContainedAdd(neighbors[faces[i].c], faces[i].a);
+			ifNotContainedInsert(neighbors[faces[i].a], faces[i].c);
+			ifNotContainedInsert(neighbors[faces[i].c], faces[i].a);
 
-			ifNotContainedAdd(neighbors[faces[i].b], faces[i].c);
-			ifNotContainedAdd(neighbors[faces[i].c], faces[i].b);
+			ifNotContainedInsert(neighbors[faces[i].b], faces[i].c);
+			ifNotContainedInsert(neighbors[faces[i].c], faces[i].b);
 
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	//Returns an array of vectors. neighbor_faces[i] will be the indices of all faces
-	//neighboring the node i
+	//neighboring the node i a preallocated and preinitialized vector of sz
+	// nrVertices
 	//////////////////////////////////////////////////////////////////////////
-	static void getNeighborFaces(vector<tuple3i> & faces, vector<int> * neighbor_faces){
+	static void getNeighborFaces(vector<tuple3i> & faces, vector<vector<int>> & neighbor_faces){
 			
 		for(int i = 0; i < (int) faces.size(); i++){
 
@@ -267,9 +278,14 @@ public:
 	static float sumAnglesWheel( int from, int at, int to, mesh & m );
 
 private:
-	static void ifNotContainedAdd( vector<int> &v, int a )
+	static void ifNotContainedInsert( vector<int> &v, int a )
 	{
 		vector<int>::iterator low;
+		
+		if(v.size() == 0){
+			v.push_back(a);
+			return;
+		}
 
 		low = lower_bound(v.begin(), v.end(),a);
 		if(low == v.end() || *low != a){
@@ -287,6 +303,11 @@ private:
 		vector<int> borderEls;
 		vector<int>::iterator it = nbrs.begin(), borderEl;
 
+		vector<tuple3i> debug;
+		for(int i = 0; i< nbr_fcs.size(); i++){
+			debug.push_back(m.getFaces()[nbr_fcs[i]]);
+		}
+
 		//check for each neighbor if it lies on the border until one is found.
 		for(it = nbrs.begin(); it != nbrs.end(); it++){
 			borderEl = lower_bound(border.begin(), border.end(),*it);
@@ -296,7 +317,8 @@ private:
 				return *it;*/
 				//an element could be on the border and a neighbor, without
 				//being connected to vertex by a border.
-				if(countPosOrientedOccurrences(nbr_fcs, vertex, *borderEl, m) ==1)
+				if(countPosOrientedOccurrences(nbr_fcs, vertex, *borderEl, m) 
+					- countNegOrientedOccurrences(nbr_fcs, vertex, *borderEl, m)==1)
 				{
 					borderEls.push_back(*it);
 				}
@@ -326,8 +348,8 @@ private:
 	//////////////////////////////////////////////////////////////////////////
 	static bool isOnBorder(int vertex_nr, mesh &m){
 
-		vector<int> * neighbors = m.getNeighbors();
-		vector<int> * neighbor_faces = m.getNeighborFaces();
+		vector<vector<int>> & neighbors = m.getNeighbors();
+		vector<vector<int>> & neighbor_faces = m.getNeighborFaces();
 		//is not on border exactly if it is in two faces
 		//or h
 		bool isBorder =false;
@@ -435,19 +457,55 @@ private:
 	//////////////////////////////////////////////////////////////////////////
 	static void replace_vbc_newv(int vertex, int nbr1, int nbr2, int newVertex, mesh& m){
 		vector<int> & nbr_fcs = m.getNeighborFaces()[vertex];
+		vector<tuple3i> & fcs = m.getFaces();
 		bool replaced = false;
+
+		int debug_that_fuck;
+		if(m.getNeighbors().size() <= newVertex){
+			m.getNeighbors().push_back(vector<int>());
+			if(m.getNeighbors().size()<= newVertex){
+				throw std::runtime_error("Assertion Error");
+			}
+		}
+		//&! replaced....
 		for(vector<int>::iterator fcID = nbr_fcs.begin(); fcID!= nbr_fcs.end(); fcID++){
-			if(nbr_fcs[i].a = vertex && nbr_fcs[i].b = nbr1 && nbr_fcs[i].c = nbr2){
-				nbr_fcs[i].a = newVertex;
+			if((fcs[*fcID].a == vertex) && (fcs[*fcID].b == nbr1) && (fcs[*fcID].c == nbr2)){
+
+				fcs[*fcID].a = newVertex;
+
+				ifNotContainedInsert(m.getNeighbors()[fcs[*fcID].b], newVertex);
+				ifNotContainedInsert(m.getNeighbors()[fcs[*fcID].c], newVertex);
+				ifNotContainedInsert(m.getNeighbors()[newVertex], fcs[*fcID].b);
+				ifNotContainedInsert(m.getNeighbors()[newVertex], fcs[*fcID].c);
+				fcID = nbr_fcs.erase(fcID);
 				replaced = true;
+				break;
 			}
-			else if(nbr_fcs[i].b = vertex && nbr_fcs[i].c = nbr1 && nbr_fcs[i].a = nbr2){
-				nbr_fcs[i].b = newVertex;
+			else if((fcs[*fcID].b == vertex )&& (fcs[*fcID].c == nbr1) && (fcs[*fcID].a == nbr2)){
+				fcs[*fcID].b = newVertex;
+
+				debug_that_fuck = fcs[*fcID].a;
+				ifNotContainedInsert(m.getNeighbors()[fcs[*fcID].a], newVertex);
+				debug_that_fuck = fcs[*fcID].c;
+				ifNotContainedInsert(m.getNeighbors()[fcs[*fcID].c], newVertex);
+				ifNotContainedInsert(m.getNeighbors()[newVertex], fcs[*fcID].a);
+				ifNotContainedInsert(m.getNeighbors()[newVertex], fcs[*fcID].c);
+
+				fcID = nbr_fcs.erase(fcID);
 				replaced = true;
+				break;
 			}
-			else if(nbr_fcs[i].c = vertex && nbr_fcs[i].a = nbr1 && nbr_fcs[i].b= nbr2){
-				nbr_fcs[i].c = newVertex;
+			else if((fcs[*fcID].c == vertex) && (fcs[*fcID].a == nbr1) && (fcs[*fcID].b== nbr2)){
+				fcs[*fcID].c = newVertex;
+
+				ifNotContainedInsert(m.getNeighbors()[fcs[*fcID].b], newVertex);
+				ifNotContainedInsert(m.getNeighbors()[fcs[*fcID].a], newVertex);
+				ifNotContainedInsert(m.getNeighbors()[newVertex], fcs[*fcID].b);
+				ifNotContainedInsert(m.getNeighbors()[newVertex], fcs[*fcID].a);
+
+				fcID = nbr_fcs.erase(fcID);
 				replaced = true;
+				break;
 			}
 		}
 		if(!replaced){

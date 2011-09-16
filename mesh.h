@@ -23,8 +23,8 @@ protected:
 	vector<tuple3f> tex;
 
 	// nbrs[i] is a vector with the indices of the neighbors
-	vector<int> * nbrs;
-	vector<int> * nbr_fcs;
+	vector<vector<int>> nbrs;
+	vector<vector<int>> nbr_fcs;
 	tuple3f color;
 	bool showOrientation;
 public:
@@ -52,8 +52,8 @@ public:
 
 	vector<tuple3f>& getVertices(void){return vertices;}
 	vector<tuple3i>& getFaces(){return faces;}
-	vector<int> * getNeighbors() { return nbrs;}
-	vector<int> * getNeighborFaces(){return nbr_fcs;}
+	vector<vector<int>> & getNeighbors() { return nbrs;}
+	vector<vector<int>> & getNeighborFaces(){return nbr_fcs;}
 	vector<tuple3f> & getTexCoords(){return tex;}
 	
 	void glDisplayVertices(void);

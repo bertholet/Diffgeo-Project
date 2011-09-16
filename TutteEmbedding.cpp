@@ -118,15 +118,13 @@ void TutteEmbedding::setUp( pardisoMatrix &mat, vector<int> &border, mesh & m,
 {
 	int nrVertices = m.getVertices().size(), count;
 	bool a_ii_added = false;
-	vector<int> * neighbors = new vector<int>[nrVertices];
-	vector<int> * neighbor_faces = new vector<int>[nrVertices];
 	double factor;
 
-	//vector<int> & nbrs_i = NULL;
-	//vector<int> * nbr_fc_i = NULL;
 	vector<int>::iterator j;
-	meshOperation::getNeighbors(m.getFaces(), neighbors);
-	meshOperation::getNeighborFaces(m.getFaces(), neighbor_faces);
+
+	vector<vector<int>> & neighbors = m.getNeighbors();
+	vector<vector<int>> & neighbor_faces = m.getNeighborFaces();
+
 	//set up indices some values might be zero. values are assumed to be only at (i,j) if i and j are neighbors
 	
 	count = 1;
@@ -169,8 +167,6 @@ void TutteEmbedding::setUp( pardisoMatrix &mat, vector<int> &border, mesh & m,
 		throw std::exception("Assertion failed, matrix malformed");
 	}
 	
-	
-	delete[] neighbors, neighbor_faces; 
 }
 
 /************************************************************************/

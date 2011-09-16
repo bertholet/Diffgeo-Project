@@ -64,7 +64,7 @@ float meshOperation::sumAnglesWheel( int from, int center, int to, mesh & m )
 
 	do{
 		next = meshOperation::getPrevious(center,actual, m);
-		if(next < 0 || lps > nbrs.size()){
+		if(next < 0 || lps > int(nbrs.size())){
 			throw std::runtime_error("Assertion failed at sum Angle Wheel");
 		}
 		angle += tuple3f::angle( m.vertices[actual], m.vertices[center], m.vertices[next]);

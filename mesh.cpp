@@ -15,8 +15,8 @@ mesh::mesh(void)
 	showOrientation = false;
 	lighTransform = matrixFactory::id();
 
-	nbrs = NULL;
-	nbr_fcs = NULL;
+//	nbrs = NULL;
+//	nbr_fcs = NULL;
 	color.set(1.f,1.f,1.f);
 }
 
@@ -37,8 +37,8 @@ mesh::mesh( const char* file, tuple3f col, float scale )
 
 mesh::~mesh(void)
 {
-	delete[] nbrs;
-	delete[] nbr_fcs;
+//	delete[] nbrs;
+//	delete[] nbr_fcs;
 }
 
 void mesh::init( const char* file, tuple3f & col, float scale )
@@ -48,8 +48,14 @@ void mesh::init( const char* file, tuple3f & col, float scale )
 	vertices = f.getVertices();
 	faces = f.getFaces();
 
-	nbrs = new vector<int>[vertices.size()];
-	nbr_fcs = new vector<int>[vertices.size()];
+	//nbrs = new vector<int>[vertices.size()];
+	//nbr_fcs = new vector<int>[vertices.size()];
+	nbrs.reserve(vertices.size());
+	nbr_fcs.reserve(vertices.size());
+	for(unsigned int i = 0; i < vertices.size(); i++){
+		nbrs.push_back(vector<int>());
+		nbr_fcs.push_back(vector<int>());
+	}
 	meshOperation::getNeighbors(faces, nbrs);
 	meshOperation::getNeighborFaces(faces, nbr_fcs);
 
@@ -79,11 +85,22 @@ void mesh::reset( vector<tuple3f> & _vertices, vector<tuple3i> &_faces )
 	vertices = _vertices;
 	faces = _faces;
 	this->initNormalsFromVertices();
-	if(nbrs!= NULL&&nbr_fcs != NULL){
+
+	nbrs.clear();
+	nbr_fcs.clear();
+	nbrs.reserve(vertices.size());
+	nbr_fcs.reserve(vertices.size());
+	for(unsigned int i = 0; i < vertices.size(); i++){
+		nbrs.push_back(vector<int>());
+		nbr_fcs.push_back(vector<int>());
+	}
+
+/*	if(nbrs!= NULL&&nbr_fcs != NULL){
 		delete[] nbrs, nbr_fcs;
 	}
 	nbrs = new vector<int>[vertices.size()];
-	nbr_fcs = new vector<int>[vertices.size()];
+	nbr_fcs = new vector<int>[vertices.size()];*/
+
 	meshOperation::getNeighbors(faces, nbrs);
 	meshOperation::getNeighborFaces(faces, nbr_fcs);
 
@@ -414,7 +431,7 @@ void mesh::setTextures_perVertex( double * x, double * y )
 	tex.clear();
 	tex.reserve(vertices.size());
 
-	for(int i = 0; i < vertices.size(); i++){
+	for(unsigned int i = 0; i < vertices.size(); i++){
 		tex.push_back(tuple3f((float)x[i], (float)y[i],0.f));
 	}
 
@@ -426,7 +443,7 @@ void mesh::setTextures_perVertex( vector<tuple3f> & textures )
 	tex.clear();
 	tex.reserve(vertices.size());
 
-	for(int i = 0; i < vertices.size(); i++){
+	for(unsigned int i = 0; i < vertices.size(); i++){
 		tex.push_back(textures[i]);
 	}
 
