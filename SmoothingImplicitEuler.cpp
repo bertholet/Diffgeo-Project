@@ -47,7 +47,7 @@ ImplicitEulerSmoothing::ImplicitEulerSmoothing( mesh &m, float lambda, float dt)
 	//a parameter vector where the COLUMNS are enumerated one after the other.
 	//NOT & b[0][0] with b n x m array.
 	b = new double[vertices.size()*NRHS];
-	for(int i = 0; i < vertices.size(); i++){
+	for(unsigned int i = 0; i < vertices.size(); i++){
 		b[i] = vertices[i].x; //b[i][0]
 		b[vertices.size()+i] = vertices[i].y;
 		b[2*vertices.size()+i] = vertices[i].z;

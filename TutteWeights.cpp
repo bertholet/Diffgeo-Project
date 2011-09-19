@@ -231,7 +231,7 @@ double TutteWeights::cotan_weights_divAmix( int i, int j, mesh & m,
 		cot_alpha2 = tuple3f::cotPoints(verts[i], verts[next], verts[j]);
 
 		float Amix = 0, areaT;
-		for(int k = 0; k < neighbors_i.size(); k++){
+		for(int k = 0; k < (int) neighbors_i.size(); k++){
 			nbr = neighbors_i[k];
 			prev = meshOperation::getPrevious(i, nbr, m);	
 		//	next = meshOperation::getNext(i,nbr_fc_i,nbr, m);
@@ -268,7 +268,7 @@ double TutteWeights::cotan_weights_divAmix( int i, int j, mesh & m,
 //////////////////////////////////////////////////////////////////////////
 
 
-void TutteWeights::circleBorder( vector<tuple3f> & outerPos , vector<int> & border, vector<int> & loops, mesh & m)
+void TutteWeights::circleBorder( vector<tuple3f> & outerPos , vector<int> & border, mesh & m)
 {
 	int sz = border.size();
 	for(int i = 0; i < sz;i++){
@@ -277,7 +277,7 @@ void TutteWeights::circleBorder( vector<tuple3f> & outerPos , vector<int> & bord
 
 }
 
-void TutteWeights::distWeightCircBorder( vector<tuple3f> & outerPos , vector<int> & border, vector<int> & loops, mesh & m)
+void TutteWeights::distWeightCircBorder( vector<tuple3f> & outerPos , vector<int> & border, mesh & m)
 {
 	int sz = border.size();
 	float length = meshOperation::getLength(border, m);
@@ -290,76 +290,110 @@ void TutteWeights::distWeightCircBorder( vector<tuple3f> & outerPos , vector<int
 	}
 }
 
-void TutteWeights::angleApproxBorder( vector<tuple3f> & outerPos , vector<int> & border
-			, vector<int> & loops, mesh & m)
+
+void TutteWeights::angles_lambdas( vector<float> &angles, vector<float> &lambdas, vector<int> & border, mesh & m)
 {
-	vector<float> angles, lambdas; //length next segment over last segment
+	int prev, next, loopsz = border.size();
+	float angle, length, scale_factor, sum = 0;
+
 	angles.reserve(border.size());
 	lambdas.reserve(border.size());
+	for(int bdr =0; bdr < loopsz; bdr++){
+		prev = (bdr == 0? loopsz-1 : bdr-1);
+		next = (bdr == loopsz-1? 0 : bdr+1);
+
+		angle = meshOperation::sumAnglesWheel(border[prev], 
+			border[bdr], border[next], m);
+		sum+= angle;
+		angles.push_back(angle); //was pi -angle...
+
+		length = (m.getVertices()[border[next]] - m.getVertices()[border[bdr]]).norm()/
+			(m.getVertices()[border[bdr]] - m.getVertices()[border[prev]]).norm();
+		lambdas.push_back(length);
+
+	}
+
+	scale_factor = (loopsz-2) * PI / sum;
+	for(int bdr =0; bdr < loopsz; bdr++){
+		angles[bdr] = PI - angles[bdr] * scale_factor;
+	}
+}
+
+void TutteWeights::angles_lambdas( vector<vector<float>> &angles, vector<vector<float>> &lambdas, 
+								  vector<vector<int>> & border, mesh & m)
+{
+	for(unsigned int i = 0; i < border.size(); i++){
+		angles.push_back(vector<float>());
+		lambdas.push_back(vector<float>());
+		angles_lambdas(angles.back(),lambdas.back(),border[i],m);
+	}
+}
+
+void TutteWeights::angleApproxBorder( vector<tuple3f> & outerPos , vector<int> & border
+			, mesh & m)
+{
+	vector<float> angles, lambdas; //length next segment over last segment
 	outerPos.clear();
 
-	int bdr, loopsz, loopSt, prev, next;
-	float angle, length, sum, scale_factor;
+	int loopsz= border.size();//, prev, next;
+//	float angle, length, sum, scale_factor;
 
-	for(int lp = 0; lp < loops.size(); lp++){
-
-		loopSt = loops[lp];
-		loopsz = (lp == loops.size() -1? border.size(): loops[lp+1]) 
-			- loopSt;
-		sum = 0;
-
-		for(bdr =0; bdr < loopsz; bdr++){
-			prev = (bdr == 0? loopsz-1 : bdr-1);
-			next = (bdr == loopsz-1? 0 : bdr+1);
-
-			angle = meshOperation::sumAnglesWheel(border[prev], 
-				border[bdr], border[next], m);
-			sum+= angle;
-			angles.push_back(angle); //was pi -angle...
-
-			length = (m.getVertices()[border[next]] - m.getVertices()[border[bdr]]).norm()/
-				(m.getVertices()[border[bdr]] - m.getVertices()[border[prev]]).norm();
-			lambdas.push_back(length);
-
-		}
-		scale_factor = (loopsz-2) * PI / sum;
-		for(bdr =0; bdr < loopsz; bdr++){
-			angles[loopSt + bdr] = PI - angles[loopSt + bdr] * scale_factor;
-		}
-
-		pardisoMatrix mat;
-
-		setUp_angleMat(angles, lambdas, mat);
-		pardisoSolver solver = pardisoSolver(pardisoSolver::MT_STRUCTURALLY_SYMMETRIC,
-			pardisoSolver::SOLVER_ITERATIVE,2);
-		solver.checkMatrix(pardisoSolver::MT_STRUCTURALLY_SYMMETRIC, mat);
-		solver.setMatrix(mat,1);
-
-		vector<double> x,b;
-		x.reserve(2*loopsz);
-		b.reserve(2*loopsz);
-		for(int k=0; k < 2*loopsz; k++){
-			b.push_back(0);
-			x.push_back(0);
-		}
-		b[1] = (m.getVertices()[border[1]]-m.getVertices()[border[0]]).norm();
-		b[loopsz+1] = (m.getVertices()[border[1]]-m.getVertices()[border[0]]).norm();
-
-		solver.solve(&(x[0]),&(b[0]));
+	angles_lambdas(angles,lambdas,border,m);
+/*	sum = 0;
 
 
-		
-		for(int k=0; k < loopsz; k++){
-			outerPos.push_back(tuple3f(x[k], x[k+loopsz],0));
-		}
-		meshOperation::normalizeTexture(outerPos);
-		printf("");
+	for(bdr =0; bdr < loopsz; bdr++){
+		prev = (bdr == 0? loopsz-1 : bdr-1);
+		next = (bdr == loopsz-1? 0 : bdr+1);
+
+		angle = meshOperation::sumAnglesWheel(border[prev], 
+			border[bdr], border[next], m);
+		sum+= angle;
+		angles.push_back(angle); //was pi -angle...
+
+		length = (m.getVertices()[border[next]] - m.getVertices()[border[bdr]]).norm()/
+			(m.getVertices()[border[bdr]] - m.getVertices()[border[prev]]).norm();
+		lambdas.push_back(length);
+
 	}
+	scale_factor = (loopsz-2) * PI / sum;
+	for(bdr =0; bdr < loopsz; bdr++){
+		angles[bdr] = PI - angles[bdr] * scale_factor;
+	}*/
+
+	//setUp Matrix;
+	pardisoMatrix mat;
+
+	setUp_angleMat(angles, lambdas, mat);
+	pardisoSolver solver = pardisoSolver(pardisoSolver::MT_STRUCTURALLY_SYMMETRIC,
+		pardisoSolver::SOLVER_ITERATIVE,2);
+//		solver.checkMatrix(pardisoSolver::MT_STRUCTURALLY_SYMMETRIC, mat);
+	solver.setMatrix(mat,1);
+
+	//setup x,b
+	vector<double> x,b;
+	x.reserve(2*loopsz);
+	b.reserve(2*loopsz);
+	for(int k=0; k < 2*loopsz; k++){
+		b.push_back(0);
+		x.push_back(0);
+	}
+	b[1] = (m.getVertices()[border[1]]-m.getVertices()[border[0]]).norm();
+	b[loopsz+1] = (m.getVertices()[border[1]]-m.getVertices()[border[0]]).norm();
+
+	solver.solve(&(x[0]),&(b[0]));
+
+
+	
+	for(int k=0; k < loopsz; k++){
+		outerPos.push_back(tuple3f(x[k], x[k+loopsz],0));
+	}
+	meshOperation::normalizeTexture(outerPos);
 
 }
 
 //////////////////////////////////////////////////////////////////////////
-//0 based notation
+//0 based notation. weights for angle based border
 //////////////////////////////////////////////////////////////////////////
 float TutteWeights::angleMat( int ind1, int ind2, vector<float> & angles, vector<float> & lambdas )
 {
@@ -507,6 +541,18 @@ void TutteWeights::setUp_angleMat( vector<float> &angles, vector<float> &lambdas
 		}
 	}
 	target.ia.push_back(target.a.size()+1);
+}
+
+void TutteWeights::setUp_fullAndAngleBased( vector<tuple3f> & outerPos ,
+		vector<int> & border, vector<int> & loops, 
+		mesh & m, pardisoMatrix & target )
+{
+
+}
+
+double TutteWeights::mulitBorderWeights( int i, int j, mesh & m, vector<int> & neighbors_i, vector<int> & nbr_fc_i, vector<vector<int>> & border )
+{
+	throw std::runtime_error("not implemented, dude!");
 }
 
 

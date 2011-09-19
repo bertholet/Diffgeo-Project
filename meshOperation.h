@@ -68,6 +68,8 @@ public:
 		int borderEdges=0, nbr, nextNbr, newVertex_id, 
 			nrVertices = m.getVertices().size();
 
+		printf("Starting to undangle border .... \n");
+
 		for(vertex= 0; vertex < nrVertices; vertex++){
 			nbr_fcs = & (m.getNeighborFaces()[vertex]);
 			borderEdges =0;
@@ -105,13 +107,10 @@ public:
 		}
 
 		m.reset(m.vertices, m.faces);
-		printf("Found %d dangling border points\n", criticalPoints.size());
+		printf("Ended Undangling: Found %d dangling border points\n", criticalPoints.size());
 
 	}
 
-	static int countComponents(mesh &m){
-
-	}
 
 	static void reduceToLargestComponent(mesh &m){
 		vector<vector<int>> components;
@@ -120,10 +119,12 @@ public:
 		vector<int>::iterator low;
 		vector<vector<int>> & nbrs = m.getNeighbors();
 		int nrComponents =0;
-		int node,j;
+		int node;
+		unsigned int j;
 
+		printf("Reducing mesh to largest connected component:... \n");
 		for(unsigned int i = 0; i < m.getVertices().size();i++){
-			low = lower_bound(done.begin(), done.end(),i);
+			low = lower_bound(done.begin(), done.end(),(int) i);
 			if(low == done.end() || *low != i){
 				components.push_back(vector<int>()); 
 				vector<int> & comp = components.back();
@@ -149,16 +150,53 @@ public:
 			}
 		}
 
-		printf("Found %d components. \n", nrComponents);
+		printf("Found %d components.\n", nrComponents);
 
-		int max=0, maxi = -1;
-		for(int i = 0; i < components.size(); i++){
+		if(nrComponents == 1){
+			return;
+		}
+		
+		printf("Starting to reconstruct mesh...\n");
+		unsigned int max=0, maxi = -1;
+		for(unsigned int i = 0; i < components.size(); i++){
 			if(components[i].size() > max){
 				maxi = i;
 				max = components[i].size();
 			}
 		}
 
+		reduceMesh(components[maxi], m);
+
+		printf("Finished reducing mesh.\n");
+	}
+
+	static void reduceMesh(vector<int> & vertices, mesh & m){
+		vector<tuple3f> verts;
+		vector<tuple3i> faces;
+		verts.reserve(vertices.size());
+		faces.reserve(m.getFaces().size());
+		for(unsigned int i = 0; i < vertices.size(); i++){
+			verts.push_back(m.getVertices()[vertices[i]]);
+		}
+
+		vector<int>::iterator a,b,c, vBegin= vertices.begin(),
+			vEnd = vertices.end();
+		vector<tuple3i>::iterator fc;
+		for(fc = m.getFaces().begin(); fc!= m.getFaces().end(); fc++){
+			a = lower_bound(vBegin, vEnd, fc->a);
+
+			if(a!= vEnd && *a == fc->a){
+				b = lower_bound(vBegin, vEnd, fc->b);
+				if(b!= vEnd && *b == fc->b){
+					c = lower_bound(vBegin, vEnd, fc->c);
+					if(c!= vEnd && *c == fc->c){
+						faces.push_back(tuple3i(a-vBegin,b-vBegin,c-vBegin));
+					}
+				}
+			}
+		}
+
+		m.reset(verts,faces);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -193,24 +231,21 @@ public:
 		}
 	}
 
-	static void getBorder(mesh & m, vector<int> & target, vector<int> & starts){
+	//////////////////////////////////////////////////////////////////////////
+	// Border, ordered by orientation.
+	//////////////////////////////////////////////////////////////////////////
+	static void getBorder(mesh & m, vector<vector<int>> & target){
 		
 		target.clear();
-/*		vector<int> *neighbors = new vector<int>[m.vertices.size()];
-		vector<int> *neighbor_faces = new vector<int>[m.vertices.size()]; 
-*/		vector<int> border;
+		vector<int> border;
 
-/*		getNeighbors(m.faces, neighbors);
-		getNeighborFaces(m.faces, neighbor_faces);
-*/		//vertex i is a border iff it has: only two neigbors
+		//vertex i is a border iff it has: only two neigbors
 		//or has one (two) neigbors connected with only one furter neigbor
 		//better: it has at least one neighbor with which it sheares only one face.
 		int nrVertices = m.vertices.size();
 		for(int i = 0; i < nrVertices; i++){
-//			if(isOnBorder(i, neighbors, neighbor_faces, m)){
 			if(isOnBorder(i, m)){
 				border.push_back(i);
-				//target.push_back(i);
 			}
 		}
 
@@ -220,11 +255,12 @@ public:
 			nextVertex = (border.back());
 			border.pop_back();
 			
-			starts.push_back((target.size()));
-			target.push_back(nextVertex);
-//			while((nextVertex = nextBorderVertex(nextVertex, border, neighbors, neighbor_faces, m)) >-1){
+//			starts.push_back((target.size()));
+//			target.push_back(nextVertex);
+			target.push_back(vector<int>());
+			target.back().push_back(nextVertex);
 			while((nextVertex = nextBorderVertex(nextVertex, border, m)) >-1){
-				target.push_back(nextVertex);
+				target.back().push_back(nextVertex);
 			}
 
 			//assertion
@@ -316,6 +352,21 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	static float sumAnglesWheel( int from, int at, int to, mesh & m );
 
+	//////////////////////////////////////////////////////////////////////////
+	//returns -1 if vertex is contained in no border and the component number
+	//else. index will store the index of vertex.
+	//////////////////////////////////////////////////////////////////////////
+	static int borderComponent(int vertex, vector<vector<int>> & border, int & index){
+		vector<int>::iterator it;
+		for(int j = 0; j < (int) border.size(); j++){
+			if( (it = find(border[j].begin() , border[j].end(), vertex)) !=border[j].end()){
+				index = it-border[j].begin();
+				return j;
+			} 
+		}
+		return -1;
+	}
+
 private:
 	static void ifNotContainedInsert( vector<int> &v, int a )
 	{
@@ -343,7 +394,7 @@ private:
 		vector<int>::iterator it = nbrs.begin(), borderEl;
 
 		vector<tuple3i> debug;
-		for(int i = 0; i< nbr_fcs.size(); i++){
+		for(unsigned int i = 0; i< nbr_fcs.size(); i++){
 			debug.push_back(m.getFaces()[nbr_fcs[i]]);
 		}
 
@@ -419,31 +470,8 @@ private:
 				printf("meshOperation::isOnBorder: detected edge contained in %d faces!", count);
 			}
 
-		}//*/
-		//old algorithm
-		//for each neighbor nbr: look at its neighbors nbr2. if nbr2 is a neighbor of
-		//the original node count ++
-/*		for(nbr = oneRing.begin(); nbr != oneRing.end(); nbr++){
-			count = 0;
+		}
 
-			nbr2 = neighbors[*nbr].begin();	
-			end  = neighbors[*nbr].end();	
-			//"neighbor's neighbor
-			for(;nbr2 != end; nbr2++){
-				nbr3 = neighbors[*nbr2].begin();	
-				end3= neighbors[*nbr2].end();
-				
-				//neighbor's neighbor is a neighbor of original node
-				for(;nbr3 != end3; nbr3++){
-					if(*nbr3 == vertex_nr){
-						count++;
-					}
-				}
-			}
-			if(count < 2){
-				return true;
-			}
-		}//*/
 		return false;
 	}
 
@@ -499,7 +527,6 @@ private:
 		vector<tuple3i> & fcs = m.getFaces();
 		bool replaced = false;
 
-		int debug_that_fuck;
 		if(m.getNeighbors().size() <= newVertex){
 			m.getNeighbors().push_back(vector<int>());
 			if(m.getNeighbors().size()<= newVertex){
@@ -523,9 +550,7 @@ private:
 			else if((fcs[*fcID].b == vertex )&& (fcs[*fcID].c == nbr1) && (fcs[*fcID].a == nbr2)){
 				fcs[*fcID].b = newVertex;
 
-				debug_that_fuck = fcs[*fcID].a;
 				ifNotContainedInsert(m.getNeighbors()[fcs[*fcID].a], newVertex);
-				debug_that_fuck = fcs[*fcID].c;
 				ifNotContainedInsert(m.getNeighbors()[fcs[*fcID].c], newVertex);
 				ifNotContainedInsert(m.getNeighbors()[newVertex], fcs[*fcID].a);
 				ifNotContainedInsert(m.getNeighbors()[newVertex], fcs[*fcID].c);

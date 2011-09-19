@@ -65,6 +65,7 @@ public:
 	tuple3f intensities( unsigned int faceNr, tuple3f &direction );
 	tuple3f intensitiesFlat( unsigned int faceNr, tuple3f &direction );
 	void setTextures_perVertex( double * x, double * y );
+	void setTextures_perVertex( double * xy);
 	void setTextures_perVertex( vector<tuple3f> & textures );
 
 	void setShowOrientation(bool b){

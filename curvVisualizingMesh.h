@@ -45,20 +45,20 @@ class borderColorMap:colorMap
 	tuple3f col1,  col2;
 	int sz;
 public:
-	borderColorMap(vector<int> & border_,vector<int> & borderStarts, tuple3f color1, tuple3f color2){
+	borderColorMap(vector<vector<int>> & border_, tuple3f color1, tuple3f color2){
 		sz = max_(border_)+1;
 		//vector<int>::iterator it = border_.begin();
-		components = borderStarts.size();
+		components = border_.size();
 		printf("%d border components found \n", components);
 
 		border = new int[sz];
-		vector<int>::iterator end; 
+		
 		for(int i = 0; i < sz; i++){
 			border[i] = -1; //border[i] = false;
-			for(int j = 0; j < borderStarts.size(); j++){
-				end = (j == components -1 ? border_.end(): border_.begin() + borderStarts[j+1]);
-				if(find(border_.begin() + borderStarts[j], end, i) != end){
+			for(int j = 0; j < (int) border_.size(); j++){
+				if( find(border_[j].begin() , border_[j].end(), i) !=border_[j].end()){
 					border[i] = j;
+					break;
 				} 
 			}
 		}
@@ -72,11 +72,13 @@ public:
 	tuple3f color(int vertexNr);
 	string additionalInfo(void);
 	
-	int max_( vector<int> & border_ ){
+	int max_( vector<vector<int>> & border_ ){
 		int max = -1;
 		for(unsigned int i = 0 ; i < border_.size(); i++){
-			if(border_[i] > max){
-				max = border_[i];
+			for(unsigned int j = 0 ; j < border_[i].size(); j++){
+				if(border_[i][j] > max){
+					max = border_[i][j];
+				}
 			}
 		}
 		return max;

@@ -13,14 +13,15 @@ public:
 	TutteDemo(void);
 	~TutteDemo(void);
 	void run(mesh &m);
-	void run( mesh &m, double (*weights ) (int, int,mesh &, vector<int>& /*nbr_i*/,
+	void run_multiBorder(mesh &m, double (*weights ) (int, int,mesh &, vector<int>& /*nbr_i*/,
 		vector<int>&/*fc_i*/, vector<int>& /*border*/) );
 	void run( mesh &m, double (*weights ) (int, int,mesh &, vector<int>& /*nbr_i*/,
 		vector<int>&/*fc_i*/, vector<int>& /*border*/),
 		void (*getBorderPos ) (vector<tuple3f> & /*outerPos*/, 
 		vector<int> & /*border*/, 
-		vector<int> & /*loops*/, 
+//		vector<int> & /*loops*/, 
 		mesh & /*m*/));
+
 
 
 	void loop();

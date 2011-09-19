@@ -114,10 +114,15 @@ void TutteDemo::run( mesh &m )
 	glutMainLoop();
 }
 
-void TutteDemo::run( mesh &m, double (*weights ) (int, int,mesh &, vector<int>& /*nbr_i*/,
+void TutteDemo::run_multiBorder( mesh &m, double (*weights ) (int, int,mesh &, vector<int>& /*nbr_i*/,
 		vector<int>&/*fc_i*/, vector<int>& /*border*/) )
 {
-	run(m,weights, TutteWeights::circleBorder);
+	//run(m,weights, TutteWeights::circleBorder);
+
+	this->bunny = &m;
+	TutteEmbedding embedding;
+	embedding.calcTexturePos_multiBorder(m, weights);
+	printf("");
 }
 
 void TutteDemo::run( mesh &m, 
@@ -125,7 +130,8 @@ void TutteDemo::run( mesh &m,
 						vector<int>& /*nbr_i*/, vector<int>&/*fc_i*/, 
 						vector<int>& /*border*/), 
 					void (*getBorderPos ) (vector<tuple3f> & /*outerPos*/, 
-					vector<int> & /*border*/, vector<int> & /*loops*/, 
+					vector<int> & /*border*/, 
+					//vector<int> & /*loops*/, 
 					mesh & /*m*/) )
 {
 	//m.faces[-1];

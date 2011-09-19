@@ -438,6 +438,19 @@ void mesh::setTextures_perVertex( double * x, double * y )
 	this->face_tex = faces;
 }
 
+
+void mesh::setTextures_perVertex( double * xy )
+{
+	tex.clear();
+	tex.reserve(vertices.size());
+
+	for(unsigned int i = 0; i < vertices.size(); i++){
+		tex.push_back(tuple3f((float)xy[i], (float)xy[i + vertices.size()],0.f));
+	}
+
+	this->face_tex = faces;
+}
+
 void mesh::setTextures_perVertex( vector<tuple3f> & textures )
 {
 	tex.clear();
