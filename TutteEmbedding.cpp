@@ -81,6 +81,10 @@ void TutteEmbedding::calcTexturePos( mesh &m,
 	vector<tuple3f> outerPos;
 	double * x = new double[m.getVertices().size()];
 	double * y = new double[m.getVertices().size()];
+	for(int i = 0; i < m.getVertices().size();i++){
+		x[i] =0.0;
+		y[i] =0.0;
+	}
 
 	getBorderPos(outerPos, border[0], m);
 
@@ -91,6 +95,8 @@ void TutteEmbedding::calcTexturePos( mesh &m,
 	setUp(mat, border[0], m, weights);
 	parsolver.checkMatrix(parsolver.MT_STRUCTURALLY_SYMMETRIC, mat);
 	parsolver.setMatrix(mat, 1);
+
+//	mat.saveMatrix("C:/Users/bertholet/Dropbox/matrix_working.m");
 
 	//getBorderPos(outerPos, border, loops,m);
 	//getBorderPos(outerPos,border,m);
@@ -118,8 +124,11 @@ void TutteEmbedding::calcTexturePos_multiBorder( mesh &m,
 	vector<vector<int>> border;
 	vector<tuple3f> outerPos;
 	vector<double> b;
-	double * xy = new double[2*m.getVertices().size()];
 	pardisoMatrix mat;
+	double * xy = new double[2*m.getVertices().size()];
+	for(int i = 0; i < 2*m.getVertices().size();i++){
+		xy[i] = 0.0;
+	}
 
 	meshOperation::getBorder(m, border);
 	int outBorder = outerBorder(border,m);
@@ -127,12 +136,15 @@ void TutteEmbedding::calcTexturePos_multiBorder( mesh &m,
 
 	setUp_multiBorder(mat,border,outerPos,outBorder,m,weights);
 
+	mat.saveMatrix("C:/Users/bertholet/Dropbox/matrix_multiBorder.m");
+	
 	pardisoSolver s(pardisoSolver::MT_ANY, pardisoSolver::SOLVER_ITERATIVE,2);
 
 //	s.checkMatrix(pardisoSolver::MT_ANY,mat);
 	s.setMatrix(mat,1);
 	setUpXY(b, border[outBorder],outerPos, m.getVertices().size());
-	printf("");
+
+	s.setPrintStatistics(true);
 	s.solve(xy,&(b[0]));
 
 	m.setTextures_perVertex(xy);
@@ -285,10 +297,12 @@ void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> 
 	vector<vector<int>> & neighbors = m.getNeighbors();
 	vector<vector<int>> & neighbor_faces = m.getNeighborFaces();
 	vector<int> NULLBORDER;
+//vector<int> & NULLBORDER = border[outBorder];
+
 
 	vector<std::pair<int,int>> vertexIndices;
 	int nrVertices = m.getVertices().size(), count;
-	int myBorder, borderIndex, offset;
+	int myBorder, borderIndex, bordersz, offset;
 	bool a_ii_added = false;
 	double factor;
 	vector<int>::iterator j;
@@ -303,14 +317,17 @@ void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> 
 	//////////////////////////////////////////////////////////////////////////
 	//x's
 	//////////////////////////////////////////////////////////////////////////
+
 	for(int i = 0; i < 2*nrVertices;i++){
 		vector<int> & nbrs_i = neighbors[i%nrVertices];
 		vector<int> & nbr_fc_i = (neighbor_faces[i%nrVertices]);
 		myBorder = meshOperation::borderComponent(i%nrVertices,border, borderIndex);
+		bordersz = (myBorder <0? 0: border[myBorder].size());
 		offset = (i<nrVertices?0:nrVertices);
 	
 		//not on boder or a reflex angle
 		if (myBorder < 0 || ((angles[myBorder][borderIndex] > PI)&&(myBorder != outBorder))){
+//		if (myBorder < 0 || ((angles[myBorder][borderIndex] > PI) || (myBorder == outBorder))){
 			a_ii_added = false;
 			//calculate normation factor
 			factor = 0;
@@ -347,14 +364,14 @@ void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> 
 			for(int i = 0; i < 5; i++){
 				mat.ja.push_back(vertexIndices[i].first +1);
 				mat.a.push_back(TutteWeights::angleMat(borderIndex, 
-					borderIndex + vertexIndices[i].second, 
+					borderIndex + vertexIndices[i].second , 
 					angles[myBorder], lambdas[myBorder]));
 			}
 
 			for(int i = 0; i < 5; i++){
 				mat.ja.push_back(vertexIndices[i].first+1);
 				mat.a.push_back(TutteWeights::angleMat(borderIndex, 
-					borderIndex + vertexIndices[i].second + nrVertices, 
+					borderIndex + vertexIndices[i].second  + nrVertices, 
 					angles[myBorder], lambdas[myBorder]));
 			}
 		}

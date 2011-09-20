@@ -7,6 +7,7 @@
 #pragma once
 #include "pardisoMatrix.h"
 
+
 extern "C" __declspec(dllimport) void pardisoinit (void   *, int    *,   int *, int *, double *, int *);
 extern "C" __declspec(dllimport) void pardiso     (void   *, int    *,   int *, int *,    int *, int *, 
 												   double *, int    *,    int *, int *,   int *, int *,
@@ -131,7 +132,6 @@ public:
 			throw std::exception("Exception in pardiso solve-");
 		}
 	}
-
 
 	static void checkMatrix( int matrix_type, pardisoMatrix & mat ) 
 	{

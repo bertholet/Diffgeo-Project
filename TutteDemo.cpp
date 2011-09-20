@@ -123,6 +123,7 @@ void TutteDemo::run_multiBorder( mesh &m, double (*weights ) (int, int,mesh &, v
 	TutteEmbedding embedding;
 	embedding.calcTexturePos_multiBorder(m, weights);
 	printf("");
+	display(m);
 }
 
 void TutteDemo::run( mesh &m, 
@@ -139,6 +140,14 @@ void TutteDemo::run( mesh &m,
 	TutteEmbedding embedding;
 	embedding.calcTexturePos(m, weights, getBorderPos);
 
+	display(m);
+
+
+}
+
+void TutteDemo::display( mesh &m ) 
+{
+	this->bunny = &m;
 	int window1 = glWindowHelper::glWindow(450,450, tutDemo::callback, tutDemo::processNormalKeys);
 
 	glTexEnvf(GL_TEXTURE_2D, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -167,6 +176,5 @@ void TutteDemo::run( mesh &m,
 
 	glutMainLoop();
 	delete this->texMesh;
-
 }
 

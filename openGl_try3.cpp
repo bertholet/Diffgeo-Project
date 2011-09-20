@@ -104,10 +104,10 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		
 	//bunny = cube(2.f, 10);
-	bunny= new mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
+//	bunny= new mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
 //	bunny = new mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/dragon.obj", tuple3f(1.f,0.f,0.f), 2.f);
-//	bunny= new mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/teapotTex.obj", tuple3f(1.f,0.f,0.f), 2);
-//	bunny = new ball(1,20,10);
+	bunny= new mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2);
+//	bunny = new ball(1,10,5);
 	//	bunny = ball(1, 80,40);
 	//bunny = torus(2.f,1.f, 30, 60);
 	//bunny = simplestCube();
@@ -121,10 +121,11 @@ int _tmain(int argc, _TCHAR* argv[])
 //	meshOperation::undangle(*bunny);
 
 	//meshOperation::getHalf(*bunny,*bunny, tuple3f(-0.25f,1,0), 0.1f); //dragon.obj config
-	meshOperation::getHalf(*bunny,*bunny, tuple3f(1,1,0), 0.05f);  
+	meshOperation::getHalf(*bunny,*bunny, tuple3f(1,0,0), -0.35f);
+	meshOperation::getHalf(*bunny,*bunny, tuple3f(-1,0,0), -0.35f);
 //	meshOperation::getHalf(*bunny,*bunny, tuple3f(0,0,1), 0.05f); // dragon.obj: 2 border
-	meshOperation::undangle(*bunny);
-	meshOperation::reduceToLargestComponent(*bunny);
+/*	meshOperation::undangle(*bunny);
+	meshOperation::reduceToLargestComponent(*bunny);*/
 
 	vector<vector<int>> border;
 	//vector<int> borderStarts;
@@ -133,10 +134,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	
 	//cMap = new curvColormap(bunny);
 	//cMap = new gaussColormap(bunny);
-	cMap = (colorMap *) new borderColorMap(border,tuple3f(0,0,1), tuple3f(1,0,0));
-	
+		
 	//	bunny->setShowOrientation(true);
-/*	smoother = new ImplicitEulerSmoothing(*bunny,1, 0.1f);
+	/*cMap = (colorMap *) new borderColorMap(border,tuple3f(0,0,1), tuple3f(1,0,0));
+	smoother = new ImplicitEulerSmoothing(*bunny,1, 0.1f);
 	implicitSmoothingDemo(argc,argv);
 	//implicitEulerTests();
 	delete smoother;//*/

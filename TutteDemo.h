@@ -22,7 +22,7 @@ public:
 //		vector<int> & /*loops*/, 
 		mesh & /*m*/));
 
-
+	void display( mesh &m );
 
 	void loop();
 	void loopTex(void);
