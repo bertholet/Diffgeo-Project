@@ -319,6 +319,9 @@ void TutteWeights::angles_lambdas( vector<float> &angles, vector<float> &lambdas
 	}
 }
 
+/************************************************************************/
+/* Returns aussenwinkel pi-sum(wheel), scaled to realistic vlue         */
+/************************************************************************/
 void TutteWeights::angles_lambdas( vector<vector<float>> &angles, vector<vector<float>> &lambdas, 
 								  vector<vector<int>> & border, mesh & m)
 {
@@ -553,6 +556,71 @@ void TutteWeights::setUp_fullAndAngleBased( vector<tuple3f> & outerPos ,
 double TutteWeights::mulitBorderWeights( int i, int j, mesh & m, vector<int> & neighbors_i, vector<int> & nbr_fc_i, vector<vector<int>> & border )
 {
 	throw std::runtime_error("not implemented, dude!");
+}
+
+/*
+* A weight function for matrix values on additional 
+*/
+float TutteWeights::turningWeight( int i, int j, vector<float> &angles, vector<float> &lambdas )
+{
+	int sz = angles.size();
+	if(i>=2*sz || j>=2*sz|| i<0 ||j<0){
+		throw std::runtime_error("Assertion Failed");
+	}
+	/*if(i==j){
+		return 1;
+	}
+	if((i<sz&&j<sz )|| (i>sz&&j>sz)){
+		if(j%sz == (i -1+sz)%sz){
+			return -(1+lambdas[(i -1+sz)%sz]*cos(angles[(i -1+sz)%sz]));
+		}
+		else if(j%sz== (i-2+sz)%sz){
+			return lambdas[(i -1+sz)%sz]*cos(angles[(i -1+sz)%sz]);
+		}
+	}
+	else if(j==sz +(i-1+sz)%sz){
+		return lambdas[(i -1+sz)%sz]*sin(angles[(i -1+sz)%sz]);
+	}
+	else if(j==sz +(i-2+sz)%sz){
+		return -lambdas[(i -1+sz)%sz]*sin(angles[(i -1+sz)%sz]);
+	}
+	else if(i==sz+(j-1+sz)%sz){
+		return lambdas[(i-1)%sz]*sin(angles[(i-1)%sz]);
+	}
+	else if(i==sz+(j-2+sz)%sz){
+		return -lambdas[(i-1)%sz]*sin(angles[(i-1)%sz]);
+	}
+	else if(i+sz==j || j+sz ==i){
+		return 0;
+	}
+	return 0;*/
+	if((i<sz&&j<sz )|| (i>sz&&j>sz)){
+		if(j%sz==(i+1)%sz){
+			return 1;
+		}
+		else if(j==i){
+			return -(1+lambdas[i]*cos(angles[i]));
+		}
+		else if(j%sz== (i-1+sz)%sz){
+			return lambdas[i]*cos(angles[i]);
+		}
+	}
+	else if(j==sz +i){
+		return lambdas[i]*sin(angles[i]);
+	}
+	else if(j==sz +(i-1+sz)%sz){
+		return -lambdas[i]*sin(angles[i]);
+	}
+	else if(j== i-sz ){
+		return -lambdas[i]*sin(angles[i]);
+	}
+	else if(j== (i-1+sz)%sz){
+		return lambdas[i]*sin(angles[i]);
+	}
+	else if(j== (i+1)%sz +sz || i == (j+1)%sz){
+		return 0;
+	}
+	return 0;
 }
 
 

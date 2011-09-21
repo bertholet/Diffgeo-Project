@@ -47,7 +47,7 @@ public:
 
 private:
 	int outerBorder(vector<vector<int>> &border, mesh & m);
-	void calculate( vector<std::pair<int,int>> & vertices, vector<int> & border, int borderIndex );
+	void calcOrdered( vector<std::pair<int,int>> & vertices, vector<int> & border, int borderIndex );
 };
 
 namespace pairComp {

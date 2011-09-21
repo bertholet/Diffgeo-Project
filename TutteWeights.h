@@ -31,6 +31,8 @@ namespace TutteWeights{
 
 	void setUp_angleMat(vector<float> &angles, vector<float> &lambdas, pardisoMatrix & target);
 	float angleMat(int i, int j, vector<float> &angles, vector<float> &lambdas);
+	float turningWeight(int i, int j, vector<float> &angles, vector<float> &lambdas);
+
 	void angles_lambdas(vector<float> &angles, vector<float> &lambdas, vector<int> & border, mesh & m);
 	void angles_lambdas( vector<vector<float>> &angles, vector<vector<float>> &lambdas, 
 		vector<vector<int>> & border, mesh & m);

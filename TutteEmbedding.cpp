@@ -140,7 +140,7 @@ void TutteEmbedding::calcTexturePos_multiBorder( mesh &m,
 	
 	pardisoSolver s(pardisoSolver::MT_ANY, pardisoSolver::SOLVER_ITERATIVE,2);
 
-//	s.checkMatrix(pardisoSolver::MT_ANY,mat);
+	s.checkMatrix(pardisoSolver::MT_ANY,mat);
 	s.setMatrix(mat,1);
 	setUpXY(b, border[outBorder],outerPos, m.getVertices().size());
 
@@ -326,7 +326,7 @@ void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> 
 		offset = (i<nrVertices?0:nrVertices);
 	
 		//not on boder or a reflex angle
-		if (myBorder < 0 || ((angles[myBorder][borderIndex] > PI)&&(myBorder != outBorder))){
+		if (myBorder < 0 || ((angles[myBorder][borderIndex] < 0)&&(myBorder != outBorder))){
 //		if (myBorder < 0 || ((angles[myBorder][borderIndex] > PI) || (myBorder == outBorder))){
 			a_ii_added = false;
 			//calculate normation factor
@@ -360,20 +360,35 @@ void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> 
 		else{
 			//border -2 to border +2 iff it is a reflex angle
 			// else act as usually., i.e. as at border < -1
-			calculate(vertexIndices, border[myBorder], borderIndex);
+/*			calculate(vertexIndices, border[myBorder], borderIndex);
 			for(int i = 0; i < 5; i++){
 				mat.ja.push_back(vertexIndices[i].first +1);
 				mat.a.push_back(TutteWeights::angleMat(borderIndex, 
-					borderIndex + vertexIndices[i].second , 
+					(borderIndex + vertexIndices[i].second+bordersz)%bordersz , 
 					angles[myBorder], lambdas[myBorder]));
 			}
 
 			for(int i = 0; i < 5; i++){
-				mat.ja.push_back(vertexIndices[i].first+1);
+				mat.ja.push_back(vertexIndices[i].first+1 + nrVertices);
 				mat.a.push_back(TutteWeights::angleMat(borderIndex, 
-					borderIndex + vertexIndices[i].second  + nrVertices, 
+					(borderIndex + vertexIndices[i].second+bordersz)%bordersz  + bordersz, 
+					angles[myBorder], lambdas[myBorder]));
+			}*/
+			calcOrdered(vertexIndices,border[myBorder],borderIndex);
+			for(int k = 0; k < 3; k++){
+				mat.ja.push_back(vertexIndices[k].first +1);
+				mat.a.push_back(TutteWeights::turningWeight(borderIndex, 
+					(borderIndex + vertexIndices[k].second+bordersz)%bordersz , 
 					angles[myBorder], lambdas[myBorder]));
 			}
+			for(int k = 0; k < 3; k++){
+				mat.ja.push_back(vertexIndices[k].first +1 +nrVertices);
+				mat.a.push_back(TutteWeights::turningWeight(borderIndex, 
+					(borderIndex + vertexIndices[k].second+bordersz)%bordersz +bordersz, 
+					angles[myBorder], lambdas[myBorder]));
+			}
+		/*	mat.ja.push_back(i+1);
+			mat.a.push_back(1);*/
 		}
 		mat.ia.push_back(mat.ja.size() +1);
 	}
@@ -434,13 +449,19 @@ int TutteEmbedding::outerBorder( vector<vector<int>> &border, mesh & m )
 
 //stores the indices of -2...+2 border neighbors in ascending order and the corresponding offset
 //-2....+2 in offsets
-void TutteEmbedding::calculate( vector<std::pair<int,int>> & vertices, vector<int> & border, int borderIndex )
+void TutteEmbedding::calcOrdered( vector<std::pair<int,int>> & vertices, vector<int> & border, int borderIndex )
 {
-	vertices.clear();
+	/*vertices.clear();
 	for(int i = 0; i < 5; i++){
 		vertices.push_back(std::pair<int,int>());
 		vertices[i].first = border[(borderIndex-2 +i+border.size()) % border.size()];
 		vertices[i].second = i-2;
+	}*/
+	vertices.clear();
+	for(int i = 0; i < 3; i++){
+		vertices.push_back(std::pair<int,int>());
+		vertices[i].first = border[(borderIndex-1 +i +border.size()) % border.size()];
+		vertices[i].second = i-1;
 	}
 
 	sort(vertices.begin(),vertices.end(),pairComp::comparator);
