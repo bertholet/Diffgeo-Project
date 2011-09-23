@@ -333,6 +333,18 @@ public:
 	static int getNext( int center_idx, int v , mesh& m );
 
 	//////////////////////////////////////////////////////////////////////////
+	//border compatible version: if there is no next you will get the last
+	//index of the neighbor component
+	static int getPrevious_bc( int center_index, int v, mesh& m );
+	//////////////////////////////////////////////////////////////////////////
+	//border compatible version: if there is no next you will get the first
+	//index of the neighbor component
+	static int getNext_bc( int center_index, int v, mesh& m );
+
+	static int getFirst( int center_index, int v, mesh& m );
+	static int getLast( int center_index, int v, mesh& m );
+
+	//////////////////////////////////////////////////////////////////////////
 	// Returns the length of the polygon train denoted by the vertex indices
 	// "vertices"
 	//////////////////////////////////////////////////////////////////////////

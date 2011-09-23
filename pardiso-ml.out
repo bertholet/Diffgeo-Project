@@ -1,19 +1,24 @@
 [PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Checking consistency of matrix...
-[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Dimension: 80
-[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Nonzeros: 416
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Dimension: 516
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Nonzeros: 3000
 [PARDISO/ML]>> Inf norm of right hand side 1.000000e+000
 [PARDISO/ML]>> MaxItersNoImprovement is 25
 [PARDISO/ML]>> [GMRES (100) solving...]
 [PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/solver_gmres.c:     - Using residual reduction stopping criterion.
 [PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/solver_gmres.c:     - Max 25 iters w/out improvement.
-[PARDISO/ML]>> Norm of RHS:                2.648773e+000
-[PARDISO/ML]>> Preconditioned norm of RHS: 3.427589e+000
-[PARDISO/ML]>> Preconditioned residual:    3.427589e+000
-[PARDISO/ML]>> [GMRES step   1,  rel.res.: 6.339e-003,  rate: 0.006]
-[PARDISO/ML]>> [GMRES step   2,  rel.res.: 8.460e-005,  rate: 0.013]
-[PARDISO/ML]>> [GMRES (100) took 0.000000 secs.,   3 its., rel.res.: 5.423704e-007]
+[PARDISO/ML]>> Norm of RHS:                5.224165e+000
+[PARDISO/ML]>> Preconditioned norm of RHS: 9.532669e+000
+[PARDISO/ML]>> Preconditioned residual:    9.532669e+000
+[PARDISO/ML]>> [GMRES step   1,  rel.res.: 3.033e-001,  rate: 0.303]
+[PARDISO/ML]>> [GMRES step   2,  rel.res.: 4.035e-002,  rate: 0.133]
+[PARDISO/ML]>> [GMRES step   3,  rel.res.: 5.515e-003,  rate: 0.137]
+[PARDISO/ML]>> [GMRES step   4,  rel.res.: 9.824e-004,  rate: 0.178]
+[PARDISO/ML]>> [GMRES step   5,  rel.res.: 2.205e-004,  rate: 0.224]
+[PARDISO/ML]>> [GMRES step   6,  rel.res.: 2.089e-005,  rate: 0.095]
+[PARDISO/ML]>> [GMRES step   7,  rel.res.: 2.669e-006,  rate: 0.128]
+[PARDISO/ML]>> [GMRES (100) took 0.014000 secs.,   8 its., rel.res.: 2.743481e-007]
 [PARDISO/ML]>> 
  IterativePilsScalar: status 0.
 [PARDISO/ML]>> 
-[PARDISO/ML]>> Residual against original matrix:  3.897367e-007
+[PARDISO/ML]>> Residual against original matrix:  1.215123e-007
 [PARDISO/ML]>> 

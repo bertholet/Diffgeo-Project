@@ -62,9 +62,11 @@ double TutteWeights::unnormed_meanvalue_weights( int i, int j, mesh & m, vector<
 
 		prev = meshOperation::getPrevious(i, j, m);	
 		next = meshOperation::getNext(i, j, m);
-		if(prev == -1 || next == -1){
-			prev = meshOperation::getPrevious(i, j, m);	
-			next = meshOperation::getNext(i, j, m);
+		if(prev == -1){
+			prev = meshOperation::getLast(i, j, m);	
+		}
+		if(next == -1){
+			next = meshOperation::getFirst(i, j, m);
 		}
 
 		tan_alpha1_2 = (1- tuple3f::cosPoints(verts[prev], verts[i], verts[j]))/
@@ -146,8 +148,8 @@ double TutteWeights::cotan_weights_divAvor( int i, int j, mesh & m,
 
 	if(find(neighbors_i.begin(), neighbors_i.end(), j)!= neighbors_i.end()){
 
-		prev = meshOperation::getPrevious(i, j, m);	
-		next = meshOperation::getNext(i, j, m);
+		prev = meshOperation::getPrevious_bc(i, j, m);	
+		next = meshOperation::getNext_bc(i, j, m);
 		if(prev == -1 || next == -1){
 			printf("Error in Tutteweights::cotanweights_adiv");
 		}
@@ -176,8 +178,9 @@ double TutteWeights::cotan_weights_divAvor( int i, int j, mesh & m,
 					(verts[i]-verts[k]).normSqr();
 			}*/
 			nbr = neighbors_i[k];
-			prev = meshOperation::getPrevious(i, nbr, m);	
-			next = meshOperation::getNext(i,nbr, m);
+			prev = meshOperation::getPrevious_bc(i, nbr, m);	
+			next = meshOperation::getNext_bc(i,nbr, m);
+
 			tempcot1 = tuple3f::cotPoints(verts[nbr], verts[prev], verts[i]);
 			tempcot1 = (tempcot1 >0 ? tempcot1: -tempcot1);
 			tempcot2 = tuple3f::cotPoints(verts[i], verts[next], verts[nbr]);
@@ -221,8 +224,8 @@ double TutteWeights::cotan_weights_divAmix( int i, int j, mesh & m,
 
 	if(find(neighbors_i.begin(), neighbors_i.end(), j)!= neighbors_i.end()){
 
-		prev = meshOperation::getPrevious(i, j, m);	
-		next = meshOperation::getNext(i, j, m);
+		prev = meshOperation::getPrevious_bc(i, j, m);	
+		next = meshOperation::getNext_bc(i, j, m);
 		if(prev == -1 || next == -1){
 			printf("Error in Tutteweights::cotanweights_adiv");
 		}
@@ -233,7 +236,7 @@ double TutteWeights::cotan_weights_divAmix( int i, int j, mesh & m,
 		float Amix = 0, areaT;
 		for(int k = 0; k < (int) neighbors_i.size(); k++){
 			nbr = neighbors_i[k];
-			prev = meshOperation::getPrevious(i, nbr, m);	
+			prev = meshOperation::getPrevious_bc(i, nbr, m);	
 		//	next = meshOperation::getNext(i,nbr_fc_i,nbr, m);
 			areaT = tuple3f::cross((verts[nbr] - verts[i]),(verts[prev] - verts[i])).norm()/2;
 
@@ -313,9 +316,9 @@ void TutteWeights::angles_lambdas( vector<float> &angles, vector<float> &lambdas
 
 	}
 
-	scale_factor = (loopsz-2) * PI / sum;
+	scale_factor = (0.f +loopsz-2) * PI / sum;
 	for(int bdr =0; bdr < loopsz; bdr++){
-		angles[bdr] = PI - angles[bdr] * scale_factor;
+		angles[bdr] = PI - (angles[bdr] * scale_factor);
 	}
 }
 
@@ -559,7 +562,8 @@ double TutteWeights::mulitBorderWeights( int i, int j, mesh & m, vector<int> & n
 }
 
 /*
-* A weight function for matrix values on additional 
+* A weight function for matrix values on additional (INNER) borders.
+* will make constrictions for the produced border to be negatively oriented!!!
 */
 float TutteWeights::turningWeight( int i, int j, vector<float> &angles, vector<float> &lambdas )
 {
@@ -594,30 +598,30 @@ float TutteWeights::turningWeight( int i, int j, vector<float> &angles, vector<f
 		return 0;
 	}
 	return 0;*/
-	if((i<sz&&j<sz )|| (i>sz&&j>sz)){
+	if((i<sz&&j<sz )|| (i>=sz&&j>=sz)){
 		if(j%sz==(i+1)%sz){
 			return 1;
 		}
 		else if(j==i){
-			return -(1+lambdas[i]*cos(angles[i]));
+			return -(1+lambdas[i%sz]*cos(-angles[i%sz]));
 		}
 		else if(j%sz== (i-1+sz)%sz){
-			return lambdas[i]*cos(angles[i]);
+			return lambdas[i%sz]*cos(-angles[i%sz]);
 		}
 	}
 	else if(j==sz +i){
-		return lambdas[i]*sin(angles[i]);
+		return lambdas[i]*sin(-angles[i]);
 	}
 	else if(j==sz +(i-1+sz)%sz){
-		return -lambdas[i]*sin(angles[i]);
+		return -lambdas[i]*sin(-angles[i]);
 	}
 	else if(j== i-sz ){
-		return -lambdas[i]*sin(angles[i]);
+		return -lambdas[i%sz]*sin(-angles[i%sz]);
 	}
 	else if(j== (i-1+sz)%sz){
-		return lambdas[i]*sin(angles[i]);
+		return lambdas[i%sz]*sin(-angles[i%sz]);
 	}
-	else if(j== (i+1)%sz +sz || i == (j+1)%sz){
+	else if(j== (i+1)%sz +sz || (i +1)%sz == j){
 		return 0;
 	}
 	return 0;

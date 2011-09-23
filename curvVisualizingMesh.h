@@ -65,6 +65,31 @@ public:
 		col1 = color1;
 		col2 = color2;
 	}
+	
+	borderColorMap(vector<vector<int>> & border_, tuple3f color1, tuple3f color2, vector<vector<tuple3f>> & angles){
+		sz = max_(border_)+1;
+		//vector<int>::iterator it = border_.begin();
+		components = border_.size();
+		printf("%d border components found \n", components);
+
+		border = new int[sz];
+
+		vector<int>::iterator it;
+		for(int i = 0; i < sz; i++){
+			border[i] = -1; //border[i] = false;
+			for(int j = 0; j < (int) border_.size(); j++){
+				if( (it = find(border_[j].begin() , border_[j].end(), i)) !=border_[j].end()){
+					if(angles[j][it-border_[j].begin()] >0){
+						border[i] = 2*j +1;
+					}
+					border[i] = 2*j;
+					break;
+				} 
+			}
+		}
+		col1 = color1;
+		col2 = color2;
+	}
 	~borderColorMap(){
 		delete border;
 	}

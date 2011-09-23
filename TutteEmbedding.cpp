@@ -123,6 +123,7 @@ void TutteEmbedding::calcTexturePos_multiBorder( mesh &m,
 
 	vector<vector<int>> border;
 	vector<tuple3f> outerPos;
+	vector<vector<float>> angles, lambdas;
 	vector<double> b;
 	pardisoMatrix mat;
 	double * xy = new double[2*m.getVertices().size()];
@@ -134,7 +135,8 @@ void TutteEmbedding::calcTexturePos_multiBorder( mesh &m,
 	int outBorder = outerBorder(border,m);
 	TutteWeights::angleApproxBorder(outerPos,border[outBorder],m);
 
-	setUp_multiBorder(mat,border,outerPos,outBorder,m,weights);
+	TutteWeights::angles_lambdas(angles,lambdas,border,m);
+	setUp_multiBorder(mat,border,outerPos,outBorder,angles, lambdas, m,weights);
 
 	mat.saveMatrix("C:/Users/bertholet/Dropbox/matrix_multiBorder.m");
 	
@@ -142,7 +144,7 @@ void TutteEmbedding::calcTexturePos_multiBorder( mesh &m,
 
 	s.checkMatrix(pardisoSolver::MT_ANY,mat);
 	s.setMatrix(mat,1);
-	setUpXY(b, border[outBorder],outerPos, m.getVertices().size());
+	setUpXY_reflex(b, border[outBorder],outerPos, angles[outBorder], m.getVertices().size());
 
 	s.setPrintStatistics(true);
 	s.solve(xy,&(b[0]));
@@ -284,16 +286,53 @@ void TutteEmbedding::setUpXY( vector<double>& b, vector<int> & border, vector<tu
 		}
 	}
 }
+
+
+void TutteEmbedding::setUpXY_reflex( vector<double>& b, vector<int> & border, vector<tuple3f> & outerPos, vector<float> & angles, int sz )
+{
+	vector<int>::iterator el;
+	b.clear();
+	b.reserve(2*sz);
+	int idx;
+	for(int i = 0; i < sz; i++){
+		b.push_back(0);
+		if((el=find(border.begin(), border.end(), i))!=border.end()){
+			idx= el-border.begin();
+			if(angles[idx] < 0){
+				b[*el] = 0;
+			}
+			else{
+				b[*el]= outerPos[idx].x;
+			}
+		}
+	}
+	for(int i = 0; i < sz; i++){
+		b.push_back(0);
+		if((el=find(border.begin(), border.end(), i))!=border.end()){
+			idx= el-border.begin();
+			if(angles[idx] < 0){
+				b[*el+sz] = 0;
+			}
+			else{
+				b[*el+sz]= outerPos[idx].y;
+			}
+		}
+	}
+}
+
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
 void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> &border, 
-					vector<tuple3f> & outerPos, int outBorder, mesh & m,
+					vector<tuple3f> & outerPos, int outBorder, 
+					vector<vector<float>> & angles,
+					vector<vector<float>> & lambdas,
+					mesh & m,
 					double (*weights ) (int /*i*/, int /*j*/, mesh & , 
 						   vector<int>& /*neighbors_i*/,vector<int>& /*neighbor_faces_i*/,
 						   vector<int>& /*border*/))
 {
-	vector<vector<float>> angles, lambdas;
+//	vector<vector<float>> angles, lambdas;
 	vector<vector<int>> & neighbors = m.getNeighbors();
 	vector<vector<int>> & neighbor_faces = m.getNeighborFaces();
 	vector<int> NULLBORDER;
@@ -308,7 +347,7 @@ void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> 
 	vector<int>::iterator j;
 	
 
-	TutteWeights::angles_lambdas(angles,lambdas, border,m);
+//	TutteWeights::angles_lambdas(angles,lambdas, border,m);
 		//set up indices some values might be zero. values are assumed to be only at (i,j) if i and j are neighbors
 
 	count = 1;
@@ -326,8 +365,10 @@ void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> 
 		offset = (i<nrVertices?0:nrVertices);
 	
 		//not on boder or a reflex angle
-		if (myBorder < 0 || ((angles[myBorder][borderIndex] < 0)&&(myBorder != outBorder))){
-//		if (myBorder < 0 || ((angles[myBorder][borderIndex] > PI) || (myBorder == outBorder))){
+		if (myBorder < 0 || ((angles[myBorder][borderIndex] < 0) && myBorder == outBorder) 
+			//orientation of inner circles will be swapped
+			||((angles[myBorder][borderIndex] > 0) && myBorder != outBorder)){
+
 			a_ii_added = false;
 			//calculate normation factor
 			factor = 0;
@@ -377,13 +418,13 @@ void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> 
 			calcOrdered(vertexIndices,border[myBorder],borderIndex);
 			for(int k = 0; k < 3; k++){
 				mat.ja.push_back(vertexIndices[k].first +1);
-				mat.a.push_back(TutteWeights::turningWeight(borderIndex, 
+				mat.a.push_back(TutteWeights::turningWeight(borderIndex +(i<nrVertices? 0:bordersz), 
 					(borderIndex + vertexIndices[k].second+bordersz)%bordersz , 
 					angles[myBorder], lambdas[myBorder]));
 			}
 			for(int k = 0; k < 3; k++){
 				mat.ja.push_back(vertexIndices[k].first +1 +nrVertices);
-				mat.a.push_back(TutteWeights::turningWeight(borderIndex, 
+				mat.a.push_back(TutteWeights::turningWeight(borderIndex+(i<nrVertices? 0:bordersz), 
 					(borderIndex + vertexIndices[k].second+bordersz)%bordersz +bordersz, 
 					angles[myBorder], lambdas[myBorder]));
 			}
@@ -393,40 +434,6 @@ void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> 
 		mat.ia.push_back(mat.ja.size() +1);
 	}
 
-	//////////////////////////////////////////////////////////////////////////
-	// y's
-	//////////////////////////////////////////////////////////////////////////
-/*	for(int i = 0; i < nrVertices;i++){
-		vector<int> & nbrs_i = neighbors[i];
-		vector<int> & nbr_fc_i = (neighbor_faces[i]);
-		myBorder = meshOperation::borderComponent(i,border);
-
-
-		a_ii_added = false;
-		//calculate normation factor
-		factor = 0;
-		for(j = nbrs_i.begin(); j!=nbrs_i.end(); j++){
-			factor += weights(i,*j,m,nbrs_i,nbr_fc_i,border);
-		}
-
-		for(j = nbrs_i.begin(); j!=nbrs_i.end(); j++){
-			if(i< *j &&! a_ii_added){
-				mat.ja.push_back(i+nrVertices + 1);
-				a_ii_added = true;
-				mat.a.push_back(weights(i,i,m,nbrs_i,nbr_fc_i,border));
-			}
-			mat.ja.push_back((*j) +1);
-			//note the following makes sense because the sum of vals = 0 means there is only a diagonal element..
-			mat.a.push_back((factor <0.0001? 0: weights(i,*j,m,nbrs_i,nbr_fc_i,border)/factor));
-
-		}
-
-		if(!a_ii_added){
-			mat.ja.push_back(i+ nrVertices+1);
-			a_ii_added = true;
-			mat.a.push_back(weights(i,i,m,nbrs_i,nbr_fc_i,border));
-		}
-	}*/
 
 	if(mat.ja.size()+1 != mat.ia.back()){ //last index + 1 
 		throw std::runtime_error("Assertion failed, matrix malformed");
@@ -436,11 +443,12 @@ void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> 
 
 int TutteEmbedding::outerBorder( vector<vector<int>> &border, mesh & m )
 {
-	unsigned int max = 0;
+	float max = 0,length;
 	int max_i = -1;
 	for(unsigned int i = 0; i < border.size(); i++){
-		if(border[i].size() > max){
-			max = border[i].size();
+		length = meshOperation::getLength(border[i],m);
+		if(length > max){
+			max = length;
 			max_i = int(i);
 		}
 	}

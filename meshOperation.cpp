@@ -28,6 +28,7 @@ int meshOperation::getPrevious( int center_index, int v, mesh  & m)
 		}
 	}
 
+
 	return -1;
 }
 
@@ -74,6 +75,43 @@ float meshOperation::sumAnglesWheel( int from, int center, int to, mesh & m )
 	while (actual != to);
 
 	return angle;
+}
+
+int meshOperation::getFirst( int center_index, int v, mesh& m )
+{
+	int actual = v, previous;
+	while((previous =getPrevious(center_index,actual,m))>=0){
+		actual = previous;
+	}
+	return actual;
+}
+
+int meshOperation::getLast( int center_index, int v, mesh& m )
+{
+	int actual = v, next;
+	while((next =getNext(center_index,actual,m))>=0){
+		actual = next;
+	}
+	return actual;
+}
+
+int meshOperation::getPrevious_bc( int center_index, int v, mesh& m )
+{
+	int prev = getPrevious(center_index,v,m);
+	if(prev < 0){
+		return getLast(center_index,v,m);
+	}
+	return prev;
+}
+
+int meshOperation::getNext_bc( int center_index, int v, mesh& m )
+{
+
+	int next = getNext(center_index,v,m);
+	if(next < 0){
+		return getFirst(center_index,v,m);
+	}
+	return next;
 }
 
 

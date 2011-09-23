@@ -7,12 +7,14 @@
 #include "glWindowHelper.h"
 #include "TutteEmbedding.h"
 #include "tutteWeights.h"
+#include "meshOperation.h"
 
 namespace tutDemo{
 	bool spacePressed =false;
 	TutteDemo * actualDemo;
+	vector<int> windows;
+	int current_win_idx = 0;
 
-	
 	void processNormalKeys(unsigned char key, int x, int y) {
 
 		if (key == ' ')
@@ -36,6 +38,11 @@ namespace tutDemo{
 		else if (key == 'u'){
 			actualDemo->bunny->scaleXYZ(0.95f);
 		}
+		else if (key == 'm'){
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, actualDemo->tex->szx,
+				actualDemo->tex->szy,0,GL_RGBA, GL_FLOAT, 
+				&(actualDemo->tex->checkboard[0]));
+		}
 	}
 
 	void callback(void){
@@ -44,6 +51,10 @@ namespace tutDemo{
 
 	void callback_sub(void){
 		actualDemo->loopTex();
+	}
+
+	void registerWindow(int id){
+		windows.push_back(id);
 	}
 
 }
@@ -149,6 +160,7 @@ void TutteDemo::display( mesh &m )
 {
 	this->bunny = &m;
 	int window1 = glWindowHelper::glWindow(450,450, tutDemo::callback, tutDemo::processNormalKeys);
+	tutDemo::registerWindow(window1);
 
 	glTexEnvf(GL_TEXTURE_2D, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	GLuint tex_id;
@@ -169,9 +181,16 @@ void TutteDemo::display( mesh &m )
 	//subwindow
 	//////////////////////////////////////////////////////////////////////////
 	int subwindow1 = glutCreateSubWindow(window1,10,10,200,200);
+	tutDemo::registerWindow(subwindow1);
 
-	this->texMesh = new drawing2d(m.getTexCoords(),m.getFaces());
+	vector<vector<int>> border;
+	meshOperation::getBorder(m,border);
+	
+	this->texMesh = new drawing2d(m.getTexCoords(),m.getFaces(),border, tex,190,190);
 	glutDisplayFunc(tutDemo::callback_sub);
+	glutMouseFunc(d2dCallBack::mouseCallback);
+//	glutKeyboardFunc(tutDemo::processNormalKeys);
+
 	this->texMesh->initGLParams(tex,tex_id);
 
 	glutMainLoop();

@@ -7,4 +7,6 @@ public:
 	float *checkboard;
 	squareTexture(void);
 	~squareTexture(void);
+
+	void draw(int x, int y);
 };

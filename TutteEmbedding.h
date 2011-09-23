@@ -35,7 +35,10 @@ public:
 		vector<int>&/*fc_i*/, vector<int>& /*border*/));
 
 	void setUp_multiBorder(pardisoMatrix &mat, vector<vector<int>> &border,
-		vector<tuple3f> & outerPos, int outBorder, mesh & m,
+		vector<tuple3f> & outerPos, int outBorder, 
+		vector<vector<float>> & angles,
+		vector<vector<float>> & lambdas,
+		mesh & m,
 		double (*weights ) (int /*i*/, int /*j*/, mesh & , 
 				vector<int>& /*neighbors_i*/,
 				vector<int>& /*neighbor_faces_i*/,
@@ -44,6 +47,9 @@ public:
 	void setUpX( vector<double>& b, vector<int> & border, vector<tuple3f> & outerPos, int sz );
 	void setUpY( vector<double>& b, vector<int> & border, vector<tuple3f> & outerPos, int sz );
 	void setUpXY( vector<double>& b, vector<int> & border, vector<tuple3f> & outerPos, int sz );
+	void setUpXY_reflex( vector<double>& b, vector<int> & border, 
+		vector<tuple3f> & outerPos,
+		vector<float> & angles, int sz );
 
 private:
 	int outerBorder(vector<vector<int>> &border, mesh & m);

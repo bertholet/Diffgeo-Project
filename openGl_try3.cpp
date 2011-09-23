@@ -104,10 +104,10 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		
 	//bunny = cube(2.f, 10);
-//	bunny= new mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
+	//bunny= new mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
 //	bunny = new mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/dragon.obj", tuple3f(1.f,0.f,0.f), 2.f);
 //	bunny= new mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2);
-	bunny = new ball(1,10,5);
+	bunny = new ball(1,40,10);
 	//	bunny = ball(1, 80,40);
 	//bunny = torus(2.f,1.f, 30, 60);
 	//bunny = simplestCube();
@@ -121,9 +121,11 @@ int _tmain(int argc, _TCHAR* argv[])
 //	meshOperation::undangle(*bunny);
 
 	//meshOperation::getHalf(*bunny,*bunny, tuple3f(-0.25f,1,0), 0.1f); //dragon.obj config
-	meshOperation::getHalf(*bunny,*bunny, tuple3f(1,0,0), -0.35f);
-	//meshOperation::getHalf(*bunny,*bunny, tuple3f(-1,0,0), -0.35f);
-	meshOperation::getHalf(*bunny,*bunny, tuple3f(-1,0,0), -0.7f);
+	meshOperation::getHalf(*bunny,*bunny, tuple3f(0,0.3,1), -0.35f);
+	meshOperation::getHalf(*bunny,*bunny, tuple3f(0,-0.1,-1), -0.35f);
+	/*meshOperation::getHalf(*bunny,*bunny, tuple3f(0,0.5f,1), -0.35f);
+	meshOperation::getHalf(*bunny,*bunny, tuple3f(0,-0.5f,-1), -0.35f);*/
+	//meshOperation::getHalf(*bunny,*bunny, tuple3f(-1,0,0), -0.7f);
 //	meshOperation::getHalf(*bunny,*bunny, tuple3f(0,0,1), 0.05f); // dragon.obj: 2 border
 /*	meshOperation::undangle(*bunny);
 	meshOperation::reduceToLargestComponent(*bunny);*/
@@ -137,7 +139,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	//cMap = new gaussColormap(bunny);
 		
 	//	bunny->setShowOrientation(true);
-/*	cMap = (colorMap *) new borderColorMap(border,tuple3f(0,0,1), tuple3f(1,0,0));
+	vector<vector<tuple3f>> angles, lambdas;
+	TutteWeights::angles_lambdas(angles,lambdas,border,*bunny);
+	cMap = (colorMap *) new borderColorMap(border,tuple3f(0,0,1), tuple3f(1,0,0),angles);
 	smoother = new ImplicitEulerSmoothing(*bunny,1, 0.1f);
 	implicitSmoothingDemo(argc,argv);
 	//implicitEulerTests();
@@ -150,8 +154,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 /*	TextureDemo demo;
 	demo.run(bunny);//*/
-	TutteDemo demo;
-	demo.run_multiBorder(*bunny, TutteWeights::cotan_weights_divAvor);
+/*	TutteDemo demo;
+	demo.run_multiBorder(*bunny, TutteWeights::unnormed_meanvalue_weights);
 //	demo.run(*bunny, TutteWeights::cotan_weights_divAvor, TutteWeights::angleApproxBorder);
 /*	squareTexture s = squareTexture();
 	textureDemo(s);//*/
