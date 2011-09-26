@@ -66,7 +66,7 @@ public:
 		col2 = color2;
 	}
 	
-	borderColorMap(vector<vector<int>> & border_, tuple3f color1, tuple3f color2, vector<vector<tuple3f>> & angles){
+	borderColorMap(vector<vector<int>> & border_, tuple3f color1, tuple3f color2, vector<vector<float>> & angles){
 		sz = max_(border_)+1;
 		//vector<int>::iterator it = border_.begin();
 		components = border_.size();
@@ -82,7 +82,9 @@ public:
 					if(angles[j][it-border_[j].begin()] >0){
 						border[i] = 2*j +1;
 					}
-					border[i] = 2*j;
+					else{
+						border[i] = 2*j;
+					}
 					break;
 				} 
 			}

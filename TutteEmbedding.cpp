@@ -135,7 +135,7 @@ void TutteEmbedding::calcTexturePos_multiBorder( mesh &m,
 	int outBorder = outerBorder(border,m);
 	TutteWeights::angleApproxBorder(outerPos,border[outBorder],m);
 
-	TutteWeights::angles_lambdas(angles,lambdas,border,m);
+	TutteWeights::angles_lambdas(angles,lambdas,border,outBorder,m);
 	setUp_multiBorder(mat,border,outerPos,outBorder,angles, lambdas, m,weights);
 
 	mat.saveMatrix("C:/Users/bertholet/Dropbox/matrix_multiBorder.m");
@@ -367,7 +367,7 @@ void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> 
 		//not on boder or a reflex angle
 		if (myBorder < 0 || ((angles[myBorder][borderIndex] < 0) && myBorder == outBorder) 
 			//orientation of inner circles will be swapped
-			||((angles[myBorder][borderIndex] > 0) && myBorder != outBorder)){
+			||((angles[myBorder][borderIndex] < 0) && myBorder != outBorder)){
 
 			a_ii_added = false;
 			//calculate normation factor

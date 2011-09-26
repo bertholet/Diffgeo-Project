@@ -34,8 +34,11 @@ namespace TutteWeights{
 	float turningWeight(int i, int j, vector<float> &angles, vector<float> &lambdas);
 
 	void angles_lambdas(vector<float> &angles, vector<float> &lambdas, vector<int> & border, mesh & m);
+	//the angles of the inner  borders will be scaled to n-2 pi of inner borders to n+2 pi.
 	void angles_lambdas( vector<vector<float>> &angles, vector<vector<float>> &lambdas, 
-		vector<vector<int>> & border, mesh & m);
+		vector<vector<int>> & border, int outBorder, mesh & m);
+	//will norm the angles such that they sum to sum
+	void angles_lambdas(vector<float> &angles, vector<float> &lambdas, vector<int> & border,float sum, mesh & m);
 
 	void setUp_fullAndAngleBased(vector<tuple3f> & outerPos , vector<int> & border, 
 		vector<int> & loops, mesh &, pardisoMatrix & target);

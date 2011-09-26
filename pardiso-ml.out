@@ -1,24 +1,204 @@
 [PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Checking consistency of matrix...
-[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Dimension: 516
-[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Nonzeros: 3000
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Dimension: 94300
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Nonzeros: 658690
+[PARDISO/ML]>> Setting up ILUC (diag-based dropping, 1.00e-002, 10.0, 1.0e-016) ...
+[PARDISO/ML]>> MPS_SR reordering ...
+[PARDISO/ML]>> MPS_SR reordering took 0.047000 secs.
+[PARDISO/ML]>> USING MPS scaling.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Scaling matrix ...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Scaling matrix took 0.000000 secs.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_utils.c: Permuting rows ...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_utils.c: Permuting rows took 0.016000 secs.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Checking MPS consistency of matrix...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Dimension: 94300
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Nonzeros: 658690
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_reorder_ext.c: METIS Nested Dissection reordering ...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_utils.c: Symmetrizing structure ...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_utils.c: sorting took 0.015000 secs.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_utils.c: Symmetrizing structure took 0.031000 secs.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_reorder_ext.c: Building adjacency structure ...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_reorder_ext.c: Building adjacency structure took 0.016000 secs.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_reorder_ext.c: Calling METIS (libpardiso, 0.0*afg) ...
+[PARDISO/ML]>> METIS reordering took 0.811000 secs.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_utils.c: Permuting matrix ...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_utils.c: Permuting matrix took 0.031000 secs.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/precon_iluc.c:  - Determine max_fill on avg. row length (max: 69).
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/ldu.c: Converting CSR -> LDU ...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/ldu.c: Conversion took 0.000000 secs.
+[PARDISO/ML]>> [ILUC finished.  L: 663013,  U: 667333,  mat: 658690  (216.28%).]
+[PARDISO/ML]>> ILUC took 1.170000 secs.
+[PARDISO/ML]>> 
+[PARDISO/ML]>> Max norm L:                  6.83e+000
+[PARDISO/ML]>> Max norm U:                  6.83e+000
+[PARDISO/ML]>> 
+[PARDISO/ML]>> Perturbed entries:                  0  (first: -1)
+[PARDISO/ML]>> 
+[PARDISO/ML]>> Number of dropped entries:          0 /   663013 (  0.00%)
+[PARDISO/ML]>> 
+[PARDISO/ML]>> Number of clipped entries:          0 /   663013 (  0.00%)
+[PARDISO/ML]>> Number of clipped rows:             0
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Checking consistency of matrix...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Dimension: 94300
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Nonzeros: 658690
 [PARDISO/ML]>> Inf norm of right hand side 1.000000e+000
 [PARDISO/ML]>> MaxItersNoImprovement is 25
 [PARDISO/ML]>> [GMRES (100) solving...]
 [PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/solver_gmres.c:     - Using residual reduction stopping criterion.
 [PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/solver_gmres.c:     - Max 25 iters w/out improvement.
-[PARDISO/ML]>> Norm of RHS:                5.224165e+000
-[PARDISO/ML]>> Preconditioned norm of RHS: 9.532669e+000
-[PARDISO/ML]>> Preconditioned residual:    9.532669e+000
-[PARDISO/ML]>> [GMRES step   1,  rel.res.: 3.033e-001,  rate: 0.303]
-[PARDISO/ML]>> [GMRES step   2,  rel.res.: 4.035e-002,  rate: 0.133]
-[PARDISO/ML]>> [GMRES step   3,  rel.res.: 5.515e-003,  rate: 0.137]
-[PARDISO/ML]>> [GMRES step   4,  rel.res.: 9.824e-004,  rate: 0.178]
-[PARDISO/ML]>> [GMRES step   5,  rel.res.: 2.205e-004,  rate: 0.224]
-[PARDISO/ML]>> [GMRES step   6,  rel.res.: 2.089e-005,  rate: 0.095]
-[PARDISO/ML]>> [GMRES step   7,  rel.res.: 2.669e-006,  rate: 0.128]
-[PARDISO/ML]>> [GMRES (100) took 0.014000 secs.,   8 its., rel.res.: 2.743481e-007]
+[PARDISO/ML]>> Norm of RHS:                6.205363e+000
+[PARDISO/ML]>> Preconditioned norm of RHS: 1.469399e+001
+[PARDISO/ML]>> Preconditioned residual:    1.469399e+001
+[PARDISO/ML]>> [GMRES step   1,  rel.res.: 2.887e-001,  rate: 0.289]
+[PARDISO/ML]>> [GMRES step   2,  rel.res.: 1.679e-001,  rate: 0.582]
+[PARDISO/ML]>> [GMRES step   3,  rel.res.: 1.069e-001,  rate: 0.636]
+[PARDISO/ML]>> [GMRES step   4,  rel.res.: 6.728e-002,  rate: 0.630]
+[PARDISO/ML]>> [GMRES step   5,  rel.res.: 4.882e-002,  rate: 0.726]
+[PARDISO/ML]>> [GMRES step   6,  rel.res.: 3.856e-002,  rate: 0.790]
+[PARDISO/ML]>> [GMRES step   7,  rel.res.: 3.175e-002,  rate: 0.823]
+[PARDISO/ML]>> [GMRES step   8,  rel.res.: 2.747e-002,  rate: 0.865]
+[PARDISO/ML]>> [GMRES step   9,  rel.res.: 2.506e-002,  rate: 0.912]
+[PARDISO/ML]>> [GMRES step  10,  rel.res.: 2.323e-002,  rate: 0.927]
+[PARDISO/ML]>> [GMRES step  11,  rel.res.: 2.150e-002,  rate: 0.926]
+[PARDISO/ML]>> [GMRES step  12,  rel.res.: 2.007e-002,  rate: 0.934]
+[PARDISO/ML]>> [GMRES step  13,  rel.res.: 1.880e-002,  rate: 0.937]
+[PARDISO/ML]>> [GMRES step  14,  rel.res.: 1.733e-002,  rate: 0.922]
+[PARDISO/ML]>> [GMRES step  15,  rel.res.: 1.602e-002,  rate: 0.925]
+[PARDISO/ML]>> [GMRES step  16,  rel.res.: 1.491e-002,  rate: 0.931]
+[PARDISO/ML]>> [GMRES step  17,  rel.res.: 1.404e-002,  rate: 0.942]
+[PARDISO/ML]>> [GMRES step  18,  rel.res.: 1.317e-002,  rate: 0.938]
+[PARDISO/ML]>> [GMRES step  19,  rel.res.: 1.233e-002,  rate: 0.936]
+[PARDISO/ML]>> [GMRES step  20,  rel.res.: 1.162e-002,  rate: 0.942]
+[PARDISO/ML]>> [GMRES step  21,  rel.res.: 1.105e-002,  rate: 0.951]
+[PARDISO/ML]>> [GMRES step  22,  rel.res.: 1.046e-002,  rate: 0.946]
+[PARDISO/ML]>> [GMRES step  23,  rel.res.: 9.861e-003,  rate: 0.943]
+[PARDISO/ML]>> [GMRES step  24,  rel.res.: 9.242e-003,  rate: 0.937]
+[PARDISO/ML]>> [GMRES step  25,  rel.res.: 8.634e-003,  rate: 0.934]
+[PARDISO/ML]>> [GMRES step  26,  rel.res.: 7.991e-003,  rate: 0.926]
+[PARDISO/ML]>> [GMRES step  27,  rel.res.: 7.311e-003,  rate: 0.915]
+[PARDISO/ML]>> [GMRES step  28,  rel.res.: 6.625e-003,  rate: 0.906]
+[PARDISO/ML]>> [GMRES step  29,  rel.res.: 6.077e-003,  rate: 0.917]
+[PARDISO/ML]>> [GMRES step  30,  rel.res.: 5.368e-003,  rate: 0.883]
+[PARDISO/ML]>> [GMRES step  31,  rel.res.: 4.567e-003,  rate: 0.851]
+[PARDISO/ML]>> [GMRES step  32,  rel.res.: 4.047e-003,  rate: 0.886]
+[PARDISO/ML]>> [GMRES step  33,  rel.res.: 3.709e-003,  rate: 0.916]
+[PARDISO/ML]>> [GMRES step  34,  rel.res.: 3.411e-003,  rate: 0.920]
+[PARDISO/ML]>> [GMRES step  35,  rel.res.: 3.162e-003,  rate: 0.927]
+[PARDISO/ML]>> [GMRES step  36,  rel.res.: 2.972e-003,  rate: 0.940]
+[PARDISO/ML]>> [GMRES step  37,  rel.res.: 2.844e-003,  rate: 0.957]
+[PARDISO/ML]>> [GMRES step  38,  rel.res.: 2.752e-003,  rate: 0.968]
+[PARDISO/ML]>> [GMRES step  39,  rel.res.: 2.684e-003,  rate: 0.975]
+[PARDISO/ML]>> [GMRES step  40,  rel.res.: 2.640e-003,  rate: 0.984]
+[PARDISO/ML]>> [GMRES step  41,  rel.res.: 2.614e-003,  rate: 0.990]
+[PARDISO/ML]>> [GMRES step  42,  rel.res.: 2.594e-003,  rate: 0.992]
+[PARDISO/ML]>> [GMRES step  43,  rel.res.: 2.574e-003,  rate: 0.992]
+[PARDISO/ML]>> [GMRES step  44,  rel.res.: 2.553e-003,  rate: 0.992]
+[PARDISO/ML]>> [GMRES step  45,  rel.res.: 2.531e-003,  rate: 0.991]
+[PARDISO/ML]>> [GMRES step  46,  rel.res.: 2.516e-003,  rate: 0.994]
+[PARDISO/ML]>> [GMRES step  47,  rel.res.: 2.497e-003,  rate: 0.992]
+[PARDISO/ML]>> [GMRES step  48,  rel.res.: 2.480e-003,  rate: 0.993]
+[PARDISO/ML]>> [GMRES step  49,  rel.res.: 2.456e-003,  rate: 0.991]
+[PARDISO/ML]>> [GMRES step  50,  rel.res.: 2.419e-003,  rate: 0.985]
+[PARDISO/ML]>> [GMRES step  51,  rel.res.: 2.362e-003,  rate: 0.976]
+[PARDISO/ML]>> [GMRES step  52,  rel.res.: 2.288e-003,  rate: 0.969]
+[PARDISO/ML]>> [GMRES step  53,  rel.res.: 2.197e-003,  rate: 0.960]
+[PARDISO/ML]>> [GMRES step  54,  rel.res.: 2.100e-003,  rate: 0.956]
+[PARDISO/ML]>> [GMRES step  55,  rel.res.: 1.999e-003,  rate: 0.952]
+[PARDISO/ML]>> [GMRES step  56,  rel.res.: 1.913e-003,  rate: 0.957]
+[PARDISO/ML]>> [GMRES step  57,  rel.res.: 1.835e-003,  rate: 0.959]
+[PARDISO/ML]>> [GMRES step  58,  rel.res.: 1.748e-003,  rate: 0.953]
+[PARDISO/ML]>> [GMRES step  59,  rel.res.: 1.647e-003,  rate: 0.942]
+[PARDISO/ML]>> [GMRES step  60,  rel.res.: 1.547e-003,  rate: 0.939]
+[PARDISO/ML]>> [GMRES step  61,  rel.res.: 1.446e-003,  rate: 0.935]
+[PARDISO/ML]>> [GMRES step  62,  rel.res.: 1.355e-003,  rate: 0.937]
+[PARDISO/ML]>> [GMRES step  63,  rel.res.: 1.284e-003,  rate: 0.948]
+[PARDISO/ML]>> [GMRES step  64,  rel.res.: 1.228e-003,  rate: 0.956]
+[PARDISO/ML]>> [GMRES step  65,  rel.res.: 1.175e-003,  rate: 0.957]
+[PARDISO/ML]>> [GMRES step  66,  rel.res.: 1.125e-003,  rate: 0.957]
+[PARDISO/ML]>> [GMRES step  67,  rel.res.: 1.074e-003,  rate: 0.955]
+[PARDISO/ML]>> [GMRES step  68,  rel.res.: 1.008e-003,  rate: 0.939]
+[PARDISO/ML]>> [GMRES step  69,  rel.res.: 9.069e-004,  rate: 0.899]
+[PARDISO/ML]>> [GMRES step  70,  rel.res.: 7.720e-004,  rate: 0.851]
+[PARDISO/ML]>> [GMRES step  71,  rel.res.: 6.186e-004,  rate: 0.801]
+[PARDISO/ML]>> [GMRES step  72,  rel.res.: 4.766e-004,  rate: 0.770]
+[PARDISO/ML]>> [GMRES step  73,  rel.res.: 3.415e-004,  rate: 0.717]
+[PARDISO/ML]>> [GMRES step  74,  rel.res.: 2.362e-004,  rate: 0.692]
+[PARDISO/ML]>> [GMRES step  75,  rel.res.: 1.744e-004,  rate: 0.738]
+[PARDISO/ML]>> [GMRES step  76,  rel.res.: 1.391e-004,  rate: 0.798]
+[PARDISO/ML]>> [GMRES step  77,  rel.res.: 1.127e-004,  rate: 0.810]
+[PARDISO/ML]>> [GMRES step  78,  rel.res.: 8.972e-005,  rate: 0.796]
+[PARDISO/ML]>> [GMRES step  79,  rel.res.: 7.416e-005,  rate: 0.827]
+[PARDISO/ML]>> [GMRES step  80,  rel.res.: 6.251e-005,  rate: 0.843]
+[PARDISO/ML]>> [GMRES step  81,  rel.res.: 5.287e-005,  rate: 0.846]
+[PARDISO/ML]>> [GMRES step  82,  rel.res.: 4.438e-005,  rate: 0.839]
+[PARDISO/ML]>> [GMRES step  83,  rel.res.: 3.641e-005,  rate: 0.820]
+[PARDISO/ML]>> [GMRES step  84,  rel.res.: 3.139e-005,  rate: 0.862]
+[PARDISO/ML]>> [GMRES step  85,  rel.res.: 2.795e-005,  rate: 0.890]
+[PARDISO/ML]>> [GMRES step  86,  rel.res.: 2.527e-005,  rate: 0.904]
+[PARDISO/ML]>> [GMRES step  87,  rel.res.: 2.315e-005,  rate: 0.916]
+[PARDISO/ML]>> [GMRES step  88,  rel.res.: 2.140e-005,  rate: 0.924]
+[PARDISO/ML]>> [GMRES step  89,  rel.res.: 1.978e-005,  rate: 0.924]
+[PARDISO/ML]>> [GMRES step  90,  rel.res.: 1.867e-005,  rate: 0.944]
+[PARDISO/ML]>> [GMRES step  91,  rel.res.: 1.776e-005,  rate: 0.952]
+[PARDISO/ML]>> [GMRES step  92,  rel.res.: 1.710e-005,  rate: 0.963]
+[PARDISO/ML]>> [GMRES step  93,  rel.res.: 1.655e-005,  rate: 0.968]
+[PARDISO/ML]>> [GMRES step  94,  rel.res.: 1.609e-005,  rate: 0.972]
+[PARDISO/ML]>> [GMRES step  95,  rel.res.: 1.560e-005,  rate: 0.970]
+[PARDISO/ML]>> [GMRES step  96,  rel.res.: 1.510e-005,  rate: 0.968]
+[PARDISO/ML]>> [GMRES step  97,  rel.res.: 1.465e-005,  rate: 0.970]
+[PARDISO/ML]>> [GMRES step  98,  rel.res.: 1.422e-005,  rate: 0.971]
+[PARDISO/ML]>> [GMRES step  99,  rel.res.: 1.383e-005,  rate: 0.972]
+[PARDISO/ML]>> [GMRES step 100,  rel.res.: 1.345e-005,  rate: 0.973]
+[PARDISO/ML]>> [GMRES step 101,  rel.res.: 1.333e-005,  rate: 0.991]
+[PARDISO/ML]>> [GMRES step 102,  rel.res.: 1.317e-005,  rate: 0.988]
+[PARDISO/ML]>> [GMRES step 103,  rel.res.: 1.303e-005,  rate: 0.989]
+[PARDISO/ML]>> [GMRES step 104,  rel.res.: 1.285e-005,  rate: 0.986]
+[PARDISO/ML]>> [GMRES step 105,  rel.res.: 1.265e-005,  rate: 0.985]
+[PARDISO/ML]>> [GMRES step 106,  rel.res.: 1.245e-005,  rate: 0.984]
+[PARDISO/ML]>> [GMRES step 107,  rel.res.: 1.223e-005,  rate: 0.983]
+[PARDISO/ML]>> [GMRES step 108,  rel.res.: 1.196e-005,  rate: 0.977]
+[PARDISO/ML]>> [GMRES step 109,  rel.res.: 1.171e-005,  rate: 0.979]
+[PARDISO/ML]>> [GMRES step 110,  rel.res.: 1.143e-005,  rate: 0.977]
+[PARDISO/ML]>> [GMRES step 111,  rel.res.: 1.121e-005,  rate: 0.981]
+[PARDISO/ML]>> [GMRES step 112,  rel.res.: 1.099e-005,  rate: 0.980]
+[PARDISO/ML]>> [GMRES step 113,  rel.res.: 1.079e-005,  rate: 0.982]
+[PARDISO/ML]>> [GMRES step 114,  rel.res.: 1.062e-005,  rate: 0.984]
+[PARDISO/ML]>> [GMRES step 115,  rel.res.: 1.044e-005,  rate: 0.984]
+[PARDISO/ML]>> [GMRES step 116,  rel.res.: 1.028e-005,  rate: 0.984]
+[PARDISO/ML]>> [GMRES step 117,  rel.res.: 1.004e-005,  rate: 0.977]
+[PARDISO/ML]>> [GMRES step 118,  rel.res.: 9.788e-006,  rate: 0.975]
+[PARDISO/ML]>> [GMRES step 119,  rel.res.: 9.472e-006,  rate: 0.968]
+[PARDISO/ML]>> [GMRES step 120,  rel.res.: 9.242e-006,  rate: 0.976]
+[PARDISO/ML]>> [GMRES step 121,  rel.res.: 9.055e-006,  rate: 0.980]
+[PARDISO/ML]>> [GMRES step 122,  rel.res.: 8.907e-006,  rate: 0.984]
+[PARDISO/ML]>> [GMRES step 123,  rel.res.: 8.778e-006,  rate: 0.986]
+[PARDISO/ML]>> [GMRES step 124,  rel.res.: 8.661e-006,  rate: 0.987]
+[PARDISO/ML]>> [GMRES step 125,  rel.res.: 8.541e-006,  rate: 0.986]
+[PARDISO/ML]>> [GMRES step 126,  rel.res.: 8.450e-006,  rate: 0.989]
+[PARDISO/ML]>> [GMRES step 127,  rel.res.: 8.320e-006,  rate: 0.985]
+[PARDISO/ML]>> [GMRES step 128,  rel.res.: 8.210e-006,  rate: 0.987]
+[PARDISO/ML]>> [GMRES step 129,  rel.res.: 8.083e-006,  rate: 0.985]
+[PARDISO/ML]>> [GMRES step 130,  rel.res.: 7.974e-006,  rate: 0.987]
+[PARDISO/ML]>> [GMRES step 131,  rel.res.: 7.802e-006,  rate: 0.978]
+[PARDISO/ML]>> [GMRES step 132,  rel.res.: 7.583e-006,  rate: 0.972]
+[PARDISO/ML]>> [GMRES step 133,  rel.res.: 7.267e-006,  rate: 0.958]
+[PARDISO/ML]>> [GMRES step 134,  rel.res.: 6.845e-006,  rate: 0.942]
+[PARDISO/ML]>> [GMRES step 135,  rel.res.: 6.295e-006,  rate: 0.920]
+[PARDISO/ML]>> [GMRES step 136,  rel.res.: 5.686e-006,  rate: 0.903]
+[PARDISO/ML]>> [GMRES step 137,  rel.res.: 5.034e-006,  rate: 0.885]
+[PARDISO/ML]>> [GMRES step 138,  rel.res.: 4.491e-006,  rate: 0.892]
+[PARDISO/ML]>> [GMRES step 139,  rel.res.: 3.958e-006,  rate: 0.881]
+[PARDISO/ML]>> [GMRES step 140,  rel.res.: 3.440e-006,  rate: 0.869]
+[PARDISO/ML]>> [GMRES step 141,  rel.res.: 2.911e-006,  rate: 0.846]
+[PARDISO/ML]>> [GMRES step 142,  rel.res.: 2.397e-006,  rate: 0.823]
+[PARDISO/ML]>> [GMRES step 143,  rel.res.: 1.940e-006,  rate: 0.809]
+[PARDISO/ML]>> [GMRES step 144,  rel.res.: 1.600e-006,  rate: 0.825]
+[PARDISO/ML]>> [GMRES step 145,  rel.res.: 1.396e-006,  rate: 0.873]
+[PARDISO/ML]>> [GMRES step 146,  rel.res.: 1.257e-006,  rate: 0.900]
+[PARDISO/ML]>> [GMRES step 147,  rel.res.: 1.147e-006,  rate: 0.913]
+[PARDISO/ML]>> [GMRES step 148,  rel.res.: 1.056e-006,  rate: 0.920]
+[PARDISO/ML]>> [GMRES (100) took 9.282000 secs., 149 its., rel.res.: 9.786287e-007]
 [PARDISO/ML]>> 
  IterativePilsScalar: status 0.
 [PARDISO/ML]>> 
-[PARDISO/ML]>> Residual against original matrix:  1.215123e-007
+[PARDISO/ML]>> Residual against original matrix:  8.187793e-008
 [PARDISO/ML]>> 
