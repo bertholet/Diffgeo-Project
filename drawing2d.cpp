@@ -1,6 +1,9 @@
 #include "StdAfx.h"
 #include "drawing2d.h"
 
+
+
+
 namespace d2dCallBack{
 	drawing2d * actualDrawing = NULL;
 }
@@ -9,6 +12,7 @@ drawing2d::drawing2d( std::vector<tuple3f> & pos, std::vector<tuple3i> & facs,
 					 std::vector<std::vector<int>> & border,
 					 squareTexture * sqtex, int szx, int szy)
 {
+	this->actual_circle = NULL;
 	this->bordr = border;
 	tex = pos;
 	faces = facs;
@@ -55,11 +59,21 @@ void drawing2d::glTexDisplay()
 		glEnd();
 	}
 	for(unsigned int i =0; i < bordr.size(); i++){
-		glColor3f(0.f,i%2,(0.f+(i)%3)/2);
+		glColor3f(0.f,0.f+i%2,(0.f+(i)%3)/2);
 		glBegin(GL_LINE_LOOP);
 		for(unsigned j = 0; j < bordr[i].size(); j++){
 			glVertex2fv( (GLfloat *) & tex[bordr[i][j]]);
 		}
+		glEnd();
+	}
+
+	for(unsigned int i =0; i < circles.size(); i++){
+		glColor3f(1.f,0 ,1.f);
+		glBegin(GL_LINE_LOOP);
+		glVertex2f( circles[i].x-circles[i].r, circles[i].y-circles[i].r);
+		glVertex2f( circles[i].x-circles[i].r, circles[i].y+circles[i].r);
+		glVertex2f( circles[i].x+circles[i].r, circles[i].y+circles[i].r);
+		glVertex2f( circles[i].x+circles[i].r, circles[i].y-circles[i].r);
 		glEnd();
 	}
 	glEnable(GL_TEXTURE_2D);
@@ -102,9 +116,73 @@ void drawing2d::draw( int x, int y )
 		&(sqTex->checkboard[0]));
 }
 
+void drawing2d::moveCircleTo( int x, int y )
+{
+	float fx = ((0.f + x)/size_x );
+	float fy =  ((0.f + y)/size_y );
+	
+	fx = (fx <0 ? 0 : fx);
+	fy = (fy >1 ? 0 : 1-fy);
+
+	actual_circle->x= fx;
+	actual_circle->y = fy;
+}
+
+void drawing2d::newCircle( int x, int y )
+{
+	circles.push_back(circle());
+	actual_circle = &(circles.back());
+	moveCircleTo(x,y);
+	actual_circle->r = 0.1f;
+}
+
+void drawing2d::scaleCircle( float f )
+{
+	actual_circle->r+=f;
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////
+//callbacks
+//////////////////////////////////////////////////////////////////////////
+namespace d2dCallBack{
+	bool pressed = false;
+}
 
 void d2dCallBack::mouseCallback( int button, int state, int x, int y )
 {
 	actualDrawing->draw(x,y);
+
+}
+
+void d2dCallBack::mouseCallback_borderSelection( int button, int state, int x, int y )
+{
+	if(state == GLUT_DOWN){
+		pressed = true;
+	}
+	else{
+		pressed = false;
+	}
+}
+
+void d2dCallBack::mouseMotion( int x, int y )
+{
+		actualDrawing->moveCircleTo(x,y);
+}
+
+void d2dCallBack::processNormalKeys( unsigned char key, int x, int y )
+{
+	if(key == 'n'){
+		actualDrawing->newCircle(x,y);
+	}
+
+	else if(key == 'p'){
+		actualDrawing->scaleCircle(0.005f);
+	}
+	else if(key == 'l'){
+		actualDrawing->scaleCircle(-0.005f);
+	}
+
 
 }
