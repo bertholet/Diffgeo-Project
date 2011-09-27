@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "TutteDemo2.h"
 #include "glWindowHelper.h"
+#include "meshOperation.h"
 
 
 namespace tutDemo2{
@@ -14,7 +15,7 @@ namespace tutDemo2{
 			spacePressed = !spacePressed;
 
 		if(spacePressed){
-			d2dCallBack::processNormalKeys(key,x,y);
+			d2d2CallBack::processNormalKeys(key,x,y);
 		}
 		else if (key == 'd')
 			actualDemo->bunny->rotX(0.05f);
@@ -46,7 +47,7 @@ namespace tutDemo2{
 	}
 
 	void callback_sub(void){
-		actualDemo->loopTex();
+		actualDemo->loopBorder();
 	}
 
 }
@@ -65,18 +66,20 @@ void TutteDemo2::run( mesh &m,
 			vector<int>& /*nbr_i*/, vector<int>&/*fc_i*/, 
 			vector<int>& /*border*/))
 {
-	bunny = new mesh();
+	vector<vector<int>> border;
+	meshOperation::getBorder(m,border);
+	
 	tex = new squareTexture();
+	cmap = new borderMarkupMap(border);
+	display(m,border);
 
-	display(*bunny);
-
-	delete bunny, tex;
+	delete tex, cmap;
 }
 
 mesh * TutteDemo2::bunny = NULL;
-drawing2d * TutteDemo2::texMesh = NULL;
+drawing2d2 * TutteDemo2::texMesh = NULL;
 
-void TutteDemo2::display( mesh &m ) 
+void TutteDemo2::display( mesh &m,vector<vector<int>> & border ) 
 {
 	this->bunny = &m;
 	int window1 = glWindowHelper::glWindow(450,450, tutDemo2::callback, tutDemo2::processNormalKeys);
@@ -101,15 +104,12 @@ void TutteDemo2::display( mesh &m )
 	//////////////////////////////////////////////////////////////////////////
 	int subwindow1 = glutCreateSubWindow(window1,10,10,200,200);
 
-	vector<vector<int>> border;
-//	meshOperation::getBorder(m,border);
-
-	this->texMesh = new drawing2d(m.getTexCoords(),m.getFaces(),border, tex,190,190);
+	this->texMesh = new drawing2d2(m,*cmap,border, tex,190,190);
 	this->texMesh->newCircle(0,0);
 	glutDisplayFunc(tutDemo2::callback_sub);
-	glutMouseFunc(d2dCallBack::mouseCallback_borderSelection);
-	glutMotionFunc(d2dCallBack::mouseMotion);
-	glutKeyboardFunc(d2dCallBack::processNormalKeys);
+	glutMouseFunc(d2d2CallBack::mouseCallback_borderSelection);
+	glutMotionFunc(d2d2CallBack::mouseMotion);
+	glutKeyboardFunc(d2d2CallBack::processNormalKeys);
 
 	this->texMesh->initGLParams(tex,tex_id);
 
@@ -117,19 +117,30 @@ void TutteDemo2::display( mesh &m )
 	delete this->texMesh;
 }
 
-void TutteDemo2::loopTex()
+
+void TutteDemo2::loopBorder()
+{
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	texMesh->glBorderDefDisplay();
+	glFlush();
+	glutPostRedisplay();
+}
+
+/*void TutteDemo2::loopTex()
 {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	texMesh->glTexDisplay();
 	glFlush();
 	glutPostRedisplay();
-}
+}*/
 
 void TutteDemo2::loop()
 {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	bunny->glTexDisplay();
-	//bunny.glDisplay();
+	//bunny->glTexDisplay();
+	glDisable(GL_TEXTURE_2D);
+	bunny->glDisplay((colorMap&)*cmap);
+	glEnable(GL_TEXTURE_2D);
 	glFlush();
 
 	//glEnable(GL_DEPTH_TEST);

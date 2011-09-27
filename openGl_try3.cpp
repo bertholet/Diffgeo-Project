@@ -161,12 +161,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	demo.run(*bunny);//*/
 /*	TutteDemo demo;
 	demo.run_multiBorder(*bunny, TutteWeights::cotan_weights_divAvor);
-//	demo.run(*bunny, TutteWeights::cotan_weights_divAvor, TutteWeights::angleApproxBorder);
+	demo.run(*bunny, TutteWeights::cotan_weights_divAvor, TutteWeights::angleApproxBorder);
 /*	squareTexture s = squareTexture();
 	textureDemo(s);//*/
 	TutteDemo2 demo;
-	demo.run(mesh(), NULL);
-	
+	demo.run(*bunny, NULL);
+//*/	
 
 	//GLWindow window = GLWindow(300,150);
 

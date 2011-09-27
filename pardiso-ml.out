@@ -26,7 +26,7 @@
 [PARDISO/ML]>> [GMRES step  15,  rel.res.: 7.632e-006,  rate: 0.336]
 [PARDISO/ML]>> [GMRES step  16,  rel.res.: 3.851e-006,  rate: 0.505]
 [PARDISO/ML]>> [GMRES step  17,  rel.res.: 1.994e-006,  rate: 0.518]
-[PARDISO/ML]>> [GMRES (100) took 0.036000 secs.,  18 its., rel.res.: 5.108921e-007]
+[PARDISO/ML]>> [GMRES (100) took 0.047000 secs.,  18 its., rel.res.: 5.108921e-007]
 [PARDISO/ML]>> 
  IterativePilsScalar: status 0.
 [PARDISO/ML]>> 

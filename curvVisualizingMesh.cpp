@@ -132,3 +132,16 @@ tuple3f borderColorMap::color( int vertexNr )
 	return col2;
 }
 
+
+tuple3f borderMarkupMap::color( int vertexNr )
+{
+	if(vertexNr < sz && border[vertexNr]==markedBorder){
+		return tuple3f(0.f,0.f,1.f);
+	}
+	return tuple3f(1.f,0.f,0.f);
+}
+
+std::string borderMarkupMap::additionalInfo( void )
+{
+	return "";
+}

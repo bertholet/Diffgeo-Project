@@ -186,7 +186,7 @@ void TutteDemo::display( mesh &m )
 	vector<vector<int>> border;
 	meshOperation::getBorder(m,border);
 	
-	this->texMesh = new drawing2d(m.getTexCoords(),m.getFaces(),border, tex,190,190);
+	this->texMesh = new drawing2d(m,border, tex,190,190);
 	glutDisplayFunc(tutDemo::callback_sub);
 	glutMouseFunc(d2dCallBack::mouseCallback);
 //	glutKeyboardFunc(tutDemo::processNormalKeys);

@@ -36,6 +36,49 @@ public:
 	string additionalInfo(void);
 };
 
+class borderMarkupMap:colorMap
+{
+private:
+	int *border;
+	int sz;
+public:
+	int markedBorder;
+	borderMarkupMap(vector<vector<int>> & border_){
+		sz = max_(border_)+1;
+		markedBorder = 0;
+
+		border = new int[sz];
+
+		for(int i = 0; i < sz; i++){
+			border[i] = -1; //border[i] = false;
+			for(int j = 0; j < (int) border_.size(); j++){
+				if( find(border_[j].begin() , border_[j].end(), i) !=border_[j].end()){
+					border[i] = j;
+					break;
+				} 
+			}
+		}
+	}
+
+	~borderMarkupMap(){
+		delete[] border;
+	}
+
+	int max_( vector<vector<int>> & border_ ){
+		int max = -1;
+		for(unsigned int i = 0 ; i < border_.size(); i++){
+			for(unsigned int j = 0 ; j < border_[i].size(); j++){
+				if(border_[i][j] > max){
+					max = border_[i][j];
+				}
+			}
+		}
+		return max;
+	}
+
+	tuple3f color(int vertexNr);
+	string additionalInfo(void);
+};
 
 class borderColorMap:colorMap
 {
