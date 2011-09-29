@@ -1,34 +1,28 @@
 [PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Checking consistency of matrix...
 [PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Dimension: 1432
-[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Nonzeros: 9768
-[PARDISO/ML]>> Inf norm of right hand side 9.999999e-001
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Nonzeros: 9376
+[PARDISO/ML]>> Inf norm of right hand side 9.589473e-001
 [PARDISO/ML]>> MaxItersNoImprovement is 25
 [PARDISO/ML]>> [GMRES (100) solving...]
 [PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/solver_gmres.c:     - Using residual reduction stopping criterion.
 [PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/solver_gmres.c:     - Max 25 iters w/out improvement.
-[PARDISO/ML]>> Norm of RHS:                2.851007e+000
-[PARDISO/ML]>> Preconditioned norm of RHS: 5.099306e+000
-[PARDISO/ML]>> Preconditioned residual:    5.099306e+000
-[PARDISO/ML]>> [GMRES step   1,  rel.res.: 3.136e-001,  rate: 0.314]
-[PARDISO/ML]>> [GMRES step   2,  rel.res.: 2.161e-001,  rate: 0.689]
-[PARDISO/ML]>> [GMRES step   3,  rel.res.: 1.559e-001,  rate: 0.721]
-[PARDISO/ML]>> [GMRES step   4,  rel.res.: 7.845e-002,  rate: 0.503]
-[PARDISO/ML]>> [GMRES step   5,  rel.res.: 3.364e-002,  rate: 0.429]
-[PARDISO/ML]>> [GMRES step   6,  rel.res.: 1.638e-002,  rate: 0.487]
-[PARDISO/ML]>> [GMRES step   7,  rel.res.: 8.301e-003,  rate: 0.507]
-[PARDISO/ML]>> [GMRES step   8,  rel.res.: 2.633e-003,  rate: 0.317]
-[PARDISO/ML]>> [GMRES step   9,  rel.res.: 1.003e-003,  rate: 0.381]
-[PARDISO/ML]>> [GMRES step  10,  rel.res.: 6.067e-004,  rate: 0.605]
-[PARDISO/ML]>> [GMRES step  11,  rel.res.: 4.776e-004,  rate: 0.787]
-[PARDISO/ML]>> [GMRES step  12,  rel.res.: 1.903e-004,  rate: 0.399]
-[PARDISO/ML]>> [GMRES step  13,  rel.res.: 6.610e-005,  rate: 0.347]
-[PARDISO/ML]>> [GMRES step  14,  rel.res.: 2.270e-005,  rate: 0.343]
-[PARDISO/ML]>> [GMRES step  15,  rel.res.: 7.632e-006,  rate: 0.336]
-[PARDISO/ML]>> [GMRES step  16,  rel.res.: 3.851e-006,  rate: 0.505]
-[PARDISO/ML]>> [GMRES step  17,  rel.res.: 1.994e-006,  rate: 0.518]
-[PARDISO/ML]>> [GMRES (100) took 0.047000 secs.,  18 its., rel.res.: 5.108921e-007]
+[PARDISO/ML]>> Norm of RHS:                4.741771e+000
+[PARDISO/ML]>> Preconditioned norm of RHS: 7.645107e+000
+[PARDISO/ML]>> Preconditioned residual:    7.645107e+000
+[PARDISO/ML]>> [GMRES step   1,  rel.res.: 3.992e-001,  rate: 0.399]
+[PARDISO/ML]>> [GMRES step   2,  rel.res.: 1.426e-001,  rate: 0.357]
+[PARDISO/ML]>> [GMRES step   3,  rel.res.: 2.802e-002,  rate: 0.197]
+[PARDISO/ML]>> [GMRES step   4,  rel.res.: 8.313e-003,  rate: 0.297]
+[PARDISO/ML]>> [GMRES step   5,  rel.res.: 2.702e-003,  rate: 0.325]
+[PARDISO/ML]>> [GMRES step   6,  rel.res.: 1.036e-003,  rate: 0.383]
+[PARDISO/ML]>> [GMRES step   7,  rel.res.: 1.972e-004,  rate: 0.190]
+[PARDISO/ML]>> [GMRES step   8,  rel.res.: 3.668e-005,  rate: 0.186]
+[PARDISO/ML]>> [GMRES step   9,  rel.res.: 1.255e-005,  rate: 0.342]
+[PARDISO/ML]>> [GMRES step  10,  rel.res.: 5.965e-006,  rate: 0.475]
+[PARDISO/ML]>> [GMRES step  11,  rel.res.: 1.127e-006,  rate: 0.189]
+[PARDISO/ML]>> [GMRES (100) took 0.025000 secs.,  12 its., rel.res.: 2.275632e-007]
 [PARDISO/ML]>> 
  IterativePilsScalar: status 0.
 [PARDISO/ML]>> 
-[PARDISO/ML]>> Residual against original matrix:  1.581036e-007
+[PARDISO/ML]>> Residual against original matrix:  6.516893e-008
 [PARDISO/ML]>> 

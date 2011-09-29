@@ -13,6 +13,7 @@ class drawing2d2
 	public:
 		float x,y;
 		float r;
+		int orientation;
 	};
 
 private: 
@@ -24,6 +25,7 @@ private:
 	int actual_circleIdx;
 	borderMarkupMap * cmap;
 	std::vector<std::vector<tuple3f>> borderPos;
+
 
 public:
 	drawing2d2( mesh &m, borderMarkupMap & cmap,
@@ -38,10 +40,12 @@ public:
 	void nextCircle();
 	void prevCircle();
 	void calcActualBorder();
+	void switchOrientation();
 
 	void initGLParams(squareTexture * textur, GLuint tex_id);
 	void glTexDisplay();
 	void glBorderDefDisplay();
+	void calcTexturePos();
 };
 
 

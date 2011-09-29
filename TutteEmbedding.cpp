@@ -138,7 +138,7 @@ void TutteEmbedding::calcTexturePos_multiBorder( mesh &m,
 	TutteWeights::angles_lambdas(angles,lambdas,border,outBorder,m);
 	setUp_multiBorder(mat,border,outerPos,outBorder,angles, lambdas, m,weights);
 
-	mat.saveMatrix("C:/Users/bertholet/Dropbox/matrix_multiBorder.m");
+//	mat.saveMatrix("C:/Users/bertholet/Dropbox/matrix_multiBorder.m");
 	
 	pardisoSolver s(pardisoSolver::MT_ANY, pardisoSolver::SOLVER_ITERATIVE,2);
 
@@ -153,9 +153,45 @@ void TutteEmbedding::calcTexturePos_multiBorder( mesh &m,
 	delete[] xy;
 }
 
+/************************************************************************/
+/* Calculate stuff for fixed border                                     */
+/************************************************************************/
+void TutteEmbedding::calcTexturePos_multiBorder( mesh &m, 
+												vector<vector<tuple3f>> & pos,
+												vector<vector<int>> & border,
+												double (*weights ) (int, int,
+												mesh &,
+												vector<int>& /*nbr_i*/,
+												vector<int>&/*fc_i*/,
+												vector<int>& /*border*/) )
+{
+
+	vector<double> b;
+	pardisoMatrix mat;
+	double * xy = new double[2*m.getVertices().size()];
+	for(int i = 0; i < 2*m.getVertices().size();i++){
+		xy[i] = 0.0;
+	}
+
+	setUp_multiBorder(mat,border,m,weights);
+
+//	mat.saveMatrix("C:/Users/bertholet/Dropbox/matrix_multiBorder2.m");
+
+	pardisoSolver s(pardisoSolver::MT_ANY, pardisoSolver::SOLVER_ITERATIVE,2);
+
+	s.checkMatrix(pardisoSolver::MT_ANY,mat);
+	s.setMatrix(mat,1);
+	setUpXY_fixBorder(b, border, pos, m.getVertices().size());
+
+	s.setPrintStatistics(true);
+	s.solve(xy,&(b[0]));
+
+	m.setTextures_perVertex(xy);
+	delete[] xy;
+}
 
 /************************************************************************/
-/* Set up Matrix                                                                     */
+/* Set up Matrix for a single border                                                                    */
 /************************************************************************/
 void TutteEmbedding::setUp( pardisoMatrix &mat, vector<int> &border, mesh & m, 
 						   double (*weights ) (int /*i*/, int /*j*/, mesh & , 
@@ -320,6 +356,30 @@ void TutteEmbedding::setUpXY_reflex( vector<double>& b, vector<int> & border, ve
 	}
 }
 
+
+
+void TutteEmbedding::setUpXY_fixBorder( vector<double>& b, vector<vector<int>> & border, vector<vector<tuple3f>> & pos, int sz )
+{
+	b.clear();
+	b.reserve(2*sz);
+	int borderInd, brdr;
+	
+	for(int i = 0; i < sz; i++){
+		brdr = meshOperation::borderComponent(i,border,borderInd);
+		b.push_back(0);
+		if(brdr >=0){
+			b[i]= pos[brdr][borderInd].x;
+		}
+	}
+	for(int i = 0; i < sz; i++){
+		brdr = meshOperation::borderComponent(i,border,borderInd);
+		b.push_back(0);
+		if(brdr >=0){
+			b[i+sz]= pos[brdr][borderInd].y;
+		}
+	}
+}
+
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -332,11 +392,9 @@ void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> 
 						   vector<int>& /*neighbors_i*/,vector<int>& /*neighbor_faces_i*/,
 						   vector<int>& /*border*/))
 {
-//	vector<vector<float>> angles, lambdas;
 	vector<vector<int>> & neighbors = m.getNeighbors();
 	vector<vector<int>> & neighbor_faces = m.getNeighborFaces();
 	vector<int> NULLBORDER;
-//vector<int> & NULLBORDER = border[outBorder];
 
 
 	vector<std::pair<int,int>> vertexIndices;
@@ -346,9 +404,6 @@ void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> 
 	double factor;
 	vector<int>::iterator j;
 	
-
-//	TutteWeights::angles_lambdas(angles,lambdas, border,m);
-		//set up indices some values might be zero. values are assumed to be only at (i,j) if i and j are neighbors
 
 	count = 1;
 	mat.ia.push_back(1);
@@ -399,22 +454,7 @@ void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> 
 			mat.a.push_back(1);
 		}
 		else{
-			//border -2 to border +2 iff it is a reflex angle
-			// else act as usually., i.e. as at border < -1
-/*			calculate(vertexIndices, border[myBorder], borderIndex);
-			for(int i = 0; i < 5; i++){
-				mat.ja.push_back(vertexIndices[i].first +1);
-				mat.a.push_back(TutteWeights::angleMat(borderIndex, 
-					(borderIndex + vertexIndices[i].second+bordersz)%bordersz , 
-					angles[myBorder], lambdas[myBorder]));
-			}
 
-			for(int i = 0; i < 5; i++){
-				mat.ja.push_back(vertexIndices[i].first+1 + nrVertices);
-				mat.a.push_back(TutteWeights::angleMat(borderIndex, 
-					(borderIndex + vertexIndices[i].second+bordersz)%bordersz  + bordersz, 
-					angles[myBorder], lambdas[myBorder]));
-			}*/
 			calcOrdered(vertexIndices,border[myBorder],borderIndex);
 			for(int k = 0; k < 3; k++){
 				mat.ja.push_back(vertexIndices[k].first +1);
@@ -428,8 +468,87 @@ void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> 
 					(borderIndex + vertexIndices[k].second+bordersz)%bordersz +bordersz, 
 					angles[myBorder], lambdas[myBorder]));
 			}
-		/*	mat.ja.push_back(i+1);
-			mat.a.push_back(1);*/
+
+		}
+		mat.ia.push_back(mat.ja.size() +1);
+	}
+
+
+	if(mat.ja.size()+1 != mat.ia.back()){ //last index + 1 
+		throw std::runtime_error("Assertion failed, matrix malformed");
+	}
+
+}
+
+/************************************************************************/
+/* Set up matrix for fixed precalculated border                         */
+/************************************************************************/
+void TutteEmbedding::setUp_multiBorder( pardisoMatrix &mat, vector<vector<int>> &border, 
+					mesh & m,
+					double (*weights ) (int /*i*/, int /*j*/, mesh & , 
+						   vector<int>& /*neighbors_i*/,vector<int>& /*neighbor_faces_i*/,
+						   vector<int>& /*border*/))
+{
+
+	vector<vector<int>> & neighbors = m.getNeighbors();
+	vector<vector<int>> & neighbor_faces = m.getNeighborFaces();
+	vector<int> NULLBORDER;
+
+	vector<std::pair<int,int>> vertexIndices;
+	int nrVertices = m.getVertices().size(), count;
+	int myBorder, borderIndex, bordersz, offset;
+	bool a_ii_added = false;
+	double factor;
+	vector<int>::iterator j;
+	
+
+//	TutteWeights::angles_lambdas(angles,lambdas, border,m);
+		//set up indices some values might be zero. values are assumed to be only at (i,j) if i and j are neighbors
+
+	count = 1;
+	mat.ia.push_back(1);
+
+	//////////////////////////////////////////////////////////////////////////
+	//x's
+	//////////////////////////////////////////////////////////////////////////
+
+	for(int i = 0; i < 2*nrVertices;i++){
+		vector<int> & nbrs_i = neighbors[i%nrVertices];
+		vector<int> & nbr_fc_i = (neighbor_faces[i%nrVertices]);
+		myBorder = meshOperation::borderComponent(i%nrVertices,border, borderIndex);
+		bordersz = (myBorder <0? 0: border[myBorder].size());
+		offset = (i<nrVertices?0:nrVertices);
+	
+		//not on boder or a reflex angle
+		if (myBorder < 0 ){
+			a_ii_added = false;
+			//calculate normation factor
+			factor = 0;
+			for(j = nbrs_i.begin(); j!=nbrs_i.end(); j++){
+				factor += weights(i%nrVertices,*j,m,nbrs_i,nbr_fc_i,NULLBORDER);
+			}
+
+			for(j = nbrs_i.begin(); j!=nbrs_i.end(); j++){
+				if(i< *j + offset &&! a_ii_added){
+					mat.ja.push_back(i+1);
+					a_ii_added = true;
+					mat.a.push_back(weights(i%nrVertices,i%nrVertices,m,nbrs_i,nbr_fc_i,NULLBORDER));
+				}
+				mat.ja.push_back((*j)+offset +1);
+				//note the following makes sense because the sum of vals = 0 means there is only a diagonal element..
+				mat.a.push_back((factor <0.0001? 0: weights(i%nrVertices,*j,m,nbrs_i,nbr_fc_i,NULLBORDER)/factor));
+
+			}
+
+			if(!a_ii_added){
+				mat.ja.push_back(i+1);
+				a_ii_added = true;
+				mat.a.push_back(weights(i%nrVertices,i%nrVertices,m,nbrs_i,nbr_fc_i,NULLBORDER));
+			}
+		}
+		else {
+			mat.ja.push_back(i+1);
+			mat.a.push_back(1);
 		}
 		mat.ia.push_back(mat.ja.size() +1);
 	}

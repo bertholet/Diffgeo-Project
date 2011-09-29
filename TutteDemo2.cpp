@@ -6,11 +6,17 @@
 
 namespace tutDemo2{
 	bool spacePressed =false;
+	bool showTex = false;
 	TutteDemo2 * actualDemo;
 	vector<int> windows;
 
 	void processNormalKeys(unsigned char key, int x, int y) {
 
+		if(key == 'y' ){
+			if(actualDemo->bunny->getTexCoords().size() >0){
+				showTex = !showTex;
+			}
+		}
 		if (key == ' ')
 			spacePressed = !spacePressed;
 
@@ -121,7 +127,12 @@ void TutteDemo2::display( mesh &m,vector<vector<int>> & border )
 void TutteDemo2::loopBorder()
 {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	texMesh->glBorderDefDisplay();
+	if(tutDemo2::showTex){
+		texMesh->glTexDisplay();
+	}
+	else{
+		texMesh->glBorderDefDisplay();
+	}
 	glFlush();
 	glutPostRedisplay();
 }
@@ -137,10 +148,14 @@ void TutteDemo2::loopBorder()
 void TutteDemo2::loop()
 {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	//bunny->glTexDisplay();
-	glDisable(GL_TEXTURE_2D);
-	bunny->glDisplay((colorMap&)*cmap);
-	glEnable(GL_TEXTURE_2D);
+	if(tutDemo2::showTex){
+		bunny->glTexDisplay();
+	}
+	else{
+		glDisable(GL_TEXTURE_2D);
+		bunny->glDisplay((colorMap&)*cmap);
+		glEnable(GL_TEXTURE_2D);
+	}
 	glFlush();
 
 	//glEnable(GL_DEPTH_TEST);

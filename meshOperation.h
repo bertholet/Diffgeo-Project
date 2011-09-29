@@ -231,6 +231,44 @@ public:
 		}
 	}
 
+	static void normalizeTexture(vector<tuple3f> &tex, float x,
+		float y, float r){
+			if(tex.size() == 0){
+				return;
+			}
+			float maxx= tex[0].x, minx = tex[0].x,
+				maxy= tex[0].y, miny = tex[0].y;
+
+			for(vector<tuple3f>::iterator it = tex.begin(); it != tex.end(); it++){
+				if(it->x > maxx){
+					maxx = it->x;
+				}
+				if(it->y > maxy){
+					maxy = it->y;
+				}
+				if(it->x < minx){
+					minx = it->x;
+				}
+				if(it->y < miny){
+					miny = it->y;
+				}
+			}
+
+			float scale = (maxx-minx>maxy-miny? maxx-minx:maxy-miny);
+			scale = 2*r/scale;
+			for(vector<tuple3f>::iterator it = tex.begin(); it != tex.end(); it++){
+				it->x = it->x-minx -(maxx-minx)/2;
+				it->y = it->y-miny -(maxy-miny)/2;
+				it->x *= scale;
+				it->y *=scale;
+				it->x += x;
+				it->y += y;
+			}
+
+	}
+
+	static void mirrorX( std::vector<tuple3f> & borderPos, float x );
+	
 	//////////////////////////////////////////////////////////////////////////
 	// Border, ordered by orientation.
 	//////////////////////////////////////////////////////////////////////////
@@ -588,4 +626,6 @@ private:
 			throw std::runtime_error("Assertion failed in replace_v_abc");
 		}
 	}
+
+
 };

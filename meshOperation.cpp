@@ -114,4 +114,11 @@ int meshOperation::getNext_bc( int center_index, int v, mesh& m )
 	return next;
 }
 
+void meshOperation::mirrorX( std::vector<tuple3f> & borderPos, float x )
+{
+	for(unsigned int i = 0; i < borderPos.size(); i++){
+		borderPos[i].x = 2*x-borderPos[i].x;
+	}
+}
+
 
