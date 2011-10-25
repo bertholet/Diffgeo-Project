@@ -30,7 +30,7 @@ squareTexture::squareTexture(void)
 				}
 			}
 			else{
-				if(j%side2 > side){
+				if(j%side2 >= side){
 					for(int k = 0; k < 4; k++){
 						checkboard[i*szy*4 + j*4+k] = 0.1f;
 

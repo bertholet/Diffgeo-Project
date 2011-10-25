@@ -1,28 +1,87 @@
 [PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Checking consistency of matrix...
-[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Dimension: 1432
-[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Nonzeros: 9376
-[PARDISO/ML]>> Inf norm of right hand side 9.589473e-001
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Dimension: 5066
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Nonzeros: 35114
+[PARDISO/ML]>> Setting up ILUC (diag-based dropping, 1.00e-002, 10.0, 1.0e-016) ...
+[PARDISO/ML]>> MPS_SR reordering ...
+[PARDISO/ML]>> MPS_SR reordering took 0.000000 secs.
+[PARDISO/ML]>> Permutation is the identical permutation!
+[PARDISO/ML]>> USING MPS scaling.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Scaling matrix ...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Scaling matrix took 0.000000 secs.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_utils.c: Permuting rows ...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_utils.c: Permuting rows took 0.016000 secs.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Checking MPS consistency of matrix...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Dimension: 5066
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Nonzeros: 35114
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_reorder_ext.c: METIS Nested Dissection reordering ...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_utils.c: Symmetrizing structure ...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_utils.c: sorting took 0.000000 secs.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_utils.c: Symmetrizing structure took 0.000000 secs.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_reorder_ext.c: Building adjacency structure ...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_reorder_ext.c: Building adjacency structure took 0.000000 secs.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_reorder_ext.c: Calling METIS (libpardiso, 0.0*afg) ...
+[PARDISO/ML]>> METIS reordering took 0.031000 secs.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_utils.c: Permuting matrix ...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat_utils.c: Permuting matrix took 0.000000 secs.
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/precon_iluc.c:  - Determine max_fill on avg. row length (max: 69).
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/ldu.c: Converting CSR -> LDU ...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/ldu.c: Conversion took 0.000000 secs.
+[PARDISO/ML]>> [ILUC finished.  L: 37669,  U: 37153,  mat: 35114  (227.51%).]
+[PARDISO/ML]>> ILUC took 0.078000 secs.
+[PARDISO/ML]>> 
+[PARDISO/ML]>> Max norm L:                  1.00e+000
+[PARDISO/ML]>> Max norm U:                  1.00e+000
+[PARDISO/ML]>> 
+[PARDISO/ML]>> Perturbed entries:                  0  (first: -1)
+[PARDISO/ML]>> 
+[PARDISO/ML]>> Number of dropped entries:          0 /    37669 (  0.00%)
+[PARDISO/ML]>> 
+[PARDISO/ML]>> Number of clipped entries:          0 /    37669 (  0.00%)
+[PARDISO/ML]>> Number of clipped rows:             0
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Checking consistency of matrix...
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Dimension: 5066
+[PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/smat.c: Nonzeros: 35114
+[PARDISO/ML]>> Inf norm of right hand side 1.000000e+000
 [PARDISO/ML]>> MaxItersNoImprovement is 25
 [PARDISO/ML]>> [GMRES (100) solving...]
 [PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/solver_gmres.c:     - Using residual reduction stopping criterion.
 [PARDISO/ML]>> 	C:/MinGW/msys/1.0/home/pardiso/pardiso/pardiso/src/PILS/corelib/solver_gmres.c:     - Max 25 iters w/out improvement.
-[PARDISO/ML]>> Norm of RHS:                4.741771e+000
-[PARDISO/ML]>> Preconditioned norm of RHS: 7.645107e+000
-[PARDISO/ML]>> Preconditioned residual:    7.645107e+000
-[PARDISO/ML]>> [GMRES step   1,  rel.res.: 3.992e-001,  rate: 0.399]
-[PARDISO/ML]>> [GMRES step   2,  rel.res.: 1.426e-001,  rate: 0.357]
-[PARDISO/ML]>> [GMRES step   3,  rel.res.: 2.802e-002,  rate: 0.197]
-[PARDISO/ML]>> [GMRES step   4,  rel.res.: 8.313e-003,  rate: 0.297]
-[PARDISO/ML]>> [GMRES step   5,  rel.res.: 2.702e-003,  rate: 0.325]
-[PARDISO/ML]>> [GMRES step   6,  rel.res.: 1.036e-003,  rate: 0.383]
-[PARDISO/ML]>> [GMRES step   7,  rel.res.: 1.972e-004,  rate: 0.190]
-[PARDISO/ML]>> [GMRES step   8,  rel.res.: 3.668e-005,  rate: 0.186]
-[PARDISO/ML]>> [GMRES step   9,  rel.res.: 1.255e-005,  rate: 0.342]
-[PARDISO/ML]>> [GMRES step  10,  rel.res.: 5.965e-006,  rate: 0.475]
-[PARDISO/ML]>> [GMRES step  11,  rel.res.: 1.127e-006,  rate: 0.189]
-[PARDISO/ML]>> [GMRES (100) took 0.025000 secs.,  12 its., rel.res.: 2.275632e-007]
+[PARDISO/ML]>> Norm of RHS:                3.438535e+000
+[PARDISO/ML]>> Preconditioned norm of RHS: 6.308644e+000
+[PARDISO/ML]>> Preconditioned residual:    6.308644e+000
+[PARDISO/ML]>> [GMRES step   1,  rel.res.: 2.886e-001,  rate: 0.289]
+[PARDISO/ML]>> [GMRES step   2,  rel.res.: 1.667e-001,  rate: 0.578]
+[PARDISO/ML]>> [GMRES step   3,  rel.res.: 1.157e-001,  rate: 0.694]
+[PARDISO/ML]>> [GMRES step   4,  rel.res.: 9.339e-002,  rate: 0.807]
+[PARDISO/ML]>> [GMRES step   5,  rel.res.: 8.044e-002,  rate: 0.861]
+[PARDISO/ML]>> [GMRES step   6,  rel.res.: 6.536e-002,  rate: 0.813]
+[PARDISO/ML]>> [GMRES step   7,  rel.res.: 5.931e-002,  rate: 0.907]
+[PARDISO/ML]>> [GMRES step   8,  rel.res.: 5.629e-002,  rate: 0.949]
+[PARDISO/ML]>> [GMRES step   9,  rel.res.: 4.458e-002,  rate: 0.792]
+[PARDISO/ML]>> [GMRES step  10,  rel.res.: 3.332e-002,  rate: 0.748]
+[PARDISO/ML]>> [GMRES step  11,  rel.res.: 2.117e-002,  rate: 0.635]
+[PARDISO/ML]>> [GMRES step  12,  rel.res.: 1.082e-002,  rate: 0.511]
+[PARDISO/ML]>> [GMRES step  13,  rel.res.: 4.526e-003,  rate: 0.418]
+[PARDISO/ML]>> [GMRES step  14,  rel.res.: 2.270e-003,  rate: 0.502]
+[PARDISO/ML]>> [GMRES step  15,  rel.res.: 1.358e-003,  rate: 0.598]
+[PARDISO/ML]>> [GMRES step  16,  rel.res.: 1.048e-003,  rate: 0.772]
+[PARDISO/ML]>> [GMRES step  17,  rel.res.: 9.028e-004,  rate: 0.861]
+[PARDISO/ML]>> [GMRES step  18,  rel.res.: 7.406e-004,  rate: 0.820]
+[PARDISO/ML]>> [GMRES step  19,  rel.res.: 6.836e-004,  rate: 0.923]
+[PARDISO/ML]>> [GMRES step  20,  rel.res.: 5.914e-004,  rate: 0.865]
+[PARDISO/ML]>> [GMRES step  21,  rel.res.: 5.131e-004,  rate: 0.868]
+[PARDISO/ML]>> [GMRES step  22,  rel.res.: 4.485e-004,  rate: 0.874]
+[PARDISO/ML]>> [GMRES step  23,  rel.res.: 2.874e-004,  rate: 0.641]
+[PARDISO/ML]>> [GMRES step  24,  rel.res.: 1.197e-004,  rate: 0.416]
+[PARDISO/ML]>> [GMRES step  25,  rel.res.: 5.399e-005,  rate: 0.451]
+[PARDISO/ML]>> [GMRES step  26,  rel.res.: 3.035e-005,  rate: 0.562]
+[PARDISO/ML]>> [GMRES step  27,  rel.res.: 1.573e-005,  rate: 0.518]
+[PARDISO/ML]>> [GMRES step  28,  rel.res.: 7.205e-006,  rate: 0.458]
+[PARDISO/ML]>> [GMRES step  29,  rel.res.: 2.751e-006,  rate: 0.382]
+[PARDISO/ML]>> [GMRES step  30,  rel.res.: 1.239e-006,  rate: 0.450]
+[PARDISO/ML]>> [GMRES (100) took 0.140000 secs.,  31 its., rel.res.: 5.147829e-007]
 [PARDISO/ML]>> 
  IterativePilsScalar: status 0.
 [PARDISO/ML]>> 
-[PARDISO/ML]>> Residual against original matrix:  6.516893e-008
+[PARDISO/ML]>> Residual against original matrix:  9.653980e-008
 [PARDISO/ML]>> 

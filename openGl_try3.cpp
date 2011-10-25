@@ -107,8 +107,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	//bunny = cube(2.f, 10);
 	//bunny= new mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/cow.obj", tuple3f(1.f,0.f,0.f), 2.f);
 //	bunny = new mesh("C:/Users/Petje/Documents/My Dropbox/workspace/RA/objfiles/dragon.obj", tuple3f(1.f,0.f,0.f), 2.f);
-//	bunny= new mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/dragon.obj", tuple3f(1.f,0.f,0.f), 2);
-	bunny = new ball(1,40,20);
+	bunny= new mesh("C:/Users/bertholet/Dropbox/workspace/RA/objfiles/bunny5k.obj", tuple3f(1.f,0.f,0.f), 2);
+	//bunny = new ball(1,100,50);
 	//	bunny = ball(1, 80,40);
 	//bunny = torus(2.f,1.f, 30, 60);
 	//bunny = simplestCube();
@@ -120,10 +120,10 @@ int _tmain(int argc, _TCHAR* argv[])
 //	meshOperation::getHalf(*bunny,*bunny, tuple3f(-1,0,0),-0.05f); //dragon.obj config
 
 	//meshOperation::getHalf(*bunny,*bunny, tuple3f(-0.25f,1,0), 0.1f); //dragon.obj config
-/*	meshOperation::getHalf(*bunny,*bunny, tuple3f(0,0.3,1), -0.35f); //nice ball with two holes
-	meshOperation::getHalf(*bunny,*bunny, tuple3f(0,-0.3f,-1), -0.35f);*/
-	meshOperation::getHalf(*bunny,*bunny, tuple3f(-1,0,0), -0.8f);
-	meshOperation::getHalf(*bunny,*bunny, tuple3f(1,0,0), -0.8f);//*/
+/*	meshOperation::getHalf(*bunny,*bunny, tuple3f(0,0,1), -0.85); //nice ball with two holes
+	meshOperation::getHalf(*bunny,*bunny, tuple3f(0,1,0), -0.85f);
+	meshOperation::getHalf(*bunny,*bunny, tuple3f(1,0,0), -0.85f);
+//	meshOperation::getHalf(*bunny,*bunny, tuple3f(1,0,0), -0.8f);//*/
 /*	meshOperation::getHalf(*bunny,*bunny, tuple3f(0,-1,0), -0.7f);
 	meshOperation::getHalf(*bunny,*bunny, tuple3f(0,1.1,0), -0.9f);
 	meshOperation::getHalf(*bunny,*bunny, tuple3f(1.1,0,0), -0.9f);
@@ -159,12 +159,12 @@ int _tmain(int argc, _TCHAR* argv[])
 
 /*	TextureDemo demo;
 	demo.run(*bunny);//*/
-/*	TutteDemo demo;
+	TutteDemo demo;
 	demo.run_multiBorder(*bunny, TutteWeights::cotan_weights_divAvor);
-//	demo.run(*bunny, TutteWeights::cotan_weights_divAvor, TutteWeights::angleApproxBorder);
+//	demo.run(*bunny, TutteWeights::cotan_weights_divAvor, TutteWeights::circleBorder);
 /*	squareTexture s = squareTexture();
 	textureDemo(s);//*/
-	TutteDemo2 demo;
+/*	TutteDemo2 demo;
 	demo.run(*bunny, NULL);
 //*/	
 
